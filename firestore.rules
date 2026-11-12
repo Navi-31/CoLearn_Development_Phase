@@ -1,0 +1,162 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /* ── Helper functions ─────────────────────────────────────── */
+
+    // Is the request authenticated?
+    function isAuth() {
+      return request.auth != null;
+    }
+
+    // Is the caller the owner of this resource?
+    function isOwner(uid) {
+      return isAuth() && request.auth.uid == uid;
+    }
+
+    // Is the caller a member of this suite? (Includes host/owner)
+    function isSuiteMember(suiteId) {
+      let suiteDoc = get(/databases/$(database)/documents/suites/$(suiteId));
+      return isAuth() && suiteDoc != null && (
+        ('memberUids' in suiteDoc.data && request.auth.uid in suiteDoc.data.memberUids) ||
+        ('ownerUid' in suiteDoc.data && request.auth.uid == suiteDoc.data.ownerUid)
+      );
+    }
+
+    // Is the caller the host (owner) of this suite?
+    function isSuiteHost(suiteId) {
+      let suiteDoc = get(/databases/$(database)/documents/suites/$(suiteId));
+      return isAuth() && suiteDoc != null && 'ownerUid' in suiteDoc.data && request.auth.uid == suiteDoc.data.ownerUid;
+    }
+
+    // Is the caller an admin of this suite?
+    function isSuiteAdmin(suiteId) {
+      let suiteDoc = get(/databases/$(database)/documents/suites/$(suiteId));
+      return isAuth() && suiteDoc != null && 'adminUids' in suiteDoc.data && request.auth.uid in suiteDoc.data.adminUids;
+    }
+
+    // Is the caller the host or an admin?
+    function isSuiteHostOrAdmin(suiteId) {
+      return isSuiteHost(suiteId) || isSuiteAdmin(suiteId);
+    }
+
+    // Is the caller one of the given participants?
+    function isParticipant(participants) {
+      return isAuth() && request.auth.uid in participants;
+    }
+
+    /* ── users/{userId} ───────────────────────────────────────── */
+    // Only the account owner can read or write their own profile.
+    match /users/{userId} {
+      allow read:   if isOwner(userId);
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId);
+      allow delete: if isOwner(userId);
+    }
+
+    /* ── suites/{suiteId} ─────────────────────────────────────── */
+    // Any authenticated user can read suite data (needed to join via invite/request).
+    // Only the host (ownerUid) can write/update/delete.
+    // Host ownership cannot be transferred or overwritten.
+    match /suites/{suiteId} {
+      allow read:   if isAuth();
+      allow create: if isAuth() && request.resource.data.ownerUid == request.auth.uid;
+      allow update: if isSuiteHost(suiteId)
+                    && request.resource.data.ownerUid == resource.data.ownerUid
+                    && request.resource.data.createdAt == resource.data.createdAt;
+      allow delete: if isSuiteHost(suiteId);
+
+      /* Suite file metadata ───────────────────────────────────── */
+      // Suite members can read file metadata; only backend Admin SDK writes files.
+      match /files/{fileId} {
+        allow read:   if isSuiteMember(suiteId);
+        allow write:  if false;
+      }
+
+      /* Suite chat messages ──────────────────────────────────── */
+      // Suite members can read messages; only members can create (with their own senderUid).
+      // No updates or hard-deletes allowed.
+      match /messages/{messageId} {
+        allow read:   if isSuiteMember(suiteId);
+        allow create: if isSuiteMember(suiteId)
+                      && request.resource.data.senderUid == request.auth.uid;
+        allow update: if false;
+        allow delete: if false;
+      }
+
+      /* Join requests subcollection ──────────────────────────── */
+      // Requesters can create and read their own requests.
+      // Host and Admins can read and update (approve/reject).
+      match /joinRequests/{requestId} {
+        allow read:   if isAuth() && (
+                        isSuiteHostOrAdmin(suiteId) ||
+                        resource.data.requesterUid == request.auth.uid
+                      );
+        allow create: if isAuth() && request.resource.data.requesterUid == request.auth.uid;
+        allow update: if isSuiteHostOrAdmin(suiteId);
+        allow delete: if isSuiteHost(suiteId);
+      }
+    }
+
+    /* ── privateChats/{convId} ────────────────────────────────── */
+    // Only the two participants can read/write the conversation metadata.
+    match /privateChats/{convId} {
+      allow read:   if isAuth() && isParticipant(resource.data.participants);
+      allow create: if isAuth() && isParticipant(request.resource.data.participants)
+                      && request.auth.uid in request.resource.data.participants;
+      allow update: if isAuth() && isParticipant(resource.data.participants);
+      allow delete: if false;
+
+      /* Private messages ─────────────────────────────────────── */
+      // Participants can read; only sender can create (with matching senderUid).
+      // Sender can update own messages (soft-delete via deleted=true flag).
+      // No hard-deletes.
+      match /messages/{messageId} {
+        allow read:   if isAuth() && request.auth.uid in get(/databases/$(database)/documents/privateChats/$(convId)).data.participants;
+        allow create: if isAuth()
+                      && request.auth.uid in get(/databases/$(database)/documents/privateChats/$(convId)).data.participants
+                      && request.resource.data.senderUid == request.auth.uid;
+        allow update: if isAuth()
+                      && ((resource.data.senderUid == request.auth.uid
+                           && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['deleted', 'read']))
+                          || (request.auth.uid in get(/databases/$(database)/documents/privateChats/$(convId)).data.participants
+                              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read'])));
+        allow delete: if false;
+      }
+    }
+
+    /* ── notifications/{userId}/items/{notifId} ───────────────── */
+    // Only the owner can read their notifications.
+    // Any authenticated user can create (to send notifications to others).
+    // Owner can update (mark read).
+    // Owner can delete their own notifications.
+    match /notifications/{userId}/items/{notifId} {
+      allow read:   if isOwner(userId);
+      allow create: if isAuth();
+      allow update: if isOwner(userId)
+                    && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read']);
+      allow delete: if isOwner(userId);
+    }
+
+    /* ── screenSharing/{suiteId} ──────────────────────────────── */
+    // Any authenticated user can read (to know who's presenting).
+    // Only the presenter (presenterUid) can write; or any suite member can clear it.
+    match /screenSharing/{suiteId} {
+      allow read:   if isAuth();
+      allow create: if isAuth() && request.resource.data.presenterUid == request.auth.uid;
+      allow update: if isAuth() && (
+                      resource.data.presenterUid == request.auth.uid ||
+                      isSuiteMember(suiteId)
+                    );
+      allow delete: if isAuth() && (
+                      resource.data.presenterUid == request.auth.uid ||
+                      isSuiteHost(suiteId)
+                    );
+    }
+
+    /* ── Deny everything else ─────────────────────────────────── */
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

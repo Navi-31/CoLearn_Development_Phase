@@ -1,0 +1,116 @@
+# ==========================
+# Dependencies
+# ==========================
+node_modules/
+**/node_modules/
+
+# ==========================
+# Environment Files
+# ==========================
+.env
+*.env
+*.env.local
+*.env.development
+*.env.production
+backend/.env
+frontend/.env
+
+# Keep example templates (safe to commit — no real values)
+!.env.example
+!backend/.env.example
+!backend/.env.production.example
+
+# ==========================
+# Firebase / Google Secrets
+# ==========================
+backend/config/serviceAccountKey.json
+backend/config/*.json
+firebase-adminsdk*.json
+*serviceAccountKey*.json
+!backend/config/serviceAccountKey.example.json
+!*.example.json
+
+# ==========================
+# Cryptographic Key Files
+# ==========================
+*.pem
+*.key
+*.crt
+*.p12
+*.jks
+*.pfx
+*.cer
+*.der
+*.keystore
+
+# ==========================
+# OAuth / Refresh Tokens
+# ==========================
+*token*.json
+*refresh_token*
+*oauth2callback*
+
+# ==========================
+# Backups and Local Dumps
+# ==========================
+backups/
+**/backups/
+*.bak
+*.backup
+*.dump
+*.sql
+*.sqlite
+*.sqlite3
+*.db
+
+# ==========================
+# Logs
+# ==========================
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+firestore-debug.log
+
+# ==========================
+# Build & Test Output
+# ==========================
+dist/
+build/
+coverage/
+.cache/
+test-results/
+
+# ==========================
+# IDE / Editor
+# ==========================
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
+.DS_Store
+Thumbs.db
+
+# ==========================
+# OS
+# ==========================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# ==========================
+# Temporary Files
+# ==========================
+*.tmp
+*.temp
+temp/
+tmp/

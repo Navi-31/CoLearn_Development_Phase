@@ -1,0 +1,39 @@
+{
+  "name": "colearn",
+  "version": "1.0.2",
+  "private": true,
+  "description": "CoLearn – Collaborative Learning Platform",
+  "scripts": {
+    "backend": "cd backend && npm run dev",
+    "install:backend": "cd backend && npm install",
+    "test": "node --test backend/tests/*.test.js && node test-firestore/test-browser-behavior.js"
+  },
+  "keywords": [
+    "collaboration",
+    "education",
+    "firebase",
+    "google-drive",
+    "webrtc",
+    "whiteboard",
+    "study",
+    "learning",
+    "real-time",
+    "open-source"
+  ],
+  "author": {
+    "name": "CoLearn Contributors",
+    "url": "https://github.com/Navi-31/CoLearn_Development_Phase/graphs/contributors"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Navi-31/CoLearn_Development_Phase.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Navi-31/CoLearn_Development_Phase/issues"
+  },
+  "homepage": "https://github.com/Navi-31/CoLearn_Development_Phase#readme",
+  "license": "MIT",
+  "dependencies": {
+    "jsdom": "^29.1.1"
+  }
+}

@@ -1,0 +1,1559 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>CoLearn | Collaborative Study Platform</title>
+    <meta name="description" content="CoLearn is a real-time collaborative study platform. Create or join suites, share documents, draw on a shared whiteboard, and chat with your study group." />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary": "#2563EB",
+                        "secondary": "#4F46E5",
+                        "accent": "#06B6D4",
+                        "background": "#F8FAFC",
+                        "surface": "#FFFFFF",
+                        "on-surface": "#1F2937",
+                        "on-surface-variant": "#6B7280",
+                        "outline": "#E5E7EB",
+                        "surface-container-low": "#F8FAFC",
+                        "surface-container": "#F1F5F9",
+                        "primary-container": "#DBEAFE",
+                        "on-primary-container": "#1E40AF"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.5rem",
+                        "lg": "0.75rem",
+                        "xl": "1.25rem",
+                        "2xl": "2rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "24px",
+                        "sm": "8px",
+                        "container-max": "1280px",
+                        "md": "16px",
+                        "lg": "24px",
+                        "xl": "32px",
+                        "2xl": "48px",
+                        "3xl": "64px",
+                        "4xl": "96px"
+                    },
+                    "fontFamily": {
+                        "sans": ["Inter", "sans-serif"]
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .reveal-on-scroll { opacity: 0; }
+        .reveal-on-scroll.animate-slide-up { animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(229, 231, 235, 0.5);
+        }
+        
+        .soft-gradient {
+            background: linear-gradient(135deg, #2563EB 0%, #4F46E5 100%);
+        }
+
+        .card-hover {
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .card-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.08);
+        }
+
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .accordion-item.active .accordion-content {
+            max-height: 300px;
+        }
+        .accordion-item.active .chevron {
+            transform: rotate(180deg);
+        }
+
+        .mesh-gradient-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            overflow: hidden;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .mesh-ball {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.15;
+        }
+
+        .nav-link.active {
+            color: #2563EB;
+        }
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: #2563EB;
+            border-radius: 2px;
+        }
+    </style>
+
+  <!-- Brand stylesheet -->
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/phase3.css">
+</head>
+
+<body class="selection:bg-primary/20">
+
+<!-- ═══════════════════════════════════════════════════════════════
+     VIEW 0 – LANDING PAGE
+     ═══════════════════════════════════════════════════════════════ -->
+<div id="view-landing" class="view active bg-background text-on-surface font-sans selection:bg-primary/20 overflow-x-hidden">
+<!-- TopNavBar -->
+<header class="fixed top-0 w-full z-50 glass-nav transition-all duration-300" id="main-header">
+    <nav class="flex justify-between items-center max-w-container-max mx-auto px-lg h-20">
+        <div class="flex items-center gap-2 cursor-pointer" onclick="navigate('view-landing')">
+            <div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/20">
+                <span class="material-symbols-outlined text-white text-2xl" style="font-variation-settings: 'FILL' 1;">hub</span>
+            </div>
+            <span class="text-2xl font-extrabold tracking-tight text-on-surface">Co<span class="text-primary">Learn</span></span>
+        </div>
+        <ul class="hidden md:flex gap-xl items-center">
+            <li><a class="nav-link relative font-medium text-on-surface-variant hover:text-primary transition-colors active" href="#">Home</a></li>
+            <li><a class="nav-link relative font-medium text-on-surface-variant hover:text-primary transition-colors" href="#features">Features</a></li>
+            <li><a class="nav-link relative font-medium text-on-surface-variant hover:text-primary transition-colors" href="#why-colearn">How it Works</a></li>
+            <li><a class="nav-link relative font-medium text-on-surface-variant hover:text-primary transition-colors" href="#faq">FAQ</a></li>
+        </ul>
+        <div class="flex items-center gap-md">
+            <a class="px-lg py-sm text-on-surface-variant font-semibold hover:text-primary transition-colors" href="/login" onclick="event.preventDefault(); navigate('view-login');">Sign In</a>
+            <a class="px-xl py-sm soft-gradient text-white rounded-lg font-semibold shadow-md hover:shadow-lg active:scale-95 transition-all" href="/login" onclick="event.preventDefault(); navigate('view-login');">Get Started</a>
+        </div>
+    </nav>
+</header>
+
+<!-- Hero Section -->
+<section class="relative min-h-screen pt-32 pb-3xl flex items-center bg-white" id="home">
+    <div class="mesh-gradient-bg">
+        <div class="mesh-ball w-[600px] h-[600px] bg-primary -top-48 -left-24"></div>
+        <div class="mesh-ball w-[400px] h-[400px] bg-accent -bottom-24 right-0"></div>
+    </div>
+    <div class="max-w-container-max mx-auto px-lg grid lg:grid-cols-2 gap-2xl items-center relative z-10">
+        <div class="space-y-xl reveal-on-scroll">
+            <div class="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 text-primary rounded-full border border-primary/20">
+                <span class="material-symbols-outlined text-sm">verified</span>
+                <span class="text-xs font-bold uppercase tracking-wider">New Semester Edition</span>
+            </div>
+            <h1 class="text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.1]">
+                Study Together. <br/><span class="text-primary">Learn Better.</span>
+            </h1>
+            <p class="text-lg md:text-xl text-on-surface-variant max-w-xl leading-relaxed">
+                CoLearn is the all-in-one collaborative workspace for students. Real-time chat, shared whiteboards, and document sync built for the modern academic workflow.
+            </p>
+            <div class="flex flex-wrap gap-md pt-4">
+                <a href="/login" onclick="event.preventDefault(); navigate('view-login');" class="px-8 py-4 soft-gradient text-white rounded-xl font-bold shadow-xl hover:shadow-primary/25 hover:-translate-y-1 transition-all flex items-center gap-2">
+                    Start Studying Free <span class="material-symbols-outlined">arrow_forward</span>
+                </a>
+                <a href="#why-colearn" class="px-8 py-4 bg-white border border-outline text-on-surface rounded-xl font-bold hover:bg-surface-container transition-all hover:-translate-y-1 inline-flex items-center justify-center">
+                    See How It Works
+                </a>
+            </div>
+            <div class="flex items-center gap-4 pt-6">
+                <div class="flex -space-x-3">
+                    <img alt="User" class="w-10 h-10 rounded-full border-2 border-white object-cover shadow-sm" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCBU-tCuKhxGAl3rpuxknXdHFl3H7UsO1jJQpBw3e5jLza_l15SX_Q2R91DQtLcnJF8QLKfctUmRodGb04qxp62Z6fhFXA5PM4AHxd3R8kBWk7AjBd2zl1-XIU3GrDURNm0AbI0AYlFob8EuiGUJWJFnfCtpUgifeaRjR2kPxYIDo706uaEPXGBS3jkodeh5s5zWQPu7FT0M5Y7N1FQhR2rsetdhQdkdE0u1EqJE7x7M4p4RzM3hJ4s"/>
+                    <img alt="User" class="w-10 h-10 rounded-full border-2 border-white object-cover shadow-sm" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBPxXfZvp1PsJXN-oZ82j00NUBs4jJ4S0dd3trJHeF7826ujWrtLv8Y0HDaTmxQDtlls2HOaDk7Sjj4ZzmvfKonR7mhJpGN8RzG9ePITaE8ZD7BwEjAjvK-45vYfkSr3K03zLwsKLhfLjIG4F2DV5lqSMvbTgIoRJq0Qrk397a1B9fmu1L1fT9RgIzIvB9f--02J9efoz3vw0rYSbCwwlFAEOrVXiiPj8ICI8Z1myJemy3GUYbCY_zd"/>
+                    <img alt="User" class="w-10 h-10 rounded-full border-2 border-white object-cover shadow-sm" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAS5udfA4X8J3S56O0Plg3Ocl-GfGy-X-TfIgL_OFP7F0Oi9be7jrZRneCn4rjX7xJ_jhwS1jUJfC5pNs9iuMhMpg_uN-ZCnRKkuM0_gSMyYmofOScRGwJIJZ6RNgxwYfBfmv-gHMPU1f8ECx1jc6DAetE5SfjhbQNfTSnb3IreVou7flJoOgndmx55-NPaOvSRux7QU5kErL4PjOvG0c55I4sydEiYrrB0xpVJedp_5nC29JHpIeTY"/>
+                </div>
+                <p class="text-sm text-on-surface-variant">Trusted by <span class="font-bold text-on-surface">12,000+</span> students worldwide</p>
+            </div>
+        </div>
+        <div class="relative hidden lg:block reveal-on-scroll">
+            <div class="p-4 bg-white/50 backdrop-blur-sm rounded-2xl border border-white/50 shadow-2xl relative z-10">
+                <img alt="CoLearn Platform" class="w-full rounded-xl shadow-lg border border-outline" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAvRuXxBi4lxg3xA8USXjW7WtMbpGZkbtcbToKP5Sz6Vzzd8i-PVJB4XcPUqQ1JqN1mglYhSQIsc2m6c6b4MGC6VShtJ7d8x4kDpRhck6xlHGRAISwYtP4YkjjU5jVUrSwaoh-DXF_1YxHbsMHgZhVyCTlboxSQQ2QE7B2ftN04mfZoGyLGUi64W-2WdIK9PI78lK6jQBK6BEDIGlRtivJN4RpHUCidykPHYgUyccJr85NWMcktu__e"/>
+            </div>
+            <div class="absolute -top-6 -right-6 p-4 bg-white rounded-xl shadow-xl border border-outline flex items-center gap-3 z-20">
+                <div class="w-8 h-8 bg-accent/20 text-accent rounded-lg flex items-center justify-center">
+                    <span class="material-symbols-outlined text-sm">draw</span>
+                </div>
+                <div class="text-xs">
+                    <p class="font-bold">Live Whiteboard</p>
+                    <p class="text-on-surface-variant">Active now</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Statistics Section -->
+<section class="relative z-20 -mt-12">
+    <div class="max-w-container-max mx-auto px-lg">
+        <div class="bg-white p-12 rounded-2xl shadow-xl border border-outline grid grid-cols-2 md:grid-cols-4 gap-xl">
+            <div class="text-center stat-card reveal-on-scroll">
+                <div class="text-4xl md:text-5xl font-extrabold text-primary stat-number" data-count="15000">0</div>
+                <div class="text-sm font-semibold text-on-surface-variant mt-2">Active Students</div>
+            </div>
+            <div class="text-center stat-card reveal-on-scroll">
+                <div class="text-4xl md:text-5xl font-extrabold text-primary stat-number" data-count="8500">0</div>
+                <div class="text-sm font-semibold text-on-surface-variant mt-2">Study Sessions</div>
+            </div>
+            <div class="text-center stat-card reveal-on-scroll">
+                <div class="text-4xl md:text-5xl font-extrabold text-primary stat-number" data-count="1200">0</div>
+                <div class="text-sm font-semibold text-on-surface-variant mt-2">Study Suites</div>
+            </div>
+            <div class="text-center stat-card reveal-on-scroll">
+                <div class="text-4xl md:text-5xl font-extrabold text-primary stat-number" data-count="99">0</div>
+                <div class="text-sm font-semibold text-on-surface-variant mt-2">Uptime %</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-4xl bg-surface-container-low" id="features">
+    <div class="max-w-container-max mx-auto px-lg">
+        <div class="text-center mb-3xl reveal-on-scroll">
+            <h2 class="text-4xl font-extrabold tracking-tight mb-4">Everything You Need to Ace Your Exams</h2>
+            <p class="text-lg text-on-surface-variant max-w-2xl mx-auto">Focused tools designed for collaboration, not just communication.</p>
+        </div>
+        <div class="grid md:grid-cols-3 gap-xl">
+            <div class="p-8 bg-white border border-outline rounded-xl card-hover group reveal-on-scroll">
+                <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-6 group-hover:bg-primary transition-colors">
+                    <span class="material-symbols-outlined text-primary group-hover:text-white">lock_open</span>
+                </div>
+                <h3 class="text-xl font-bold mb-3">Secure OTP Access</h3>
+                <p class="text-on-surface-variant leading-relaxed">No complex passwords to remember. Log in instantly with secure one-time passwords via email.</p>
+            </div>
+            <div class="p-8 bg-white border border-outline rounded-xl card-hover group reveal-on-scroll">
+                <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-6 group-hover:bg-primary transition-colors">
+                    <span class="material-symbols-outlined text-primary group-hover:text-white">meeting_room</span>
+                </div>
+                <h3 class="text-xl font-bold mb-3">Private Study Suites</h3>
+                <p class="text-on-surface-variant leading-relaxed">Custom virtual rooms for your group. Organize by subject, project, or exam date.</p>
+            </div>
+            <div class="p-8 bg-white border border-outline rounded-xl card-hover group reveal-on-scroll">
+                <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-6 group-hover:bg-primary transition-colors">
+                    <span class="material-symbols-outlined text-primary group-hover:text-white">chat</span>
+                </div>
+                <h3 class="text-xl font-bold mb-3">Rich Academic Chat</h3>
+                <p class="text-on-surface-variant leading-relaxed">Support for LaTeX formulas, code snippets, and direct image pastes for complex explanations.</p>
+            </div>
+            <div class="p-8 bg-white border border-outline rounded-xl card-hover group reveal-on-scroll">
+                <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-6 group-hover:bg-primary transition-colors">
+                    <span class="material-symbols-outlined text-primary group-hover:text-white">draw</span>
+                </div>
+                <h3 class="text-xl font-bold mb-3">Infinite Whiteboards</h3>
+                <p class="text-on-surface-variant leading-relaxed">Draw, diagram, and brainstorm on a canvas that never ends. Fully synced in real-time.</p>
+            </div>
+            <div class="p-8 bg-white border border-outline rounded-xl card-hover group reveal-on-scroll">
+                <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-6 group-hover:bg-primary transition-colors">
+                    <span class="material-symbols-outlined text-primary group-hover:text-white">cloud_sync</span>
+                </div>
+                <h3 class="text-xl font-bold mb-3">Instant Doc Sharing</h3>
+                <p class="text-on-surface-variant leading-relaxed">Drag and drop PDFs, slides, and notes. Everyone in the suite gets instant access.</p>
+            </div>
+            <div class="p-8 bg-white border border-outline rounded-xl card-hover group reveal-on-scroll">
+                <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-6 group-hover:bg-primary transition-colors">
+                    <span class="material-symbols-outlined text-primary group-hover:text-white">lan</span>
+                </div>
+                <h3 class="text-xl font-bold mb-3">LAN-First Design</h3>
+                <p class="text-on-surface-variant leading-relaxed">Zero-lag collaboration when you're on the same network—perfect for libraries and dorms.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Why Section -->
+<section class="py-4xl relative overflow-hidden bg-white" id="why-colearn">
+    <div class="mesh-gradient-bg">
+        <div class="mesh-ball w-[500px] h-[500px] bg-secondary/10 -bottom-48 -left-24"></div>
+    </div>
+    <div class="max-w-container-max mx-auto px-lg relative z-10">
+        <div class="grid lg:grid-cols-2 gap-3xl items-center">
+            <div class="space-y-lg reveal-on-scroll">
+                <h2 class="text-4xl font-extrabold tracking-tight">Built for Students, <br/>By Students.</h2>
+                <p class="text-lg text-on-surface-variant">General-purpose tools like Zoom or Discord wasn't built for studying. We've optimized every pixel for learning efficiency.</p>
+                <div class="space-y-4 pt-4">
+                    <div class="flex items-start gap-4">
+                        <div class="w-6 h-6 rounded-full bg-green-500/10 text-green-600 flex items-center justify-center mt-1">
+                            <span class="material-symbols-outlined text-sm font-bold">check</span>
+                        </div>
+                        <div>
+                            <p class="font-bold">Integrated Workspace</p>
+                            <p class="text-sm text-on-surface-variant">No more jumping between 5 different tabs just to study one concept.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-4">
+                        <div class="w-6 h-6 rounded-full bg-green-500/10 text-green-600 flex items-center justify-center mt-1">
+                            <span class="material-symbols-outlined text-sm font-bold">check</span>
+                        </div>
+                        <div>
+                            <p class="font-bold">Privacy by Design</p>
+                            <p class="text-sm text-on-surface-variant">Your study data and sessions are private to your group. No tracking.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-4">
+                        <div class="w-6 h-6 rounded-full bg-green-500/10 text-green-600 flex items-center justify-center mt-1">
+                            <span class="material-symbols-outlined text-sm font-bold">check</span>
+                        </div>
+                        <div>
+                            <p class="font-bold">High Performance</p>
+                            <p class="text-sm text-on-surface-variant">Runs smoothly even on older laptops and tablet browsers.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="reveal-on-scroll">
+                <div class="bg-white p-6 rounded-2xl shadow-2xl border border-outline relative">
+                    <div class="flex items-center gap-2 mb-4 border-b border-outline pb-4">
+                        <div class="w-3 h-3 rounded-full bg-red-400"></div>
+                        <div class="w-3 h-3 rounded-full bg-yellow-400"></div>
+                        <div class="w-3 h-3 rounded-full bg-green-400"></div>
+                        <div class="ml-4 text-[10px] text-on-surface-variant font-mono bg-background px-3 py-1 rounded">colearn.app/suite/quantum-physics</div>
+                    </div>
+                    <div class="aspect-video bg-background rounded-lg overflow-hidden border border-outline">
+                        <img alt="CoLearn Workspace" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB-hTidWNcm5bd0vfvLvcveeFN2cJzqLYIozDKKyA-OeJvxuU6zlcV4YUAiIm2k5P8S7ZRFiSe-HhWkKn3RcJZSgXcLnR_evXscWPuDEIsLtVyu2xeZ8n-v_GvsQ3eEtIPVU5hkLYJx1Oa8vlsDtpH9Aft9hE_jXG4Rz8FCQMJJyMnptKjZsKwOGVD8MeieL5yOm_TFhC6y2bv2k3ZJIFY2SRo5c57scEKVTcJgpthInXyCGCkTc128"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ Section -->
+<section class="py-4xl bg-surface-container-low" id="faq">
+    <div class="max-w-3xl mx-auto px-lg">
+        <div class="text-center mb-2xl reveal-on-scroll">
+            <h2 class="text-3xl font-extrabold tracking-tight mb-4">Frequently Asked Questions</h2>
+            <p class="text-on-surface-variant">Everything you need to know about getting started.</p>
+        </div>
+        <div class="space-y-4">
+            <div class="accordion-item border border-outline bg-white rounded-xl p-5 cursor-pointer hover:border-primary/40 transition-all reveal-on-scroll" onclick="this.classList.toggle('active')">
+                <div class="flex justify-between items-center">
+                    <h4 class="font-bold">How does CoLearn work?</h4>
+                    <span class="material-symbols-outlined chevron transition-transform">expand_more</span>
+                </div>
+                <div class="accordion-content">
+                    <p class="pt-4 text-on-surface-variant text-sm">Simply create an account with your email, verify your login via OTP, and you can instantly create a 'Suite'. Invite friends with a link and start collaborating in real-time.</p>
+                </div>
+            </div>
+            <div class="accordion-item border border-outline bg-white rounded-xl p-5 cursor-pointer hover:border-primary/40 transition-all reveal-on-scroll" onclick="this.classList.toggle('active')">
+                <div class="flex justify-between items-center">
+                    <h4 class="font-bold">Can I study with friends in different locations?</h4>
+                    <span class="material-symbols-outlined chevron transition-transform">expand_more</span>
+                </div>
+                <div class="accordion-content">
+                    <p class="pt-4 text-on-surface-variant text-sm">Absolutely! CoLearn works over the internet. Our LAN mode is an optional optimization for when you are in the same building, but global sync is always active.</p>
+                </div>
+            </div>
+            <div class="accordion-item border border-outline bg-white rounded-xl p-5 cursor-pointer hover:border-primary/40 transition-all reveal-on-scroll" onclick="this.classList.toggle('active')">
+                <div class="flex justify-between items-center">
+                    <h4 class="font-bold">Is my data and study material secure?</h4>
+                    <span class="material-symbols-outlined chevron transition-transform">expand_more</span>
+                </div>
+                <div class="accordion-content">
+                    <p class="pt-4 text-on-surface-variant text-sm">Yes. We use industry-standard encryption for all data transfers. Your suites are private, and access is restricted to people you explicitly invite.</p>
+                </div>
+            </div>
+            <div class="accordion-item border border-outline bg-white rounded-xl p-5 cursor-pointer hover:border-primary/40 transition-all reveal-on-scroll" onclick="this.classList.toggle('active')">
+                <div class="flex justify-between items-center">
+                    <h4 class="font-bold">How many documents can I share?</h4>
+                    <span class="material-symbols-outlined chevron transition-transform">expand_more</span>
+                </div>
+                <div class="accordion-content">
+                    <p class="pt-4 text-on-surface-variant text-sm">Free student accounts include up to 500MB of cloud storage for PDFs and images per suite. You can always delete old files to make room for new ones.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Section -->
+<section class="py-4xl bg-white" id="contact">
+    <div class="max-w-container-max mx-auto px-lg text-center">
+        <div class="max-w-2xl mx-auto space-y-lg reveal-on-scroll">
+            <h2 class="text-3xl font-extrabold tracking-tight">Need Help or Have Feedback?</h2>
+            <p class="text-on-surface-variant text-lg">We're always looking to improve CoLearn for students. Reach out to our team directly.</p>
+            <div class="py-12 bg-primary/5 rounded-2xl border border-primary/10">
+                <p class="text-sm font-bold text-primary uppercase tracking-widest mb-2">Email Us At</p>
+                <a class="text-2xl md:text-4xl font-extrabold text-on-surface hover:text-primary transition-colors underline decoration-primary/30 underline-offset-8" href="mailto:colearn.inc@gmail.com">colearn.inc@gmail.com</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Final CTA Section -->
+<section class="py-3xl relative" id="get-started">
+    <div class="max-w-container-max mx-auto px-lg">
+        <div class="soft-gradient p-12 md:p-24 rounded-3xl text-center text-white relative overflow-hidden shadow-2xl shadow-primary/30 reveal-on-scroll">
+            <div class="absolute -top-24 -left-24 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+            <div class="absolute -bottom-24 -right-24 w-64 h-64 bg-accent/20 rounded-full blur-3xl"></div>
+            <div class="relative z-10 max-w-2xl mx-auto space-y-xl">
+                <h2 class="text-4xl md:text-5xl font-extrabold leading-tight">Ready to Transform Your Group Study?</h2>
+                <p class="text-lg md:text-xl text-white/80">Join thousands of students and start your collaborative journey today. No credit card required.</p>
+                <div class="pt-8 flex flex-wrap justify-center gap-md">
+                    <a href="/login" onclick="event.preventDefault(); navigate('view-login');" class="px-10 py-5 bg-white text-primary rounded-xl font-bold shadow-xl hover:bg-background transition-all active:scale-95 inline-flex items-center justify-center">Create Free Account</a>
+                    <a href="#contact" class="px-10 py-5 bg-white/10 border border-white/20 text-white rounded-xl font-bold hover:bg-white/20 transition-all inline-flex items-center justify-center">Schedule a Demo</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="bg-white py-2xl border-t border-outline">
+    <div class="max-w-container-max mx-auto px-lg">
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-2xl mb-2xl">
+            <div class="col-span-2 space-y-lg">
+                <div class="flex items-center gap-2 cursor-pointer" onclick="navigate('view-landing')">
+                    <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center shadow-md">
+                        <span class="material-symbols-outlined text-white text-lg" style="font-variation-settings: 'FILL' 1;">hub</span>
+                    </div>
+                    <span class="text-xl font-bold tracking-tight text-on-surface">CoLearn</span>
+                </div>
+                <p class="text-on-surface-variant max-w-xs leading-relaxed">The collaborative learning platform for modern students. Sync your brain, not just your files.</p>
+                <div class="flex gap-4">
+                    <a class="w-10 h-10 rounded-full bg-background flex items-center justify-center text-on-surface hover:bg-primary hover:text-white transition-all shadow-sm" href="#"><span class="material-symbols-outlined text-xl">share</span></a>
+                    <a class="w-10 h-10 rounded-full bg-background flex items-center justify-center text-on-surface hover:bg-primary hover:text-white transition-all shadow-sm" href="#"><span class="material-symbols-outlined text-xl">send</span></a>
+                </div>
+            </div>
+            <div>
+                <h5 class="font-bold mb-6">Platform</h5>
+                <ul class="space-y-4 text-on-surface-variant">
+                    <li><a class="hover:text-primary transition-colors" href="#features">Features</a></li>
+                    <li><a class="hover:text-primary transition-colors" href="#features">Whiteboard</a></li>
+                    <li><a class="hover:text-primary transition-colors" href="#features">Live Chat</a></li>
+                </ul>
+            </div>
+            <div>
+                <h5 class="font-bold mb-6">Resources</h5>
+                <ul class="space-y-4 text-on-surface-variant">
+                    <li><a class="hover:text-primary transition-colors" href="#faq">Help Center</a></li>
+                    <li><a class="hover:text-primary transition-colors" href="#why-colearn">Study Tips</a></li>
+                    <li><a class="hover:text-primary transition-colors" href="mailto:colearn.inc@gmail.com">Contact Support</a></li>
+                </ul>
+            </div>
+            <div>
+                <h5 class="font-bold mb-6">Legal</h5>
+                <ul class="space-y-4 text-on-surface-variant">
+                    <li><a class="hover:text-primary transition-colors" href="#">Privacy</a></li>
+                    <li><a class="hover:text-primary transition-colors" href="#">Terms</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="pt-12 border-t border-outline flex flex-col md:flex-row justify-between items-center gap-6 text-on-surface-variant text-sm">
+            <p>© 2026 CoLearn Inc. All rights reserved.</p>
+            <div class="flex gap-8">
+                <a class="hover:text-primary transition-colors" href="mailto:colearn.inc@gmail.com">colearn.inc@gmail.com</a>
+                <a class="hover:text-primary transition-colors" href="#">System Status</a>
+            </div>
+        </div>
+    </div>
+</footer>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     VIEW 1 – LOG IN
+     ═══════════════════════════════════════════════════════════════ -->
+<div id="view-login" class="view" style="background:var(--c-softblue);align-items:center;justify-content:center;padding:2rem 1rem;">
+  <div class="form-card">
+    <div class="brand-bar" style="border-radius:12px 12px 0 0;margin:-2.5rem -2rem 1.5rem;padding:1rem 1.5rem;">
+      <span style="cursor:pointer;" onclick="navigate('view-landing')">🔗 CoLearn</span>
+    </div>
+    <h2 style="font-size:1.5rem;font-weight:700;color:var(--c-charcoal);margin-bottom:1.4rem;text-align:center;">Log In</h2>
+
+    <div id="login-alert" class="hidden" style="margin-bottom:1rem;"></div>
+
+      <div class="form-group">
+        <div>
+          <label class="fs-label">Email Address</label>
+          <input id="login-email" type="email" class="fs-input" placeholder="you@example.com" autocomplete="email" />
+        </div>
+        <div>
+          <label class="fs-label">Password</label>
+          <div style="position:relative;display:flex;align-items:center;">
+            <input id="login-password" type="password" class="fs-input" placeholder="••••••••" autocomplete="current-password" style="padding-right:2.8rem;flex:1;" />
+            <button
+              id="login-pw-toggle"
+              type="button"
+              aria-label="Toggle password visibility"
+              onclick="toggleLoginPassword()"
+              tabindex="0"
+              style="position:absolute;right:0.65rem;background:none;border:none;cursor:pointer;padding:0.25rem;color:var(--c-mutedgray);display:flex;align-items:center;justify-content:center;border-radius:4px;transition:color 0.2s;"
+              onmouseover="this.style.color='var(--c-blue)'"
+              onmouseout="this.style.color='var(--c-mutedgray)'"
+            >
+              <!-- Eye icon (visible) -->
+              <svg id="login-eye-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+              <!-- Eye-off icon (hidden by default) -->
+              <svg id="login-eye-off-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:none;">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                <line x1="1" y1="1" x2="23" y2="23"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    <button class="btn-primary" style="width:100%;margin-top:1.4rem;" onclick="handleLogin()">Submit</button>
+
+    <div style="display:flex;justify-content:space-between;margin-top:1.1rem;font-size:0.87rem;">
+      <span style="color:var(--c-blue);font-weight:600;cursor:pointer;" onclick="navigate('view-signup')">New user</span>
+      <span style="color:var(--c-blue);font-weight:600;cursor:pointer;" onclick="navigate('view-forgot')">Forgot password</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     VIEW 2 – SIGN UP
+     ═══════════════════════════════════════════════════════════════ -->
+<div id="view-signup" class="view" style="background:var(--c-softblue);padding:2rem 1rem;">
+  <div style="width:100%;max-width:480px;margin:0 auto;">
+    <div class="brand-bar" style="border-radius:14px 14px 0 0;">
+      <span style="cursor:pointer;" onclick="navigate('view-landing')">🔗 CoLearn</span>
+    </div>
+    <div class="form-card" style="border-radius:0 0 18px 18px;border-top:none;max-width:100%;">
+      <h2 style="font-size:1.35rem;font-weight:700;color:var(--c-charcoal);margin-bottom:1.3rem;">Create Account</h2>
+      <div id="signup-alert" class="hidden" style="margin-bottom:1rem;"></div>
+
+      <div class="form-group">
+        <div>
+          <label class="fs-label">Name</label>
+          <input id="signup-name" type="text" class="fs-input" placeholder="Your full name" />
+        </div>
+        <div>
+          <label class="fs-label">Username</label>
+          <input id="signup-username" type="text" class="fs-input" placeholder="@username" />
+        </div>
+        <div>
+          <label class="fs-label">Email</label>
+          <input id="signup-email" type="email" class="fs-input" placeholder="you@example.com" />
+        </div>
+        <div>
+          <label class="fs-label">Mobile</label>
+          <input id="signup-mobile" type="tel" class="fs-input" placeholder="+91 9876543210" />
+        </div>
+        <div>
+          <label class="fs-label">Gender</label>
+          <select id="signup-gender" class="fs-input" style="cursor:pointer;appearance:auto;">
+            <option value="" disabled selected>Select gender</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="nonbinary">Non-binary</option>
+            <option value="prefer-not">Prefer not to say</option>
+          </select>
+        </div>
+        <!-- Password -->
+        <div>
+          <label class="fs-label">Password</label>
+          <input id="signup-password" type="password" class="fs-input" placeholder="Min 8 chars, uppercase, number, symbol" oninput="checkPWStrength()" autocomplete="new-password" />
+          <div class="pw-strength-track"><div class="pw-strength-bar" id="pw-strength-bar" style="width:0%;"></div></div>
+          <span class="pw-strength-label" id="pw-strength-label"></span>
+        </div>
+        <!-- Confirm Password -->
+        <div>
+          <label class="fs-label">Confirm Password</label>
+          <input id="signup-confirm-password" type="password" class="fs-input" placeholder="Re-enter password" autocomplete="new-password" />
+        </div>
+        <!-- OTP section (hidden until Continue is clicked) -->
+        <div id="signup-otp-section" style="display:none;">
+          <label class="fs-label">Email OTP Verification</label>
+          <div class="input-row" style="margin-bottom:0.5rem;">
+            <input id="signup-otp" type="text" class="fs-input" placeholder="Enter 6-digit OTP" maxlength="6" inputmode="numeric" style="flex:1;" />
+            <button class="btn-teal" id="btn-send-otp" style="flex-shrink:0;" onclick="sendOTP()">Resend OTP</button>
+          </div>
+          <!-- Countdown (hidden until OTP sent) -->
+          <div class="otp-countdown-wrap" id="otp-countdown-wrap" style="display:none;">
+            <span style="white-space:nowrap;">⏱ OTP valid for</span>
+            <div class="otp-progress-track"><div class="otp-progress-bar" id="otp-progress-bar"></div></div>
+            <span class="otp-timer-text" id="otp-timer-text">300s</span>
+          </div>
+          <button class="btn-navy" id="btn-signup-submit" style="margin-top:0.8rem;" onclick="handleSignup()">Create Account</button>
+        </div>
+      </div>
+
+      <!-- Continue button (visible until OTP is sent) -->
+      <div id="signup-continue-section">
+        <button class="btn-navy" id="btn-signup-continue" style="margin-top:1.5rem;" onclick="handleSignupContinue()">Continue →</button>
+      </div>
+      <p style="text-align:center;margin-top:1rem;font-size:0.87rem;">
+        <span style="color:var(--c-slate);">Already have an account? </span>
+        <span style="color:var(--c-blue);font-weight:600;cursor:pointer;" onclick="navigate('view-login')">Log in</span>
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     VIEW 3 – FORGOT PASSWORD
+     ═══════════════════════════════════════════════════════════════ -->
+<div id="view-forgot" class="view" style="background:var(--c-softblue);align-items:center;justify-content:center;padding:2rem 1rem;">
+  <div class="form-card">
+    <div class="brand-bar" style="border-radius:12px 12px 0 0;margin:-2.5rem -2rem 1.5rem;padding:1rem 1.5rem;">
+      <span style="cursor:pointer;" onclick="navigate('view-landing')">🔗 CoLearn</span>
+    </div>
+    <h2 style="font-size:1.35rem;font-weight:700;color:var(--c-charcoal);margin-bottom:0.4rem;">Forgot Password?</h2>
+    <p style="color:var(--c-slate);font-size:0.87rem;margin-bottom:1.4rem;">Enter your email to receive a reset OTP.</p>
+
+    <div id="forgot-alert" class="hidden" style="margin-bottom:1rem;"></div>
+
+    <!-- Step 1: Enter email -->
+    <div id="forgot-step1" class="form-group" style="display:block;">
+      <div>
+        <label class="fs-label">Linked Email Address</label>
+        <input id="forgot-email" type="email" class="fs-input" placeholder="you@example.com" />
+      </div>
+      <button id="btn-reset-request" class="btn-primary" onclick="sendResetOTP()">Request Reset Link</button>
+    </div>
+
+    <!-- Step 2: Verify OTP -->
+    <div id="forgot-step2" style="display:none;flex-direction:column;gap:0.9rem;margin-top:1rem;">
+      <p style="color:var(--c-slate);font-size:0.85rem;margin:0;">A 6-digit OTP was sent to your email. It expires in <strong>5 minutes</strong>.</p>
+      <div>
+        <label class="fs-label">OTP Code</label>
+        <input id="forgot-otp" type="text" class="fs-input" placeholder="Enter 6-digit OTP" maxlength="6" inputmode="numeric" />
+      </div>
+      <button id="btn-verify-otp" class="btn-primary" onclick="verifyResetStep()">Verify OTP</button>
+      <p style="text-align:center;font-size:0.83rem;margin-top:0.3rem;">
+        <span style="color:var(--c-blue);font-weight:600;cursor:pointer;" onclick="showForgotStep(1)">← Change email / Resend OTP</span>
+      </p>
+    </div>
+
+    <!-- Step 3: Set new password -->
+    <div id="forgot-step3" style="display:none;flex-direction:column;gap:0.9rem;margin-top:1rem;">
+      <p style="color:var(--c-slate);font-size:0.85rem;margin:0;">OTP verified ✅. Please choose a strong new password.</p>
+      <div>
+        <label class="fs-label">New Password</label>
+        <input id="forgot-newpw" type="password" class="fs-input" placeholder="Min 8 chars, uppercase, number, symbol" autocomplete="new-password" />
+      </div>
+      <div>
+        <label class="fs-label">Confirm New Password</label>
+        <input id="forgot-confirmpw" type="password" class="fs-input" placeholder="Re-enter new password" autocomplete="new-password" />
+      </div>
+      <button id="btn-reset-password" class="btn-primary" onclick="handleResetPassword()">Reset Password</button>
+    </div>
+
+    <p style="text-align:center;margin-top:1.2rem;font-size:0.87rem;">
+      <span style="color:var(--c-blue);font-weight:600;cursor:pointer;" onclick="navigate('view-login')">← Back to Login</span>
+    </p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     VIEW 4 – SUITE DASHBOARD
+     ═══════════════════════════════════════════════════════════════ -->
+<div id="view-dashboard" class="view" style="background:var(--c-lightgray);">
+  <div class="brand-bar">
+    <span>🔗 CoLearn</span>
+    <div style="display:flex;gap:0.4rem;align-items:center;">
+      <span class="nav-link" onclick="showAbout()">About us</span>
+      <span class="nav-link" onclick="showProfile()">Profile</span>
+    </div>
+  </div>
+
+  <div style="flex:1;padding:1.5rem;max-width:1100px;margin:0 auto;width:100%;">
+    <div style="margin-bottom:1.3rem;">
+      <h1 style="font-size:1.6rem;font-weight:800;color:var(--c-charcoal);">Welcome back! 👋</h1>
+      <p style="color:var(--c-slate);font-size:0.9rem;margin-top:4px;">Jump into an existing suite or create a new one.</p>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;" id="dashboard-grid">
+      <!-- LEFT: User's suites (loaded from Firestore) -->
+      <div class="action-block">
+        <div class="section-label">My Suites</div>
+        <!-- #suites-list is populated by loadUserSuites() in dashboard.js -->
+        <div id="suites-list" style="display:flex;flex-direction:column;gap:0.5rem;">
+          <!-- Populated dynamically after login. No mock data. -->
+          <div style="padding:2rem;text-align:center;color:var(--c-slate);font-size:0.88rem;">
+            Loading…
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Action blocks -->
+      <div style="display:flex;flex-direction:column;gap:1rem;">
+        <div class="action-block">
+          <div class="section-label">Create Suite</div>
+          <p style="color:var(--c-mutedgray);font-size:0.87rem;margin-bottom:0.9rem;">Set up a permanent collaborative workspace.</p>
+          <button class="btn-primary" style="width:100%;" onclick="openModal('modal-create-suite')">✨ Create New Suite</button>
+        </div>
+        <div class="action-block" style="border-color:#fff3cd;">
+          <div class="section-label" style="color:#856404;">Quick Suite</div>
+          <p style="color:#856404;font-size:0.82rem;margin-bottom:0.9rem;">⚡ Auto-deletes after this session</p>
+          <button class="btn-yellow" onclick="openModal('modal-quick-suite')">⚡ Create Quick Suite</button>
+        </div>
+        <div class="action-block">
+          <div class="section-label">Join Suite</div>
+          <p style="color:var(--c-mutedgray);font-size:0.87rem;margin-bottom:0.9rem;">Enter a suite code or invite link.</p>
+          <div class="input-row">
+            <input id="join-suite-code" type="text" class="fs-input" placeholder="Suite code or link" style="flex:1;" />
+            <button class="btn-primary" style="flex-shrink:0;" onclick="handleJoinSuite()">Enter</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     VIEW 6 – ACTIVE SUITE WORKSPACE
+     ═══════════════════════════════════════════════════════════════ -->
+<div id="view-workspace" class="view">
+  <!-- Fluent Light Top Bar -->
+  <div id="ws-topbar">
+    <div id="ws-topbar-logo">🔗 CoLearn</div>
+    <span id="ws-suite-name"></span>
+    <span id="ws-privacy-badge"></span>
+    <!-- Active call return pill -->
+    <div id="ws-active-call-pill" onclick="returnToCall()" title="Return to call">📹 Return to Call</div>
+    <!-- Active screen share indicator pill -->
+    <div id="ws-screen-share-pill" onclick="if(document.getElementById('screen-share-overlay') && !document.getElementById('screen-share-overlay').classList.contains('hidden')){ document.getElementById('screen-share-overlay').classList.add('hidden'); } else if(document.getElementById('screen-share-overlay')){ document.getElementById('screen-share-overlay').classList.remove('hidden'); }" title="Screen share active">
+      <span class="ss-indicator-dot"></span>
+      <span id="ws-ss-indicator-text">Screen sharing active</span>
+    </div>
+    <!-- Settings Icon Button -->
+    <button id="btn-suite-settings" onclick="openSuiteSettingsModal()" title="Suite Settings"
+      style="background:none;border:none;cursor:pointer;font-size:1.2rem;padding:0.35rem;border-radius:var(--fl-radius-xs);transition:background 0.15s;display:flex;align-items:center;justify-content:center;">
+      ⚙️
+    </button>
+
+    <!-- Notification Bell -->
+    <div style="position:relative;" id="notification-bell-wrap">
+      <button id="btn-notification-bell" onclick="toggleNotificationPanel()" title="Notifications"
+        style="background:none;border:none;cursor:pointer;font-size:1.2rem;padding:0.35rem;position:relative;border-radius:var(--fl-radius-xs);transition:background 0.15s;">
+        🔔
+        <span id="notification-count" style="display:none;position:absolute;top:-4px;right:-4px;background:var(--fl-red);color:#fff;border-radius:50%;width:16px;height:16px;font-size:0.6rem;font-weight:700;align-items:center;justify-content:center;min-width:16px;">0</span>
+      </button>
+      <!-- Notification Dropdown -->
+      <div id="notification-dropdown" class="notification-dropdown hidden">
+        <div style="padding:0.75rem 1rem;border-bottom:1px solid var(--fl-border);display:flex;align-items:center;justify-content:space-between;">
+          <span style="font-weight:700;font-size:0.88rem;color:var(--fl-text-hi);">🔔 Notifications</span>
+          <button onclick="clearAllNotifications()" style="background:none;border:none;font-size:0.75rem;color:var(--fl-accent);cursor:pointer;font-weight:600;">Clear all</button>
+        </div>
+        <div id="notification-list" style="max-height:320px;overflow-y:auto;">
+          <div style="padding:1.5rem;text-align:center;color:var(--fl-text-muted);font-size:0.85rem;">No notifications</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Body -->
+  <div class="workspace-body">
+
+    <!-- ── Main viewport ──────────────────────────────────────── -->
+    <div class="workspace-main" id="ws-main">
+
+      <!-- STATE A: Suite Home -->
+      <div id="ws-state-invite" style="display:block;">
+
+        <!-- Suite Home Header -->
+        <div class="fl-card" style="margin-bottom:1rem;">
+          <div class="fl-card-header">
+            <div style="display:flex;align-items:center;gap:0.5rem;">
+              <span style="font-size:1.1rem;">🏠</span>
+              <span>Suite Home</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:0.5rem;">
+              <!-- Invite Link copy -->
+              <div style="display:flex;align-items:center;gap:0.4rem;background:var(--fl-surface-2);border:1px solid var(--fl-border);border-radius:var(--fl-radius-sm);padding:0.25rem 0.6rem;">
+                <span id="invite-link-text" style="font-size:0.75rem;color:var(--fl-text-lo);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Loading invite link…</span>
+                <button onclick="copyInviteLink()" style="background:none;border:none;cursor:pointer;font-size:0.78rem;color:var(--fl-accent);font-weight:600;padding:0;white-space:nowrap;">📋 Copy</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Document File Grid (populated by file-grid.js) -->
+        <div class="fl-card" style="margin-bottom:1rem;">
+          <div class="fl-card-header">
+            <div style="display:flex;align-items:center;gap:0.5rem;">
+              <span>📂</span>
+              <span>Documents</span>
+              <span id="drive-status-badge-home" style="font-size:0.75rem;font-weight:600;display:flex;align-items:center;gap:4px;"></span>
+            </div>
+            <div style="display:flex;gap:0.5rem;">
+              <button class="fl-btn fl-btn-outline fl-btn-sm" id="btn-upload-document-home" onclick="handleDocumentUpload()">
+                ➕ Upload
+              </button>
+            </div>
+
+          </div>
+          <div class="fl-card-body" style="padding:0.75rem;">
+            <!-- Drive Connect Banner (shown by file-grid.js when Drive not connected on home) -->
+            <div id="drive-connect-banner-home" style="display:none;flex-direction:column;align-items:center;gap:0.6rem;background:var(--fl-yellow-bg);border:1.5px solid #fde68a;border-radius:var(--fl-radius-sm);padding:0.9rem 1rem;margin-bottom:0.75rem;">
+              <div style="font-weight:700;font-size:0.88rem;color:var(--fl-yellow);">🔗 Connect Google Drive to upload files</div>
+              <div style="font-size:0.78rem;color:#92400e;">Files are stored in your own Google Drive — private and secure.</div>
+              <button class="fl-btn fl-btn-primary" onclick="connectGoogleDrive()" style="font-size:0.8rem;">🔗 Connect Google Drive</button>
+            </div>
+            <!-- Categorized file grid — rendered by file-grid.js -->
+            <div id="ws-file-category-grid" class="fl-cat-grid"></div>
+          </div>
+        </div>
+
+        <!-- Hidden: legacy member4 info slot referenced by invite.js -->
+        <div id="ws-member4-info" style="display:none;"></div>
+      </div>
+
+      <!-- STATE B: Docs Viewer (Upload / Preview) -->
+      <div id="ws-state-docs" style="display:none;">
+
+        <!-- Mini video participant strip (hidden in doc-viewer mode; IDs preserved) -->
+        <div class="fl-card" id="doc-view-participants" style="display:none;margin-bottom:0.75rem;overflow:hidden;">
+          <div class="fl-card-header">
+            <div style="display:flex;align-items:center;gap:0.5rem;">
+              <span>👥</span><span>Participants</span>
+            </div>
+          </div>
+          <div style="padding:0.5rem 0.75rem;background:var(--fl-bg);">
+            <div class="video-grid">
+              <div class="video-slot"><div class="vid-avatar">A</div><div class="vid-label">Alex · Host</div></div>
+              <div class="video-slot"><div class="vid-avatar" style="background:linear-gradient(135deg,#17a2b8,#0f7a8c);">P</div><div class="vid-label">Priya</div></div>
+              <div class="video-slot"><div class="vid-avatar" style="background:linear-gradient(135deg,#28a745,#1e7e34);">M</div><div class="vid-label">Marco</div></div>
+              <div class="video-slot" id="vid-member4" style="display:none;"><div class="vid-avatar" style="background:linear-gradient(135deg,#ffc107,#d39e00);color:#212529;">S</div><div class="vid-label">Sam</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Document viewer -->
+        <div class="doc-viewer fl-card" id="doc-viewer-container" style="margin-bottom:0.75rem;">
+          <!-- Header: icon + filename + meta (updated dynamically) -->
+          <div id="doc-viewer-header" style="padding:1rem;text-align:center;width:100%;">
+            <div id="doc-type-icon" style="font-size:2.5rem;margin-bottom:0.5rem;">📂</div>
+            <div id="doc-file-name" style="font-size:0.95rem;font-weight:700;color:var(--fl-text-hi);">Select a document to view</div>
+            <div id="doc-file-meta" style="font-size:0.8rem;color:var(--fl-text-muted);margin-top:4px;"></div>
+          </div>
+
+          <!-- Placeholder (shown when no file is open) -->
+          <div id="doc-viewer-placeholder" class="doc-skeleton" style="width:100%;text-align:center;padding:1.5rem;border:1.5px dashed var(--fl-border);border-radius:var(--fl-radius-sm);margin:0 1rem 1rem;width:calc(100% - 2rem);">
+            <div style="font-size:1.8rem;margin-bottom:0.5rem;">☁️</div>
+            <div style="font-weight:600;color:var(--fl-text-hi);margin-bottom:0.3rem;">No document open</div>
+            <div style="font-size:0.82rem;color:var(--fl-text-muted);">Click the 👁️ button on any uploaded file to preview it here</div>
+          </div>
+
+          <!-- Page navigation (only for multi-page docs) -->
+          <div id="doc-page-nav" style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;justify-content:center;margin:0 1rem 1rem;display:none;">
+            <button class="fl-btn fl-btn-outline" onclick="changeDocPage(-1)">◀ Previous</button>
+            <span id="doc-page-indicator" style="font-size:0.87rem;color:var(--fl-text-lo);font-weight:600;">Page 1 of 5</span>
+            <button class="fl-btn fl-btn-outline" onclick="changeDocPage(1)">Next ▶</button>
+          </div>
+        </div>
+
+        <!-- Drive Connect Banner (shown when Drive not connected) -->
+        <div id="drive-connect-banner" style="display:none;flex-direction:column;align-items:center;gap:0.6rem;background:var(--fl-yellow-bg);border:1.5px solid #fde68a;border-radius:var(--fl-radius-md);padding:1rem 1.2rem;margin-bottom:0.75rem;">
+          <div style="font-size:1.3rem;">🔗</div>
+          <div style="font-weight:700;font-size:0.9rem;color:var(--fl-yellow);">Connect Google Drive to upload files</div>
+          <div style="font-size:0.8rem;color:#92400e;">Your files will be stored in your own Google Drive — private and secure.</div>
+          <button id="btn-connect-drive" class="fl-btn fl-btn-primary" onclick="connectGoogleDrive()" style="font-size:0.82rem;">🔗 Connect Google Drive</button>
+        </div>
+
+
+        <!-- Upload Document Section -->
+        <div class="fl-card" id="docs-card-container">
+          <div class="fl-card-header">
+            <div style="display:flex;align-items:center;gap:0.6rem;">
+              <div class="section-label" style="margin-bottom:0;">Documents</div>
+              <span id="drive-status-badge" style="font-size:0.75rem;font-weight:600;display:flex;align-items:center;gap:4px;"></span>
+              <span id="drive-connected-email" style="display:none;"></span>
+            </div>
+            <button class="btn-primary" id="btn-upload-document" onclick="handleDocumentUpload()" style="font-size:0.82rem;padding:0.4rem 0.9rem;">➕ Upload Document</button>
+          </div>
+          <!-- Pending + Drive Documents List -->
+          <div id="pending-docs-list" style="display:flex;flex-direction:column;gap:0.5rem;">
+            <!-- Populated dynamically by document-service.js -->
+            <div id="pending-docs-empty" style="text-align:center;padding:1.5rem;color:var(--c-slate);font-size:0.85rem;border:1.5px dashed var(--c-divider);border-radius:10px;">
+              <div style="font-size:1.8rem;margin-bottom:0.4rem;">📂</div>
+              <div style="font-weight:600;">No documents uploaded yet</div>
+              <div style="font-size:0.78rem;margin-top:0.3rem;">Click "Upload Document" to add files from your Google Drive</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STATE C: Whiteboard -->
+      <div id="ws-state-whiteboard" style="display:none;">
+        <div class="fl-card" style="margin-bottom:1.5rem;overflow:hidden;border:1px solid var(--fl-border);">
+          <div class="fl-card-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.6rem;padding:0.75rem 1rem;box-sizing:border-box;min-height:50px;">
+            <div style="display:flex;align-items:center;gap:0.5rem;min-width:0;">
+              <span style="font-size:1.1rem;flex-shrink:0;">🎨</span>
+              <span style="font-weight:700;font-size:0.95rem;color:var(--fl-text-hi);white-space:nowrap;">Shared Whiteboard</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:0.6rem;flex-shrink:0;flex-wrap:nowrap;">
+              <span id="wb-live-status" style="font-size:0.78rem;color:var(--fl-green);font-weight:600;display:flex;align-items:center;gap:4px;white-space:nowrap;flex-shrink:0;">
+                <span style="width:7px;height:7px;background:var(--fl-green);border-radius:50%;display:inline-block;"></span> Live
+              </span>
+              <button class="fl-btn fl-btn-outline fl-btn-sm" onclick="wbAction('exit')" title="Exit Whiteboard" style="font-size:0.78rem;padding:0.35rem 0.85rem;border-radius:6px;white-space:nowrap;flex-shrink:0;cursor:pointer;font-weight:600;background:var(--fl-surface-2);color:var(--fl-text-hi);border:1px solid var(--fl-border);">← Exit Whiteboard</button>
+            </div>
+          </div>
+          <!-- Toolbar -->
+          <div class="wb-toolbar">
+            <button class="wb-btn active" id="wb-btn-pen"    onclick="setWBTool('pen')">✏️ Pen</button>
+            <button class="wb-btn"        id="wb-btn-eraser" onclick="setWBTool('eraser')">🧹 Eraser</button>
+            <button class="wb-btn"        id="wb-btn-text"   onclick="setWBTool('text')" title="Add or edit text on whiteboard">🔤 Text</button>
+            <button class="wb-btn"        id="wb-btn-flowchart" onclick="setWBTool('flowchart')" title="Flowchart diagram mode (Drawflow)">📊 Flowchart</button>
+            <button class="wb-btn"        id="wb-btn-smart"  onclick="toggleWBSmartRecognition()" title="Toggle Smart Handwriting Recognition (Converts handwriting to clean text/math)">✨ Smart Write</button>
+            <div class="wb-divider"></div>
+            <input type="color" class="wb-color-picker" id="wb-color" value="#212529" title="Color" onchange="updateWBColor(this.value)" />
+            <input type="number" class="wb-size-input" id="wb-size" value="4" min="1" max="40" title="Size" onchange="updateWBSize(this.value)" />
+            <div class="wb-divider"></div>
+            <button class="wb-btn" onclick="wbAction('undo')" title="Undo (Ctrl+Z)">↩️ Undo</button>
+            <button class="wb-btn" onclick="wbAction('redo')" title="Redo (Ctrl+Y)">↪️ Redo</button>
+            <button class="wb-btn" onclick="wbAction('clear')" title="Clear Current Page">🗑️ Clear</button>
+            <div class="wb-divider"></div>
+            <button class="wb-btn" onclick="wbAction('new')" title="Add New Page">➕ Add Page</button>
+            <button class="wb-btn" id="wb-btn-prev" onclick="wbAction('prev')" title="Previous Page">◀ Prev</button>
+            <span id="wb-page-label" style="color:var(--fl-text-lo);font-size:0.78rem;font-weight:700;min-width:75px;text-align:center;">Page 1</span>
+            <button class="wb-btn" id="wb-btn-next" onclick="wbAction('next')" title="Next Page">Next ▶</button>
+            <button class="wb-btn" onclick="wbAction('delete_page')" title="Delete Current Page">🗑️ Del Page</button>
+            <div class="wb-divider"></div>
+            <button class="wb-btn" onclick="wbAction('save')" title="Save current page as PNG">💾 Save PNG</button>
+            <button class="wb-btn" onclick="wbAction('zip')" title="Download all pages as ZIP" style="font-weight:700;background:var(--fl-accent, #2563eb);color:#fff;border-color:transparent;">📦 Download ZIP</button>
+          </div>
+          <!-- Flowchart Sub-Toolbar (Compact Excalidraw-style: Start/End | Process | Decision | Arrow | Select | ⋯) -->
+          <div class="wb-toolbar" id="wb-flowchart-toolbar" style="display:none;background:var(--fl-surface-2);border-bottom:1px solid var(--fl-border);padding:0.35rem 0.75rem;gap:0.35rem;align-items:center;position:relative;">
+            <button class="wb-btn" onclick="addDrawflowNode('start_end')" title="Add Start / End node (Capsule)">🟢 Start/End</button>
+            <button class="wb-btn" onclick="addDrawflowNode('process')" title="Add Process node (Rectangle)">🟦 Process</button>
+            <button class="wb-btn" onclick="addDrawflowNode('decision')" title="Add Decision node (Diamond)">🔶 Decision</button>
+            <div class="wb-divider"></div>
+            <button class="wb-btn" id="df-btn-mode-arrow" onclick="setDrawflowMode('arrow')" title="Arrow mode: drag between node handles to connect">➡️ Arrow</button>
+            <button class="wb-btn active" id="df-btn-mode-select" onclick="setDrawflowMode('select')" title="Select and move nodes / edit connections">👆 Select</button>
+            <div class="wb-divider"></div>
+            <!-- More menu toggle -->
+            <div style="position:relative;display:inline-block;">
+              <button class="wb-btn" id="df-btn-more" onclick="toggleDrawflowMoreMenu(event)" title="More flowchart options" style="padding:0.3rem 0.5rem;font-weight:700;">⋯</button>
+              <div id="df-more-menu" class="context-menu hidden" style="position:absolute;top:110%;left:0;z-index:100;min-width:160px;box-shadow:0 8px 24px rgba(0,0,0,0.15);border:1px solid var(--fl-border);background:var(--fl-surface);border-radius:8px;padding:4px;">
+                <button class="ctx-item" onclick="zoomDrawflow(1.1);hideDrawflowMoreMenu();" style="width:100%;text-align:left;padding:6px 12px;display:flex;align-items:center;gap:6px;font-size:0.8rem;cursor:pointer;border:none;background:none;border-radius:4px;">🔍 Zoom In</button>
+                <button class="ctx-item" onclick="zoomDrawflow(0.9);hideDrawflowMoreMenu();" style="width:100%;text-align:left;padding:6px 12px;display:flex;align-items:center;gap:6px;font-size:0.8rem;cursor:pointer;border:none;background:none;border-radius:4px;">🔍 Zoom Out</button>
+                <button class="ctx-item" onclick="resetDrawflowZoom();hideDrawflowMoreMenu();" style="width:100%;text-align:left;padding:6px 12px;display:flex;align-items:center;gap:6px;font-size:0.8rem;cursor:pointer;border:none;background:none;border-radius:4px;">⟲ Reset Zoom</button>
+                <div class="ctx-separator" style="height:1px;background:var(--fl-border);margin:4px 0;"></div>
+                <button class="ctx-item danger" onclick="deleteSelectedDrawflowNode();hideDrawflowMoreMenu();" style="width:100%;text-align:left;padding:6px 12px;display:flex;align-items:center;gap:6px;font-size:0.8rem;cursor:pointer;border:none;background:none;border-radius:4px;color:#dc2626;">🗑️ Delete Selected (Del)</button>
+                <button class="ctx-item danger" onclick="clearDrawflowCanvas();hideDrawflowMoreMenu();" style="width:100%;text-align:left;padding:6px 12px;display:flex;align-items:center;gap:6px;font-size:0.8rem;cursor:pointer;border:none;background:none;border-radius:4px;color:#dc2626;">🧹 Clear Flowchart</button>
+              </div>
+            </div>
+          </div>
+          <div id="whiteboard-canvas-wrapper">
+            <canvas id="whiteboard-canvas"></canvas>
+            <div id="drawflow" style="display:none;"></div>
+            <svg id="wb-fc-svg-layer"></svg>
+            <div id="wb-text-layer"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STATE D: Room Hub -->
+      <div id="ws-state-room-hub" style="display:none; padding-top:2rem;">
+        <div class="hub-grid">
+          <div class="hub-card" id="hub-card-voice" onclick="if(typeof _voiceActive !== 'undefined' && _voiceActive){ endVoiceCall(); } else { startVoiceCall(); }">Start Voice</div>
+          <div class="hub-card" onclick="joinVideoCall()">Start Video</div>
+          <div class="hub-card" id="hub-card-screen" onclick="if(typeof _ssIsPresenting !== 'undefined' && _ssIsPresenting){ stopScreenShare(); } else { startScreenShare(); }">Screenshare</div>
+          <div class="hub-card" onclick="toggleChat()">Chat</div>
+          <div class="hub-card" onclick="setWSState('docs')">📁 Documents</div>
+          <div class="hub-card wide" style="background:var(--fl-text-md);" onclick="setWSState('whiteboard')">Whiteboard</div>
+        </div>
+      </div>
+    </div><!-- /workspace-main -->
+
+    <!-- ── Right Sidebar (Fluent Light) ─────────────────────── -->
+    <div class="workspace-sidebar" id="ws-sidebar">
+      <button class="sidebar-toggle" id="sidebar-toggle-btn" onclick="toggleSidebar()" title="Toggle sidebar">
+        <span id="sidebar-chevron">›</span>
+      </button>
+
+      <!-- Active Voice Call Bar with End Button -->
+      <div id="active-voice-call-bar" style="display:none;align-items:center;justify-content:space-between;padding:8px 12px;background:#eff6ff;border:1.5px solid #bfdbfe;border-radius:10px;margin-bottom:12px;box-sizing:border-box;min-width:0;gap:8px;">
+        <div style="display:flex;align-items:center;gap:8px;min-width:0;overflow:hidden;">
+          <span style="font-size:1.1rem;flex-shrink:0;">📞</span>
+          <div style="min-width:0;overflow:hidden;">
+            <div style="font-weight:700;font-size:0.85rem;color:#1e40af;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Voice Call</div>
+            <div id="voice-bar-mic-status" style="font-size:0.72rem;color:#3b82f6;white-space:nowrap;">Mic OFF</div>
+          </div>
+        </div>
+        <button class="fl-btn fl-btn-danger fl-btn-sm" onclick="endVoiceCall()" style="padding:4px 12px;border-radius:8px;font-weight:700;font-size:0.78rem;background:#dc2626;color:#fff;border:none;cursor:pointer;white-space:nowrap;flex-shrink:0;" title="End Voice Call">End Call</button>
+      </div>
+
+      <!-- Return to call banner -->
+      <div id="return-to-call-banner" onclick="returnToCall()">
+        📹 <span id="return-to-call-text">Return to call</span>
+      </div>
+
+      <!-- Sidebar Header -->
+      <div id="ws-sidebar-header">
+        <span id="ws-sidebar-header-title">Members</span>
+        <div style="display:flex;align-items:center;gap:0.4rem;">
+          <button id="btn-sidebar-refresh" onclick="connectMemberSSE && typeof connectMemberSSE === 'function' ? connectMemberSSE(AppState.currentSuite && AppState.currentSuite.id) : null" title="Refresh members">↻</button>
+          <button id="btn-sidebar-invite" onclick="showInviteModal()">
+            + Invite
+          </button>
+        </div>
+      </div>
+
+      <!-- Member List -->
+      <div id="sidebar-members-list">
+        <!-- Real members populated by invite.js / workspace.js -->
+        <!-- Real members populated by invite.js / workspace.js -->
+      </div>
+
+      <!-- Sidebar Bottom Nav -->
+      <div id="ws-sidebar-bottom">
+        <button class="ws-sidebar-bottom-btn btn-enter-room" onclick="setWSState('room-hub')">
+          🚪 Enter Room
+        </button>
+        <button class="ws-sidebar-bottom-btn btn-leave-suite" onclick="leaveSuite()">
+          ← Leave Suite
+        </button>
+      </div>
+    </div>
+
+    <!-- ── Chat fly-out ────────────────────────────────────────── -->
+    <div class="chat-panel" id="chat-panel">
+      <div style="padding:0.9rem;border-bottom:1px solid var(--fl-border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
+        <span style="font-weight:700;font-size:0.95rem;color:var(--fl-text-hi);">💬 Suite Chat</span>
+        <div style="display:flex;align-items:center;gap:0.5rem;">
+          <input type="text" placeholder="Search..." style="border:1px solid var(--fl-border);border-radius:4px;padding:2px 6px;font-size:0.75rem;width:100px;">
+          <!-- Private Chat Toggle -->
+          <button id="btn-private-chat" onclick="togglePrivateChatPanel()" title="Private Messages"
+            style="background:none;border:1px solid var(--fl-border);border-radius:7px;padding:0.2rem 0.5rem;cursor:pointer;font-size:0.9rem;position:relative;transition:all 0.2s;"
+            onmouseover="this.style.borderColor='var(--fl-accent)'" onmouseout="this.style.borderColor='var(--fl-border)'">
+            ✉️
+            <span id="pc-unread-badge" style="display:none;position:absolute;top:-5px;right:-5px;background:var(--fl-red);color:#fff;border-radius:50%;width:16px;height:16px;font-size:0.6rem;font-weight:700;align-items:center;justify-content:center;">0</span>
+          </button>
+          <button onclick="toggleChat()" style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--fl-text-muted);">✕</button>
+        </div>
+      </div>
+      <div class="chat-messages" id="chat-messages">
+        <!-- Messages dynamically rendered here -->
+      </div>
+      <div id="suite-typing-indicator" style="display:none;padding:0.2rem 1rem;font-size:0.75rem;color:var(--fl-text-muted);font-style:italic;">Someone is typing...</div>
+      <div style="padding:0.7rem;border-top:1px solid var(--fl-border);flex-shrink:0;background:var(--fl-surface);">
+        <div class="input-row" style="display:flex;gap:0.5rem;align-items:center;">
+          <button style="background:none;border:none;cursor:pointer;font-size:1.1rem;padding:0.2rem;" title="Emoji">😀</button>
+          <input id="chat-input" type="text" class="fs-input" placeholder="Type a message…" style="flex:1;font-size:0.88rem;border:1px solid var(--fl-border);border-radius:4px;padding:0.4rem 0.5rem;" onkeydown="if(event.key==='Enter')sendChatMessage()" />
+          <button class="fl-btn fl-btn-primary" style="flex-shrink:0;padding:0.4rem 0.8rem;" onclick="sendChatMessage()">Send</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── AI Buddy Fly-out Sidebar ────────────────────────────── -->
+    <div class="ai-panel" id="ai-panel">
+      <!-- Header -->
+      <div style="padding:0.9rem;border-bottom:1px solid var(--c-divider);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:var(--c-white);">
+        <div style="display:flex;align-items:center;gap:0.4rem;">
+          <span style="font-size:1.15rem;line-height:1;">🤖</span>
+          <span style="font-weight:700;font-size:0.95rem;color:var(--c-charcoal);">AI Study Buddy</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:0.5rem;">
+          <!-- Model selection dropdown -->
+          <select id="ai-model-select" class="ai-model-select" style="background:var(--c-lightgray);color:var(--c-charcoal);border:1px solid var(--c-divider);border-radius:6px;padding:0.2rem 0.4rem;font-size:0.75rem;cursor:pointer;outline:none;font-weight:600;">
+            <option value="google/gemini-2.5-flash" selected>Gemini 2.5 Flash</option>
+            <option value="meta-llama/llama-3.1-8b-instruct:free">Llama 3.1 8B (Free)</option>
+            <option value="mistralai/mistral-7b-instruct:free">Mistral 7B (Free)</option>
+            <option value="google/gemini-2.5-pro">Gemini 2.5 Pro</option>
+          </select>
+          <button onclick="toggleAIBuddy()" style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--c-slate);padding:0 0.2rem;line-height:1;">✕</button>
+        </div>
+      </div>
+
+      <!-- Scrollable messages section -->
+      <div class="ai-chat-messages" id="ai-chat-messages">
+        <!-- Rendered dynamically by ai-buddy.js -->
+      </div>
+
+      <!-- Bouncing dots typing indicator -->
+      <div id="ai-typing-indicator" class="hidden" style="align-self:flex-start;display:flex;gap:6px;padding:0.6rem 0.9rem;background:var(--c-lightgray);border-radius:12px;margin:0.5rem 0.9rem;align-items:center;">
+        <span style="font-size:0.72rem;font-weight:600;color:var(--c-slate);">AI is thinking</span>
+        <div class="typing-dots">
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+        </div>
+      </div>
+
+      <!-- Bottom controls / Chat input -->
+      <div style="padding:0.7rem;border-top:1px solid var(--c-divider);background:var(--c-white);flex-shrink:0;position:relative;">
+        <!-- Emoji Picker Panel -->
+        <div id="ai-emoji-picker" class="ai-emoji-picker hidden"></div>
+
+        <div class="input-row" style="display:flex;gap:0.4rem;align-items:center;">
+          <button onclick="toggleAIEmojiPicker()" style="background:none;border:none;cursor:pointer;font-size:1.25rem;padding:0.25rem;line-height:1;display:flex;align-items:center;justify-content:center;" title="Insert Emoji">😊</button>
+          <input id="ai-chat-input" type="text" class="fs-input" placeholder="Ask study questions…" style="flex:1;font-size:0.85rem;padding:0.5rem 0.8rem;border-radius:8px;" onkeydown="if(event.key==='Enter')sendAIMessage()" />
+          <button class="btn-primary" style="flex-shrink:0;padding:0.5rem 0.8rem;border-radius:8px;font-size:0.85rem;" onclick="sendAIMessage()">Send</button>
+          <button class="btn-outline" style="flex-shrink:0;padding:0.5rem 0.65rem;border-radius:8px;font-size:0.85rem;color:var(--c-slate);" onclick="clearAIChat()" title="Clear Conversation">🗑️</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /workspace-body -->
+
+  <!-- ── Fixed Bottom Taskbar ───────────────────────────────────── -->
+  <!-- ── Live Media Status ─────────────────────────────────────── -->
+  <div id="live-media-status" class="hidden"></div>
+
+  <!-- ── Professional Bottom Toolbar ────────────────────────────── -->
+  <div class="bottom-toolbar">
+    <button class="tb-btn" title="Home" onclick="setWSState('room-hub'); if(document.getElementById('video-call-overlay')) document.getElementById('video-call-overlay').classList.add('hidden'); if(document.getElementById('screen-share-overlay')) document.getElementById('screen-share-overlay').classList.add('hidden');">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+    </button>
+    <button class="tb-btn" title="Chat" onclick="toggleChat()">
+      <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+    </button>
+    <button class="tb-btn" title="Members" onclick="toggleSidebar()">
+      <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+    </button>
+    <button class="tb-btn" title="Documents" onclick="setWSState('docs'); if(document.getElementById('video-call-overlay')) document.getElementById('video-call-overlay').classList.add('hidden'); if(document.getElementById('screen-share-overlay')) document.getElementById('screen-share-overlay').classList.add('hidden');">
+      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+    </button>
+    <button class="tb-btn" title="Whiteboard" onclick="setWSState('whiteboard'); if(document.getElementById('screen-share-overlay')) document.getElementById('screen-share-overlay').classList.add('hidden');">
+      <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+    </button>
+    <button class="tb-btn" title="Notes" onclick="toggleNotepad()">
+      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+    </button>
+    <button class="tb-btn" title="Microphone" id="tb-btn-mic" onclick="toggleMic()">
+      <svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+    </button>
+    <button class="tb-btn" title="Camera" id="tb-btn-cam" onclick="toggleVideoCamera()">
+      <svg viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>
+    </button>
+    <button class="tb-btn" title="Screen Share" id="tb-btn-screen-share" onclick="if(typeof _ssIsPresenting !== 'undefined' && _ssIsPresenting){ stopScreenShare(); } else { startScreenShare(); }">
+      <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+    </button>
+    <button class="tb-btn end-call" title="End Call" id="tb-btn-leave" onclick="if(typeof _vcInCall !== 'undefined' && _vcInCall){ leaveVideoCall(); } else if(typeof _voiceActive !== 'undefined' && _voiceActive){ endVoiceCall(); } else if(typeof _ssIsPresenting !== 'undefined' && _ssIsPresenting){ stopScreenShare(); } else if(typeof leaveSuite === 'function'){ leaveSuite(); }">
+      <svg viewBox="0 0 24 24"><path d="M10.68 13.31a16 16 0 0 0 3.41 2.6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7 2 2 0 0 1 1.72 2v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.42 19.42 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91"></path><line x1="23" y1="1" x2="1" y2="23"></line></svg>
+    </button>
+  </div>
+
+  <!-- ── Video Call Overlay ─────────────────────────────────────── -->
+  <div id="video-call-overlay" class="media-overlay hidden" style="flex-direction:column;position:fixed;top:0;left:0;right:0;bottom:0;z-index:2000;background:rgba(15,23,42,0.96);display:flex;">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:0.9rem 1.5rem;background:rgba(0,0,0,0.3);border-bottom:1px solid rgba(255,255,255,0.1);flex-shrink:0;">
+      <div style="display:flex;align-items:center;gap:0.75rem;">
+        <span style="font-size:1.2rem;">📹</span>
+        <span style="font-weight:700;color:#fff;font-size:0.95rem;">Video Call</span>
+        <span id="vc-status" style="color:var(--fl-accent, #38bdf8);font-size:0.8rem;font-weight:600;">In call</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:0.6rem;">
+        <button class="fl-btn fl-btn-sm" onclick="document.getElementById('video-call-overlay').classList.add('hidden')" style="border-radius:20px;padding:6px 14px;background:rgba(255,255,255,0.15);color:#fff;border:none;cursor:pointer;font-weight:600;font-size:0.82rem;" title="Minimize overlay to workspace">🗗 Minimize</button>
+      </div>
+    </div>
+    <div id="vc-grid" class="vc-grid" style="flex:1; padding:2rem 2rem 6rem; overflow-y:auto;"></div>
+  </div>
+
+  <!-- ── Screen Share Overlay (Viewer) ─────────────────────────── -->
+  <div id="screen-share-overlay" class="media-overlay hidden" style="flex-direction:column;position:fixed;top:0;left:0;right:0;bottom:0;z-index:2000;background:rgba(15,23,42,0.96);display:flex;">
+    <div id="screen-share-header" style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 1.25rem;background:rgba(0,0,0,0.4);border-bottom:1px solid rgba(255,255,255,0.12);flex-shrink:0;transition:opacity 0.3s ease;box-sizing:border-box;min-height:52px;gap:0.5rem;flex-wrap:wrap;">
+      <div style="display:flex;align-items:center;gap:0.75rem;min-width:0;">
+        <span style="font-size:1.2rem;flex-shrink:0;">📺</span>
+        <span id="ss-presenter-name" style="font-weight:700;color:#fff;font-size:0.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Screen Share</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:0.6rem;flex-shrink:0;flex-wrap:nowrap;">
+        <button id="btn-stop-screen-share" class="fl-btn fl-btn-danger fl-btn-sm" onclick="stopScreenShare()" style="display:none;border-radius:20px;padding:6px 16px;background:#dc2626;color:#fff;font-weight:700;border:none;cursor:pointer;font-size:0.82rem;white-space:nowrap;flex-shrink:0;">⏹️ Stop Sharing</button>
+        <button id="btn-fullscreen-screen-share" class="fl-btn fl-btn-sm" onclick="toggleScreenShareFullscreen()" style="border-radius:20px;padding:6px 14px;background:rgba(255,255,255,0.15);color:#fff;border:none;cursor:pointer;font-weight:600;font-size:0.82rem;white-space:nowrap;flex-shrink:0;" title="Toggle Fullscreen">⛶ Fullscreen</button>
+        <button class="fl-btn fl-btn-sm" onclick="document.getElementById('screen-share-overlay').classList.add('hidden')" style="border-radius:20px;padding:6px 14px;background:rgba(255,255,255,0.15);color:#fff;border:none;cursor:pointer;font-weight:600;font-size:0.82rem;white-space:nowrap;flex-shrink:0;" title="Minimize overlay to workspace">🗗 Minimize</button>
+      </div>
+    </div>
+    <div style="flex:1;display:flex;align-items:center;justify-content:center;background:var(--fl-accent-dark, #020617);position:relative;padding:1.5rem;">
+      <video id="screen-share-video" autoplay playsinline style="max-width:100%;max-height:100%;width:100%;height:100%;object-fit:contain;"></video>
+    </div>
+  </div>
+
+  <!-- ── Private Chat Panel ─────────────────────────────────────── -->
+  <div id="private-chat-panel" class="private-chat-panel hidden">
+    <div class="pc-header">
+      <span style="font-weight:700;font-size:0.95rem;color:var(--c-charcoal);">✉️ Private Messages</span>
+      <button onclick="closePrivateChatPanel()" style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--c-slate);">✕</button>
+    </div>
+    <div class="pc-body">
+      <!-- Conversation List -->
+      <div id="pc-conversation-list" class="pc-conv-list">
+        <div style="padding:1rem;text-align:center;color:var(--c-slate);font-size:0.85rem;">
+          <div style="font-size:1.5rem;margin-bottom:0.4rem;">✉️</div>
+          No conversations yet
+        </div>
+      </div>
+      <!-- Active Conversation -->
+      <div id="pc-active-conversation" class="pc-active-conv" style="display:none;">
+        <div class="pc-conv-header">
+          <button onclick="showConversationList()" style="background:none;border:none;cursor:pointer;color:var(--c-blue);font-size:0.85rem;font-weight:600;">← Back</button>
+          <span id="pc-peer-name" style="font-weight:700;font-size:0.9rem;color:var(--c-charcoal);"></span>
+          <span id="pc-peer-status" style="font-size:0.75rem;color:var(--c-green);"></span>
+        </div>
+        <div id="pc-messages" class="pc-messages"></div>
+        <div id="pc-typing-indicator" style="padding:0.3rem 0.8rem;font-size:0.75rem;color:var(--c-slate);height:1.2rem;"></div>
+        <!-- Reply preview -->
+        <div id="pc-reply-preview" style="display:none;padding:0.4rem 0.8rem;background:var(--c-softblue);border-left:3px solid var(--c-blue);margin:0 0.5rem;border-radius:0 6px 6px 0;font-size:0.78rem;color:var(--c-navy);">
+          <span id="pc-reply-text"></span>
+          <button onclick="clearReply()" style="float:right;background:none;border:none;cursor:pointer;color:var(--c-slate);font-size:0.8rem;">✕</button>
+        </div>
+        <!-- Emoji Picker -->
+        <div id="pc-emoji-picker" class="pc-emoji-picker hidden"></div>
+        <div style="padding:0.5rem;border-top:1px solid var(--c-divider);display:flex;gap:0.4rem;align-items:center;">
+          <button onclick="toggleEmojiPicker()" style="background:none;border:none;cursor:pointer;font-size:1.2rem;padding:0.2rem;" title="Emoji">😊</button>
+          <input id="pc-message-input" type="text" class="fs-input" placeholder="Type a message…"
+            style="flex:1;font-size:0.85rem;padding:0.4rem 0.7rem;"
+            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendPrivateMessage();}"
+            oninput="handlePrivateTyping()" />
+          <button class="btn-primary" id="btn-pc-send" type="button" onclick="sendPrivateMessage()" style="padding:0.4rem 0.8rem;font-size:0.82rem;flex-shrink:0;cursor:pointer;">Send</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Member Context Menu ────────────────────────────────────── -->
+  <div id="member-context-menu" class="context-menu hidden"></div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     MODALS
+     ═══════════════════════════════════════════════════════════════ -->
+
+<!-- Create Permanent Suite -->
+<div id="modal-create-suite" class="modal-overlay hidden">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span class="modal-title">✨ Create New Suite</span>
+      <button class="modal-close" onclick="closeModal('modal-create-suite')">✕</button>
+    </div>
+    <div class="form-group">
+      <div>
+        <label class="fs-label">Suite Name</label>
+        <input id="cs-suite-name" type="text" class="fs-input" placeholder="e.g., Study Group Alpha" />
+      </div>
+      <div>
+        <label class="fs-label" style="margin-bottom:8px;">Private Suite</label>
+        <div class="toggle-wrap">
+          <button class="toggle-track" id="cs-private-toggle" onclick="toggleSwitch('cs-private-toggle','cs-private-label')">
+            <div class="toggle-thumb"></div>
+          </button>
+          <span id="cs-private-label" style="font-size:0.87rem;color:var(--c-mutedgray);font-weight:500;">No – Public (Direct join)</span>
+        </div>
+        <p id="cs-private-hint" style="color:var(--c-slate);font-size:0.78rem;margin-top:6px;">🔓 Anyone with the link can join directly.</p>
+      </div>
+      <div>
+        <label class="fs-label" style="margin-bottom:8px;">Enter the number of admins:</label>
+        <div style="display:flex;align-items:center;gap:12px;background:var(--c-lightgray, #f1f5f9);padding:6px 12px;border-radius:8px;width:fit-content;border:1px solid var(--fl-border, #cbd5e1);">
+          <button type="button" id="cs-admin-limit-dec" onclick="stepAdminLimit(-1)" style="width:32px;height:32px;border-radius:6px;border:1px solid #cbd5e1;background:#fff;font-size:1.1rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.15s;" title="Decrease limit">−</button>
+          <span id="cs-admin-limit-val" style="font-size:1rem;font-weight:700;min-width:28px;text-align:center;color:var(--fl-text-hi, #0f172a);">3</span>
+          <button type="button" id="cs-admin-limit-inc" onclick="stepAdminLimit(1)" style="width:32px;height:32px;border-radius:6px;border:1px solid #cbd5e1;background:#fff;font-size:1.1rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.15s;" title="Increase limit">+</button>
+        </div>
+        <input type="hidden" id="cs-admin-limit" value="3" />
+        <p style="color:var(--c-slate, #64748b);font-size:0.78rem;margin-top:4px;">Minimum: 1, Maximum: 20 available admin slots (excluding host).</p>
+      </div>
+      <div>
+        <label class="fs-label">Invite via Email or Username</label>
+        <input id="cs-invite" type="text" class="fs-input" placeholder="friend@example.com or @username" />
+      </div>
+    </div>
+    <button class="btn-primary" style="width:100%;margin-top:1.3rem;" onclick="createSuite('permanent')">Create</button>
+  </div>
+</div>
+
+<!-- Create Quick Suite -->
+<div id="modal-quick-suite" class="modal-overlay hidden">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span class="modal-title">⚡ Quick Suite <span style="font-size:0.75rem;color:#856404;background:#fff3cd;padding:2px 8px;border-radius:6px;margin-left:6px;">Temporary</span></span>
+      <button class="modal-close" onclick="closeModal('modal-quick-suite')">✕</button>
+    </div>
+    <div class="form-group">
+      <div>
+        <label class="fs-label">Suite Name</label>
+        <input id="qs-suite-name" type="text" class="fs-input" placeholder="Quick session name" />
+      </div>
+      <div>
+        <label class="fs-label" style="margin-bottom:8px;">Access Type</label>
+        <label id="qs-opt-public" style="display:flex;align-items:center;gap:0.6rem;cursor:pointer;padding:0.65rem 0.9rem;background:var(--c-lightgray);border-radius:9px;border:1.5px solid #007bff;background:#e9f7fe;margin-bottom:0.5rem;">
+          <input type="radio" name="qs-access" value="public" checked onchange="updateQSOption()" style="accent-color:var(--c-blue);" />
+          <div><div style="font-weight:600;font-size:0.88rem;color:var(--c-charcoal);">🔓 Direct link join (Public)</div><div style="font-size:0.77rem;color:var(--c-slate);">Anyone with the link joins immediately</div></div>
+        </label>
+        <label id="qs-opt-private" style="display:flex;align-items:center;gap:0.6rem;cursor:pointer;padding:0.65rem 0.9rem;background:var(--c-lightgray);border-radius:9px;border:1.5px solid var(--c-divider);">
+          <input type="radio" name="qs-access" value="private" onchange="updateQSOption()" style="accent-color:var(--c-blue);" />
+          <div><div style="font-weight:600;font-size:0.88rem;color:var(--c-charcoal);">🔒 Admit approval required (Private)</div><div style="font-size:0.77rem;color:var(--c-slate);">Host must approve join requests</div></div>
+        </label>
+      </div>
+    </div>
+    <button class="btn-yellow" style="margin-top:1.3rem;" onclick="createSuite('quick')">Create Quick Suite</button>
+  </div>
+</div>
+
+<!-- About Us -->
+<div id="modal-about" class="modal-overlay hidden">
+  <div class="modal-box" style="max-width:500px;">
+    <div class="modal-header">
+      <span class="modal-title">🔗 About CoLearn</span>
+      <button class="modal-close" onclick="closeModal('modal-about')">✕</button>
+    </div>
+    <div style="color:var(--c-mutedgray);font-size:0.9rem;line-height:1.7;">
+      <p style="margin-bottom:0.8rem;"><strong style="color:var(--c-blue);">CoLearn</strong> is a real-time collaborative study platform built to help students connect, share resources, and work together seamlessly.</p>
+      <p style="margin-bottom:0.8rem;">✨ Permanent &amp; temporary study suites<br>📄 Document viewer with page navigation<br>🎨 Shared whiteboard canvas<br>💬 Real-time chat<br>☁️ Google Drive asset integration</p>
+      <p style="color:var(--c-slate);font-size:0.82rem;">Version 2.0.0 · Built for Protothon 2026</p>
+    </div>
+  </div>
+</div>
+
+<!-- Profile -->
+<div id="modal-profile" class="modal-overlay hidden">
+  <div class="modal-box" style="max-width:380px;">
+    <div class="modal-header">
+      <span class="modal-title">👤 Profile</span>
+      <button class="modal-close" onclick="closeModal('modal-profile')">✕</button>
+    </div>
+    <div style="display:flex;align-items:center;gap:1rem;padding:1rem;background:var(--c-lightgray);border-radius:12px;margin-bottom:1rem;">
+      <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--c-blue),var(--c-teal));display:flex;align-items:center;justify-content:center;color:var(--c-white);font-size:1.5rem;font-weight:700;">
+        <span id="profile-initial">U</span>
+      </div>
+      <div>
+        <div style="font-weight:700;color:var(--c-charcoal);" id="profile-name-display">User</div>
+        <div style="color:var(--c-slate);font-size:0.85rem;" id="profile-email-display">user@example.com</div>
+      </div>
+    </div>
+    <button class="btn-danger" style="width:100%;" onclick="handleLogout()">🚪 Log Out</button>
+  </div>
+</div>
+
+<!-- Member Info Modal (from Context Menu) -->
+<div id="modal-member-info" class="modal-overlay hidden">
+  <div class="modal-box" style="max-width:380px;">
+    <div class="modal-header">
+      <span class="modal-title">👤 Member Info</span>
+      <button class="modal-close" onclick="closeModal('modal-member-info')">✕</button>
+    </div>
+    <div style="display:flex;align-items:center;gap:1rem;padding:1rem;background:var(--fl-surface-2, #f8f9fa);border-radius:12px;margin-bottom:1rem;border:1px solid var(--fl-border);">
+      <div id="minfo-avatar" style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--fl-accent-dark, #1e3a8a),var(--fl-accent, #2563eb));display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.4rem;font-weight:700;flex-shrink:0;">U</div>
+      <div style="min-width:0;flex:1;">
+        <div style="font-weight:700;color:var(--fl-text-hi);font-size:1rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" id="minfo-name">Member Name</div>
+        <div style="font-size:0.8rem;color:var(--fl-text-muted);margin-top:2px;" id="minfo-status">● Online</div>
+        <div style="font-size:0.75rem;color:var(--fl-accent-dark);font-weight:600;margin-top:2px;" id="minfo-role">Member</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:0.6rem;justify-content:flex-end;">
+      <button id="minfo-msg-btn" class="fl-btn fl-btn-primary fl-btn-sm" style="padding:0.45rem 1rem;" onclick="">✉️ Message</button>
+      <button class="fl-btn fl-btn-outline fl-btn-sm" style="padding:0.45rem 1rem;" onclick="closeModal('modal-member-info')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Invite from Workspace -->
+<div id="modal-ws-invite" class="modal-overlay hidden">
+  <div class="modal-box" style="max-width:420px;">
+    <div class="modal-header">
+      <span class="modal-title">✉️ Invite to Suite</span>
+      <button class="modal-close" onclick="closeModal('modal-ws-invite')">✕</button>
+    </div>
+
+    <!-- Step 1: Generated code + link (always visible) -->
+    <div id="invite-info-panel" style="display:none;margin-bottom:1rem;">
+      <div style="background:var(--c-charcoal);border-radius:12px;padding:1rem;text-align:center;margin-bottom:0.8rem;">
+        <div style="font-size:11px;font-weight:600;color:#adb5bd;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">5-Digit Invite Code</div>
+        <div id="invite-code-display" style="font-size:2.4rem;font-weight:800;letter-spacing:0.3em;color:#ffffff;font-family:monospace;">─ ─ ─ ─ ─</div>
+      </div>
+      <div class="invite-link-box" style="margin-bottom:0.8rem;">
+        <span id="invite-link-display" style="font-size:0.78rem;color:var(--c-blue);word-break:break-all;">Generating…</span>
+        <button class="btn-teal" style="padding:0.3rem 0.7rem;font-size:0.78rem;flex-shrink:0;" onclick="copyInviteLink()">📋 Copy</button>
+      </div>
+      <div style="font-size:0.78rem;color:var(--c-slate);background:var(--c-lightgray);border-radius:8px;padding:0.6rem 0.8rem;">
+        ⚠️ This code is valid only while you (the host) are online.
+      </div>
+    </div>
+
+    <!-- Divider -->
+    <div id="invite-divider" style="display:none;display:flex;align-items:center;gap:0.75rem;margin:0.8rem 0;">
+      <div style="flex:1;height:1px;background:var(--c-divider);"></div>
+      <span style="font-size:0.78rem;color:var(--c-mutedgray);font-weight:600;">SEND VIA EMAIL</span>
+      <div style="flex:1;height:1px;background:var(--c-divider);"></div>
+    </div>
+
+    <!-- Step 2: Email form -->
+    <div id="invite-email-form">
+      <label class="fs-label" style="margin-bottom:6px;">Recipient Email</label>
+      <input id="invite-email-input" type="email" class="fs-input"
+             placeholder="friend@example.com"
+             style="margin-bottom:0.8rem;"
+             onkeydown="if(event.key==='Enter') handleSendInviteEmail()" />
+
+      <!-- Status messages -->
+      <div id="invite-email-alert" class="hidden" style="margin-bottom:0.8rem;"></div>
+
+      <button id="btn-send-invite" class="btn-primary" style="width:100%;"
+              onclick="handleSendInviteEmail()">
+        📨 Send Invitation
+      </button>
+    </div>
+
+    <!-- Loading state -->
+    <div id="invite-loading" style="display:none;text-align:center;padding:0.8rem;color:var(--c-slate);font-size:0.9rem;">
+      ⏳ Sending invitation…
+    </div>
+
+    <!-- Loading spinner for generating code -->
+    <div id="invite-generating" style="display:none;text-align:center;padding:1rem;color:var(--c-slate);font-size:0.9rem;">
+      ⏳ Generating invite code…
+    </div>
+  </div>
+</div>
+
+<!-- Screen Share Busy Modal -->
+<div id="modal-screen-share-busy" class="modal-overlay hidden">
+  <div class="modal-box" style="max-width:400px;text-align:center;">
+    <div style="font-size:3rem;margin-bottom:0.8rem;">📺</div>
+    <h3 style="font-size:1.1rem;font-weight:700;color:var(--c-charcoal);margin-bottom:0.5rem;">
+      <span id="ss-busy-presenter">Someone</span> is presenting
+    </h3>
+    <p style="color:var(--c-slate);font-size:0.88rem;margin-bottom:1.3rem;">Only one screen share is allowed at a time. Wait for them to stop sharing.</p>
+    <button class="btn-primary" onclick="closeModal('modal-screen-share-busy')" style="width:100%;">Got it</button>
+  </div>
+</div>
+
+<!-- Remove Member Confirmation Modal -->
+<div id="modal-remove-member" class="modal-overlay hidden">
+  <div class="modal-box" style="max-width:380px;">
+    <div class="modal-header">
+      <span class="modal-title">⚠️ Remove Member</span>
+      <button class="modal-close" onclick="closeModal('modal-remove-member')">✕</button>
+    </div>
+    <p style="color:var(--c-mutedgray);font-size:0.9rem;margin-bottom:1.3rem;">
+      Remove <strong id="remove-member-name">this member</strong> from the suite?
+      They will lose access immediately.
+    </p>
+    <div style="display:flex;gap:0.7rem;">
+      <button class="btn-outline" onclick="closeModal('modal-remove-member')" style="flex:1;">Cancel</button>
+      <button class="btn-danger" id="btn-confirm-remove-member" onclick="confirmRemoveMember()" style="flex:1;">Remove</button>
+    </div>
+  </div>
+</div>
+
+<!-- Suite Settings Modal -->
+<div id="modal-suite-settings" class="modal-overlay hidden">
+  <div class="modal-box" style="max-width:440px;">
+    <div class="modal-header">
+      <span class="modal-title">⚙️ Suite Settings</span>
+      <button class="modal-close" onclick="closeModal('modal-suite-settings')">✕</button>
+    </div>
+    <div class="form-group" style="margin-top:1rem;display:flex;flex-direction:column;gap:1.1rem;">
+      <div>
+        <label class="fs-label" style="font-weight:700;font-size:0.8rem;text-transform:uppercase;color:var(--fl-text-muted,#64748b);">SUITE NAME</label>
+        <input id="sett-suite-name" type="text" class="fs-input" placeholder="Suite Name" />
+        <small id="sett-suite-name-hint" style="color:var(--fl-text-muted,#64748b);font-size:0.75rem;display:none;">Only the host can edit suite name.</small>
+      </div>
+      <div>
+        <label class="fs-label" style="font-weight:700;font-size:0.8rem;text-transform:uppercase;color:var(--fl-text-muted,#64748b);">SUITE HOST NAME</label>
+        <input id="sett-suite-host" type="text" class="fs-input" readonly style="background:var(--c-lightgray,#f1f5f9);cursor:not-allowed;" />
+      </div>
+      <div>
+        <label class="fs-label" style="font-weight:700;font-size:0.8rem;text-transform:uppercase;color:var(--fl-text-muted,#64748b);">CREATED DATE AND TIME</label>
+        <input id="sett-suite-created" type="text" class="fs-input" readonly style="background:var(--c-lightgray,#f1f5f9);cursor:not-allowed;" />
+      </div>
+      <div>
+        <label class="fs-label" style="font-weight:700;font-size:0.8rem;text-transform:uppercase;color:var(--fl-text-muted,#64748b);">NO. OF ADMINS</label>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:4px;">
+          <div id="sett-admin-controls" style="display:flex;align-items:center;gap:10px;background:var(--c-lightgray,#f1f5f9);padding:5px 12px;border-radius:8px;border:1px solid var(--fl-border,#cbd5e1);">
+            <button type="button" id="sett-admin-dec" onclick="stepSettingsAdminLimit(-1)" style="width:30px;height:30px;border-radius:6px;border:1px solid #cbd5e1;background:#fff;font-size:1.1rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;">−</button>
+            <span id="sett-admin-limit-val" style="font-size:1rem;font-weight:700;min-width:28px;text-align:center;color:var(--fl-text-hi,#0f172a);">3</span>
+            <button type="button" id="sett-admin-inc" onclick="stepSettingsAdminLimit(1)" style="width:30px;height:30px;border-radius:6px;border:1px solid #cbd5e1;background:#fff;font-size:1.1rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;">+</button>
+          </div>
+          <div id="sett-admin-counts" style="font-size:0.85rem;font-weight:600;color:var(--fl-text-hi,#0f172a);">
+            Current admins: <span id="sett-admin-current">0</span> / <span id="sett-admin-allowed">3</span> allowed
+          </div>
+        </div>
+        <input type="hidden" id="sett-admin-limit" value="3" />
+        <small id="sett-admin-hint" style="color:var(--fl-text-muted,#64748b);font-size:0.75rem;margin-top:4px;display:block;">Only the host can modify admin limits.</small>
+      </div>
+      <div id="sett-error-alert" class="hidden" style="color:#dc2626;background:#fef2f2;border:1px solid #fecaca;padding:8px 12px;border-radius:6px;font-size:0.82rem;"></div>
+    </div>
+    <div style="display:flex;gap:0.7rem;margin-top:1.4rem;">
+      <button class="btn-outline" onclick="closeModal('modal-suite-settings')" style="flex:1;">Cancel</button>
+      <button class="btn-primary" id="btn-save-suite-settings" onclick="saveSuiteSettings()" style="flex:1;">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     TOAST NOTIFICATIONS
+     ═══════════════════════════════════════════════════════════════ -->
+<div id="main-toast" class="toast">
+  <div class="toast-inner">
+    <span id="main-toast-text">Notification</span>
+  </div>
+</div>
+<div id="copy-toast" class="toast">
+  <div class="toast-inner green">✓ Invite link copied to clipboard!</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     JAVASCRIPT – load order matters
+     ═══════════════════════════════════════════════════════════════ -->
+
+<!-- Firebase Client SDK (compat v9 – works with window.firebase.*) -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<script src="js/config.js"></script>
+<script src="js/state.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/api.js"></script>
+<!-- Firebase Client SDK init (after config + state are loaded) -->
+<script src="js/firebase-client.js"></script>
+<!-- JSZip for multi-page whiteboard ZIP export -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="js/whiteboard.js"></script>
+<!-- Shared WebRTC Infrastructure (must load before voice/video/screen) -->
+<script src="js/webrtc-manager.js"></script>
+<!-- Voice (WebRTC) module -->
+<script src="js/voice.js"></script>
+<!-- Video Call module -->
+<script src="js/video-call.js"></script>
+<!-- Screen Share module -->
+<script src="js/screen-share.js"></script>
+<!-- Notifications -->
+<script src="js/notifications.js"></script>
+<!-- Private Chat -->
+<script src="js/private-chat.js"></script>
+<!-- Document Renderer & Service -->
+<script src="js/document-renderer.js"></script>
+<script src="js/document-service.js"></script>
+<!-- File Grid (Fluent categorized document view) -->
+<script src="js/file-grid.js"></script>
+<!-- Notepad (floating localStorage notepad) -->
+<script src="js/notepad.js"></script>
+<!-- Member Context Menu -->
+<script src="js/member-context-menu.js"></script>
+<script src="js/views/landing.js"></script>
+<script src="js/views/login.js"></script>
+<script src="js/views/signup.js"></script>
+<script src="js/views/forgot.js"></script>
+<script src="js/views/dashboard.js"></script>
+<script src="js/views/workspace.js"></script>
+<script src="js/views/ai-buddy.js"></script>
+<script src="js/invite.js"></script>
+
+<!-- Router last (sets up keyboard shortcuts after all handlers are defined) -->
+<script src="js/router.js"></script>
+
+</body>
+</html>
