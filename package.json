@@ -34,6 +34,6 @@
   "homepage": "https://github.com/Navi-31/CoLearn_Development_Phase#readme",
   "license": "MIT",
   "dependencies": {
-    "jsdom": "^29.1.1"
+    "jsdom": "^31.0.0"
   }
 }
