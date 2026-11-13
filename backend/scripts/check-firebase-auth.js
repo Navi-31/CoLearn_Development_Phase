@@ -53,10 +53,29 @@ async function checkTokenFetch() {
   try {
     const { cert } = require('firebase-admin/app');
     let serviceAccount;
-    try {
-      serviceAccount = require(resolvedPath);
-    } catch (err) {
-      throw new Error(`Could not load service account key JSON from ${resolvedPath}.`);
+    const rawEnvJson = (process.env.FIREBASE_SERVICE_ACCOUNT_JSON || process.env.FIREBASE_SERVICE_ACCOUNT || '').trim();
+    if (rawEnvJson) {
+      try {
+        if (rawEnvJson.startsWith('{')) {
+          serviceAccount = JSON.parse(rawEnvJson);
+        } else {
+          serviceAccount = JSON.parse(Buffer.from(rawEnvJson, 'base64').toString('utf8'));
+        }
+        if (serviceAccount.private_key) {
+          serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, '\n');
+        }
+      } catch (e) {
+        throw new Error('Failed to parse FIREBASE_SERVICE_ACCOUNT_JSON: ' + e.message);
+      }
+    } else {
+      try {
+        serviceAccount = require(resolvedPath);
+        if (serviceAccount.private_key) {
+          serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, '\n');
+        }
+      } catch (err) {
+        throw new Error(`Could not load service account key JSON from ${resolvedPath}.`);
+      }
     }
 
     const credential = cert(serviceAccount);

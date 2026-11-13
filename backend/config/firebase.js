@@ -18,24 +18,95 @@ const { getAuth }      = require('firebase-admin/auth');
 const { getFirestore } = require('firebase-admin/firestore');
 const { getDatabase }  = require('firebase-admin/database');
 const path             = require('path');
+const fs               = require('fs');
 const admin            = require('firebase-admin');
 
-/* ── Load service-account key ────────────────────────────────── */
-const KEY_PATH     = process.env.FIREBASE_KEY_PATH || './config/serviceAccountKey.json';
-const resolvedPath = path.resolve(__dirname, '..', KEY_PATH.replace(/^\.\//, ''));
+/* ── Load service-account key ──────────────────────────────────
+ * Supports two secure loading mechanisms:
+ *  1. FIREBASE_SERVICE_ACCOUNT_JSON: Service account JSON string or
+ *     base64 string stored directly in cloud environment secrets.
+ *  2. FIREBASE_KEY_PATH: File path on disk (default: ./config/serviceAccountKey.json)
+ *     used for local development.
+ * ────────────────────────────────────────────────────────────── */
+function loadServiceAccountCredentials() {
+  // Option 1: FIREBASE_SERVICE_ACCOUNT_JSON environment variable (Production Cloud Host / Secret Manager)
+  const rawEnvJson = (process.env.FIREBASE_SERVICE_ACCOUNT_JSON || process.env.FIREBASE_SERVICE_ACCOUNT || '').trim();
+  if (rawEnvJson) {
+    try {
+      let parsed = null;
+      if (rawEnvJson.startsWith('{')) {
+        parsed = JSON.parse(rawEnvJson);
+      } else {
+        // Handle base64 encoded JSON string
+        try {
+          const decoded = Buffer.from(rawEnvJson, 'base64').toString('utf8');
+          parsed = JSON.parse(decoded);
+        } catch (_) {
+          parsed = JSON.parse(rawEnvJson);
+        }
+      }
 
-let serviceAccount;
-try {
-  serviceAccount = require(resolvedPath);
-} catch (e) {
-  console.error(`\n❌  Firebase: Cannot load service-account key at: ${resolvedPath}`);
-  console.error('   → Download it from Firebase Console → Project Settings → Service Accounts');
-  console.error('   → Select Node.js, click "Generate new private key".');
-  console.error('   → Place the JSON at backend/config/serviceAccountKey.json');
-  console.error('   → Or set FIREBASE_KEY_PATH in backend/.env if the path differs.\n');
+      if (parsed && typeof parsed === 'object') {
+        // Normalize escaped newlines in PEM private key if present
+        if (parsed.private_key && typeof parsed.private_key === 'string') {
+          parsed.private_key = parsed.private_key.replace(/\\n/g, '\n');
+        }
+        if (parsed.project_id && parsed.client_email && parsed.private_key) {
+          console.log('[Firebase] Loaded service account credentials from environment secret (FIREBASE_SERVICE_ACCOUNT_JSON).');
+          return parsed;
+        }
+        throw new Error('Service account JSON in environment secret is missing project_id, client_email, or private_key.');
+      }
+    } catch (parseErr) {
+      console.error(`\n❌  Firebase: Failed to parse FIREBASE_SERVICE_ACCOUNT_JSON environment variable.`);
+      console.error(`   → Details: ${parseErr.message}`);
+      console.error('   → Ensure the value is valid raw JSON or base64-encoded JSON downloaded from Firebase Console.\n');
+      process.exit(1);
+    }
+  }
+
+  // Option 2: File on disk (Local Development)
+  const keyPath = process.env.FIREBASE_KEY_PATH || './config/serviceAccountKey.json';
+  const resolvedPath = path.resolve(__dirname, '..', keyPath.replace(/^\.\//, ''));
+
+  if (fs.existsSync(resolvedPath)) {
+    try {
+      const fileContent = fs.readFileSync(resolvedPath, 'utf8');
+      const parsed = JSON.parse(fileContent);
+      if (parsed && typeof parsed === 'object') {
+        if (parsed.private_key && typeof parsed.private_key === 'string') {
+          parsed.private_key = parsed.private_key.replace(/\\n/g, '\n');
+        }
+        if (parsed.project_id && parsed.client_email && parsed.private_key) {
+          console.log(`[Firebase] Loaded service account credentials from file: ${resolvedPath}`);
+          return parsed;
+        }
+        throw new Error('File is missing project_id, client_email, or private_key.');
+      }
+    } catch (fileErr) {
+      console.error(`\n❌  Firebase: Cannot parse service-account key at: ${resolvedPath}`);
+      console.error(`   → Details: ${fileErr.message}`);
+      process.exit(1);
+    }
+  }
+
+  // Neither credential source is available — report clear, actionable startup error
+  console.error('\n❌  Firebase: Cannot load service-account key.');
+  console.error('   Missing credentials for Firebase Admin SDK.');
+  console.error('   Please configure one of the following:\n');
+  console.error('   • LOCAL DEVELOPMENT:');
+  console.error('     1. Go to Firebase Console → Project Settings → Service Accounts');
+  console.error('     2. Click "Generate new private key" to download your service account JSON');
+  console.error(`     3. Place the file at: ${resolvedPath}`);
+  console.error('        (or specify its path via FIREBASE_KEY_PATH in backend/.env)\n');
+  console.error('   • PRODUCTION DEPLOYMENT (Render, Railway, Fly.io, etc.):');
+  console.error('     1. Copy the entire contents of your service account JSON file');
+  console.error('     2. Add an environment variable in your hosting dashboard:');
+  console.error('        FIREBASE_SERVICE_ACCOUNT_JSON=<paste-json-or-base64-here>\n');
   process.exit(1);
 }
 
+const serviceAccount = loadServiceAccountCredentials();
 const credentialInstance = cert(serviceAccount);
 const databaseURL = process.env.FIREBASE_DATABASE_URL || (serviceAccount && serviceAccount.project_id ? `https://${serviceAccount.project_id}-default-rtdb.firebaseio.com` : 'https://your-project-id-default-rtdb.firebaseio.com');
 

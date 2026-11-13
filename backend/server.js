@@ -336,7 +336,7 @@ app.get('/api/debug/email', async (req, res) => {
     env: {
       smtpUserSet:  Boolean(process.env.SMTP_USER),
       smtpPassSet:  Boolean(process.env.SMTP_PASS),
-      firebaseKeySet: Boolean(process.env.FIREBASE_KEY_PATH),
+      firebaseKeySet: Boolean(process.env.FIREBASE_SERVICE_ACCOUNT_JSON || process.env.FIREBASE_KEY_PATH),
       nodeEnv:      process.env.NODE_ENV || 'development',
     },
     timestamp: new Date().toISOString(),
