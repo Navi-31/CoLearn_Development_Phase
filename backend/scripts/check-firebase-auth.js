@@ -6,8 +6,9 @@ const dotenv = require('dotenv');
 // Load environment variables from backend/.env if available
 dotenv.config({ path: path.join(__dirname, '..', '.env') });
 
+const BACKEND_DIR = path.resolve(__dirname, '..');
 const KEY_PATH = process.env.FIREBASE_KEY_PATH || './config/serviceAccountKey.json';
-const resolvedPath = path.resolve(__dirname, '..', KEY_PATH.replace(/^\.\//, ''));
+const resolvedPath = path.isAbsolute(KEY_PATH) ? KEY_PATH : path.resolve(BACKEND_DIR, KEY_PATH);
 
 console.log('----------------------------------------------------');
 console.log('🔍 CoLearn Firebase Diagnostic Script');
