@@ -13,17 +13,16 @@
 
 require('dotenv').config();
 
-/* ── Auto-derive GOOGLE_REDIRECT_URI from APP_URL if not explicit ────
-   This means production only needs APP_URL set.
-   Local dev: set GOOGLE_REDIRECT_URI explicitly OR set APP_URL=http://localhost:3000
-   Production: set APP_URL=https://yourdomain.com (redirect URI auto-derived)
+/* ── Auto-derive GOOGLE_REDIRECT_URI from APP_URL / BACKEND_URL ────
+   Production: set BACKEND_URL=https://api.yourdomain.com or APP_URL
+   Local dev: defaults to http://localhost:PORT/api/drive/callback
    ────────────────────────────────────────────────────────────────── */
 (function deriveRedirectUri() {
   if (!process.env.GOOGLE_REDIRECT_URI) {
-    const appUrl = (process.env.APP_URL || '').trim().replace(/\/$/, '');
+    const appUrl = (process.env.BACKEND_URL || process.env.APP_URL || '').trim().replace(/\/$/, '');
     if (appUrl) {
       process.env.GOOGLE_REDIRECT_URI = appUrl + '/api/drive/callback';
-      console.log('[Drive] GOOGLE_REDIRECT_URI auto-derived from APP_URL:', process.env.GOOGLE_REDIRECT_URI);
+      console.log('[Drive] GOOGLE_REDIRECT_URI auto-derived:', process.env.GOOGLE_REDIRECT_URI);
     } else {
       // Fallback for local dev with no APP_URL
       process.env.GOOGLE_REDIRECT_URI = 'http://localhost:' + (process.env.PORT || '3000') + '/api/drive/callback';
@@ -163,29 +162,86 @@ app.use(helmet({
   } : false,
 }));
 
-/* ── CORS – allow any origin on the LAN ─────────────────────── */
-// ALLOWED_ORIGINS env var: '*' (wildcard) or comma-separated list
-// e.g. ALLOWED_ORIGINS=http://192.168.1.5:3000,http://192.168.1.10:3000
-const rawOrigins = (process.env.ALLOWED_ORIGINS || process.env.ALLOWED_ORIGIN || '*').trim();
-if (process.env.NODE_ENV === 'production' && rawOrigins === '*') {
+/* ── CORS – Centralized Environment-Aware Configuration ───────── */
+const rawAllowed = [
+  process.env.ALLOWED_ORIGINS || '',
+  process.env.ALLOWED_ORIGIN || '',
+  process.env.FRONTEND_URL || '',
+  process.env.APP_URL || '',
+]
+  .join(',')
+  .split(',')
+  .map(s => s.trim().replace(/\/$/, ''))
+  .filter(Boolean);
+
+const configuredOrigins = [...new Set(rawAllowed)];
+const isWildcardConfigured = configuredOrigins.includes('*');
+
+if (process.env.NODE_ENV === 'production' && isWildcardConfigured) {
   console.warn('⚠️  [Security Warning] ALLOWED_ORIGINS is set to wildcard (*) in production. Consider restricting to your specific domain.');
+}
+
+function isOriginAllowed(origin) {
+  // Allow requests with no origin (mobile apps, server-to-server, curl)
+  if (!origin) return true;
+
+  const normalized = origin.trim().replace(/\/$/, '');
+
+  // 1. Explicitly configured origins
+  if (configuredOrigins.some(c => c.toLowerCase() === normalized.toLowerCase())) {
+    return true;
+  }
+
+  // 2. Cloudflare Pages support: allow preview / branch domains if base domain is configured
+  try {
+    const originUrl = new URL(normalized);
+    const originHost = originUrl.hostname.toLowerCase();
+
+    for (const allowed of configuredOrigins) {
+      if (allowed === '*') continue;
+      try {
+        const allowedHost = new URL(allowed).hostname.toLowerCase();
+        if (allowedHost.endsWith('.pages.dev') && originHost.endsWith('.pages.dev')) {
+          return true;
+        }
+        if (originHost === allowedHost || originHost.endsWith('.' + allowedHost)) {
+          return true;
+        }
+      } catch (_) {}
+    }
+  } catch (_) {}
+
+  // 3. Localhost & development environments (only when not strictly production)
+  const isProduction = process.env.NODE_ENV === 'production';
+  if (!isProduction) {
+    if (isWildcardConfigured || configuredOrigins.length === 0) return true;
+    try {
+      const { hostname } = new URL(normalized);
+      if (
+        hostname === 'localhost' ||
+        hostname === '127.0.0.1' ||
+        hostname === '::1' ||
+        hostname.endsWith('.localhost') ||
+        /^192\.168\./.test(hostname) ||
+        /^10\./.test(hostname) ||
+        /^172\.(1[6-9]|2\d|3[01])\./.test(hostname)
+      ) {
+        return true;
+      }
+    } catch (_) {}
+  }
+
+  return false;
 }
 
 const corsOptions = {
   origin: (origin, callback) => {
-    // Allow requests with no origin (mobile apps, curl, Postman, server-to-server)
-    if (!origin) return callback(null, true);
-    // Explicit origins check
-    if (rawOrigins !== '*') {
-      const allowed = rawOrigins.split(',').map(s => s.trim());
-      if (allowed.includes(origin)) return callback(null, true);
-      // In production, block origins not explicitly allowed
-      if (process.env.NODE_ENV === 'production') {
-        return callback(new Error('CORS not allowed for this origin'));
-      }
+    if (isOriginAllowed(origin)) {
+      return callback(null, true);
     }
-    // Allow any origin on the same LAN subnet (any http/https origin)
-    return callback(null, true);
+    const err = new Error(`CORS blocked: Origin ${origin} not permitted.`);
+    err.status = 403;
+    return callback(err);
   },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: [
@@ -195,10 +251,11 @@ const corsOptions = {
     'Accept',
     'Origin',
     'X-FS-UID',
+    'X-Suite-ID',
   ],
   exposedHeaders: ['Content-Length', 'X-Request-Id'],
   credentials: true,
-  optionsSuccessStatus: 200, // For legacy browsers (IE11) on OPTIONS pre-flight
+  optionsSuccessStatus: 200,
 };
 
 // Handle pre-flight OPTIONS for all routes

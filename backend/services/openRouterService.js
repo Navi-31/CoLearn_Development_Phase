@@ -158,7 +158,7 @@ async function chatWithOpenRouter(messages, model) {
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${apiKey}`,
-      'HTTP-Referer': 'http://localhost:3000',
+      'HTTP-Referer': process.env.FRONTEND_URL || process.env.APP_URL || 'https://colearn.app',
       'X-Title': 'CoLearn'
     },
     body: JSON.stringify({

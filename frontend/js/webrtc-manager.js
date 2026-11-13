@@ -472,8 +472,22 @@ const SignalManager = (function () {
     const sendQueue = [];
 
     function _getWsUrl() {
+      if (window.CONFIG && window.CONFIG.WS_URL) {
+        return window.CONFIG.WS_URL;
+      }
+      if (window.CONFIG && window.CONFIG.API_BASE) {
+        try {
+          const parsed = new URL(window.CONFIG.API_BASE);
+          const proto = parsed.protocol === 'https:' ? 'wss:' : 'ws:';
+          return `${proto}//${parsed.host}/ws/video`;
+        } catch (_) {}
+      }
+      if (window.CONFIG && window.CONFIG.IS_PRODUCTION) {
+        console.error('[SignalManager] ❌ WebSocket signaling endpoint is not configured in production.');
+        return '';
+      }
       const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-      const host = window.location.host;
+      const host = window.location.host || 'localhost:3000';
       return `${proto}//${host}/ws/video`;
     }
 
@@ -483,6 +497,10 @@ const SignalManager = (function () {
       }
 
       const url = _getWsUrl();
+      if (!url) {
+        console.warn(`[SignalManager] Cannot connect WebSocket: signaling URL is not configured (room=${suiteId})`);
+        return;
+      }
       console.info(`[SignalManager] Connecting to WebSocket: ${url} (room=${suiteId})`);
       ws = new WebSocket(url);
 

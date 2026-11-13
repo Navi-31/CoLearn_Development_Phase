@@ -1513,6 +1513,14 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
+<!-- Centralized Environment Configuration (Automatic localhost detection + Cloudflare production support) -->
+<script id="colearn-env-config">
+  window.__COLEARN_CONFIG__ = window.__COLEARN_CONFIG__ || {};
+  // In development, CoLearn automatically defaults to http://localhost:3000.
+  // For Cloudflare production deployment, set your deployed backend URL:
+  // window.__COLEARN_CONFIG__.BACKEND_URL = "https://your-deployed-backend.com";
+  // window.__COLEARN_CONFIG__.WS_URL = "wss://your-deployed-backend.com/ws/video";
+</script>
 <script src="js/config.js"></script>
 <script src="js/state.js"></script>
 <script src="js/utils.js"></script>

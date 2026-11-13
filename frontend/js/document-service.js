@@ -626,7 +626,17 @@ async function attemptDriveUpload(id) {
   };
 
   var apiBase = (typeof CONFIG !== 'undefined' && CONFIG.API_BASE) ? CONFIG.API_BASE : '';
+  if (window.CONFIG && window.CONFIG.IS_PRODUCTION && !apiBase) {
+    doc.status = 'error';
+    _updatePendingCard(doc.id, 'error', 0, 'Unconfigured API');
+    _logUploadError(doc.name, 'Production backend URL is not configured');
+    showToast('main-toast', '⚠️ Production backend URL is not configured.', 'dark');
+    return;
+  }
   xhr.open('POST', apiBase + '/api/drive/upload');
+  if (window.CONFIG && window.CONFIG.IS_CROSS_ORIGIN) {
+    xhr.withCredentials = true;
+  }
   if (uid) xhr.setRequestHeader('X-FS-UID', uid);
   if (suiteId) xhr.setRequestHeader('X-Suite-ID', suiteId);
   if (authToken) {

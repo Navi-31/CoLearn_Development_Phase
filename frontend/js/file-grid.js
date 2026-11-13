@@ -601,8 +601,17 @@ function fileGridFetch(path, options = {}) {
   if (uid) headers["X-FS-UID"] = uid;
   if (token) headers["Authorization"] = `Bearer ${token}`;
 
-  return fetch(`${CONFIG.API_BASE}${path}`, {
+  const base = (window.CONFIG && window.CONFIG.API_BASE) || '';
+  if (window.CONFIG && window.CONFIG.IS_PRODUCTION && !base) {
+    return Promise.reject(new Error('Production backend URL is not configured.'));
+  }
+
+  const cleanPath = path.startsWith('/') ? path : `/${path}`;
+  const credentialsMode = options.credentials || (window.CONFIG && window.CONFIG.IS_CROSS_ORIGIN ? 'include' : 'same-origin');
+
+  return fetch(`${base}${cleanPath}`, {
     ...options,
+    credentials: credentialsMode,
     headers
   }).then(r => r.json());
 }

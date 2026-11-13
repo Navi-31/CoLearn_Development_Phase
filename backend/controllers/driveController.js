@@ -104,8 +104,8 @@ async function handleCallback(req, res) {
   <script>
     try {
       if (window.opener) {
-        var targetOrigin = window.location.origin;
-        window.opener.postMessage(${payload}, targetOrigin);
+        // Send status safely to opener window regardless of deployment origin
+        window.opener.postMessage(${payload}, '*');
       }
     } catch(e) {}
     setTimeout(function() { window.close(); }, 2000);

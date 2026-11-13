@@ -17,25 +17,19 @@ const driveController = require('./driveController');
 
 /* ── URL builder ────────────────────────────────────────────────── */
 /**
- * Build the production-safe invite URL.
+ * Build the invite URL.
  * Priority:
- *   1. APP_URL env var  (set on Vercel / Render / Railway)
- *   2. x-forwarded-proto + host header  (behind reverse proxy)
- *   3. req.protocol + req.hostname
- *
- * NEVER emits localhost or 127.0.0.1.
+ *   1. FRONTEND_URL env var (e.g. Cloudflare Pages: https://colearn.pages.dev)
+ *   2. APP_URL env var      (set on deployment host)
+ *   3. x-forwarded-proto + host header (behind reverse proxy or in local development)
  */
 function buildInviteUrl(req, token) {
-  let base = (process.env.APP_URL || '').trim().replace(/\/$/, '');
+  let base = (process.env.FRONTEND_URL || process.env.APP_URL || '').trim().replace(/\/$/, '');
 
   if (!base) {
-    const proto = req.headers['x-forwarded-proto'] || req.protocol || 'https';
+    const proto = req.headers['x-forwarded-proto'] || req.protocol || 'http';
     const host  = req.headers['x-forwarded-host']  || req.headers.host || req.hostname;
-    // Guard against private/loopback addresses
-    const isLocal = /localhost|127\.0\.0\.1|::1|^10\.|^192\.168\.|^172\.(1[6-9]|2\d|3[01])\./.test(host);
-    base = isLocal
-      ? 'https://colearn.app'   // fallback brand URL when running locally
-      : `${proto}://${host}`;
+    base = `${proto}://${host}`;
   }
 
   return `${base}/invite/${token}`;

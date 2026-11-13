@@ -14,7 +14,16 @@
 
 /* ── Shared fetch helper ─────────────────────────────────── */
 async function apiFetch(path, options = {}) {
-  const url = `${CONFIG.API_BASE}${path}`;
+  // Guard against unconfigured production backend
+  if (window.CONFIG && window.CONFIG.IS_PRODUCTION && !window.CONFIG.API_BASE) {
+    const configError = '❌ Production backend URL is not configured. Please configure your deployed backend endpoint in window.__COLEARN_CONFIG__.BACKEND_URL or via meta tag.';
+    console.error('[CoLearn API]', configError);
+    throw new Error(configError);
+  }
+
+  const base = (window.CONFIG && window.CONFIG.API_BASE) || '';
+  const cleanPath = path.startsWith('/') ? path : `/${path}`;
+  const url = `${base}${cleanPath}`;
 
   // Auto-inject token & current user UID so requireAuth middleware always has them
   const uid = (typeof AppState !== 'undefined' && AppState.currentUser)
@@ -27,13 +36,15 @@ async function apiFetch(path, options = {}) {
     } catch (_) {}
   }
 
+  const credentialsMode = options.credentials || (window.CONFIG && window.CONFIG.IS_CROSS_ORIGIN ? 'include' : 'same-origin');
+
   const defaults = {
     headers: {
       'Content-Type': 'application/json',
       ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
       ...(uid ? { 'X-FS-UID': uid } : {}),
     },
-    credentials: 'same-origin',
+    credentials: credentialsMode,
   };
 
   // For GET requests with a uid-based route, append uid to query string
@@ -64,13 +75,18 @@ async function apiFetch(path, options = {}) {
 
     return data;
   } catch (err) {
+    if (err.message && err.message.startsWith('❌')) {
+      throw err;
+    }
     // Network-level failure (server down, wrong IP, firewall, CORS blocked)
-    const message =
-      `❌ Cannot connect to server at ${CONFIG.API_BASE}.\n` +
-      `Make sure:\n` +
-      `  • The backend server is running (npm run dev in /backend)\n` +
-      `  • Both devices are on the same Wi-Fi / LAN network\n` +
-      `  • No firewall is blocking port ${CONFIG.API_BASE.split(':').pop() || '3000'}`;
+    const isProd = window.CONFIG && window.CONFIG.IS_PRODUCTION;
+    const message = isProd
+      ? `❌ Cannot connect to backend server at ${base || 'configured endpoint'}. Please check your connection or CORS settings.`
+      : `❌ Cannot connect to server at ${base}.\n` +
+        `Make sure:\n` +
+        `  • The backend server is running (npm run dev in /backend)\n` +
+        `  • Both devices are on the same Wi-Fi / LAN network\n` +
+        `  • No firewall is blocking port ${(base.split(':').pop() || '3000')}`;
     console.error('[CoLearn API] Network error →', finalUrl, err.message);
     // Re-throw enriched error so view-layer catch blocks display it
     throw new Error(message);
@@ -412,6 +428,10 @@ const API = {
     const uid     = userProfile ? (userProfile.uid || userProfile.id) : ((typeof window !== 'undefined' && window.fsAuth && window.fsAuth.currentUser) ? window.fsAuth.currentUser.uid : '');
     const apiBase = (typeof CONFIG !== 'undefined' && CONFIG.API_BASE) ? CONFIG.API_BASE : '';
 
+    if (window.CONFIG && window.CONFIG.IS_PRODUCTION && !apiBase) {
+      return Promise.reject(new Error('Production backend URL is not configured.'));
+    }
+
     return new Promise(function (resolve, reject) {
       const formData = new FormData();
       formData.append('file',    file);
@@ -419,6 +439,9 @@ const API = {
       if (uid) formData.append('uid', uid);
 
       const xhr = new XMLHttpRequest();
+      if (window.CONFIG && window.CONFIG.IS_CROSS_ORIGIN) {
+        xhr.withCredentials = true;
+      }
 
       if (typeof onProgress === 'function') {
         xhr.upload.onprogress = function (e) {

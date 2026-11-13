@@ -124,8 +124,10 @@ async function loadUserSuites() {
   const container = document.getElementById('suites-list');
   if (container) {
     container.innerHTML = `
-      <div style="padding:1.5rem;text-align:center;color:var(--c-slate);font-size:0.88rem;">
-        ⏳ Loading your suites…
+      <div class="col-span-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-2 animate-pulse" id="suites-skeleton-loader">
+        <div class="h-28 bg-slate-200 dark:bg-slate-700/50 rounded-2xl border border-slate-200/50 dark:border-slate-700/50"></div>
+        <div class="h-28 bg-slate-200 dark:bg-slate-700/50 rounded-2xl border border-slate-200/50 dark:border-slate-700/50"></div>
+        <div class="h-28 bg-slate-200 dark:bg-slate-700/50 rounded-2xl border border-slate-200/50 dark:border-slate-700/50"></div>
       </div>`;
   }
 
@@ -136,10 +138,27 @@ async function loadUserSuites() {
     } else {
       renderSuites([]);
       console.warn('[Dashboard] getSuites error:', data.error);
+      if (container && data.error) {
+        container.innerHTML = `
+          <div class="col-span-full p-6 text-center text-rose-500 bg-rose-50 dark:bg-rose-950/20 rounded-2xl border border-rose-200 dark:border-rose-900/30">
+            <p class="font-semibold text-sm">⚠️ Unable to load suites</p>
+            <p class="text-xs mt-1 text-slate-500 dark:text-slate-400">${data.error}</p>
+          </div>`;
+      }
     }
   } catch (err) {
     renderSuites([]);
     console.error('[Dashboard] Could not load suites:', err.message);
+    if (container) {
+      container.innerHTML = `
+        <div class="col-span-full p-6 text-center text-rose-500 bg-rose-50 dark:bg-rose-950/20 rounded-2xl border border-rose-200 dark:border-rose-900/30">
+          <p class="font-semibold text-sm">⚠️ Connection Error</p>
+          <p class="text-xs mt-1 text-slate-500 dark:text-slate-400">${err.message || 'Unable to connect to the backend server.'}</p>
+        </div>`;
+    }
+    if (typeof showToast === 'function') {
+      showToast('main-toast', '⚠️ Connection error loading suites', 'dark');
+    }
   }
 }
 
