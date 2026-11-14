@@ -178,9 +178,10 @@ async function handleSignupContinue() {
     }
   } catch (err) {
     if (contBtn) { contBtn.disabled = false; contBtn.textContent = 'Continue'; }
+    console.error('[Signup] Send OTP failed:', err);
     showTempError(alertEl, err.message.includes('Cannot connect')
       ? '⚠️ Cannot connect to server. Check Wi-Fi/LAN and backend.'
-      : '⚠️ Server unreachable.', 5000);
+      : (err.message || '⚠️ Server unreachable.'), 5000);
   }
 }
 
@@ -222,7 +223,10 @@ async function sendOTP() {
     sendBtn.textContent   = 'Resend OTP';
     sendBtn.style.opacity = '1';
     sendBtn.style.cursor  = 'pointer';
-    showTempError(alertEl, '⚠️ Server unreachable.', 4000);
+    console.error('[Signup] Resend OTP failed:', err);
+    showTempError(alertEl, err.message.includes('Cannot connect')
+      ? '⚠️ Cannot connect to server. Check Wi-Fi/LAN and backend.'
+      : (err.message || '⚠️ Server unreachable.'), 4000);
   }
 }
 

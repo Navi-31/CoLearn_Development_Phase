@@ -212,24 +212,31 @@ function isOriginAllowed(origin) {
     }
   } catch (_) {}
 
-  // 3. Localhost & development environments (only when not strictly production)
+  // 3. Localhost, LAN & development tunnels
+  try {
+    const { hostname } = new URL(normalized);
+    if (
+      hostname === 'localhost' ||
+      hostname === '127.0.0.1' ||
+      hostname === '::1' ||
+      hostname.endsWith('.localhost') ||
+      hostname.endsWith('.tunnel.to') ||
+      hostname.endsWith('.trycloudflare.com') ||
+      hostname.endsWith('.ngrok.io') ||
+      hostname.endsWith('.ngrok-free.app') ||
+      hostname.endsWith('.loca.lt') ||
+      /^192\.168\./.test(hostname) ||
+      /^10\./.test(hostname) ||
+      /^172\.(1[6-9]|2\d|3[01])\./.test(hostname)
+    ) {
+      return true;
+    }
+  } catch (_) {}
+
+  // 4. In development mode with no configured origins or wildcard
   const isProduction = process.env.NODE_ENV === 'production';
-  if (!isProduction) {
-    if (isWildcardConfigured || configuredOrigins.length === 0) return true;
-    try {
-      const { hostname } = new URL(normalized);
-      if (
-        hostname === 'localhost' ||
-        hostname === '127.0.0.1' ||
-        hostname === '::1' ||
-        hostname.endsWith('.localhost') ||
-        /^192\.168\./.test(hostname) ||
-        /^10\./.test(hostname) ||
-        /^172\.(1[6-9]|2\d|3[01])\./.test(hostname)
-      ) {
-        return true;
-      }
-    } catch (_) {}
+  if (!isProduction && (isWildcardConfigured || configuredOrigins.length === 0)) {
+    return true;
   }
 
   return false;
@@ -240,9 +247,8 @@ const corsOptions = {
     if (isOriginAllowed(origin)) {
       return callback(null, true);
     }
-    const err = new Error(`CORS blocked: Origin ${origin} not permitted.`);
-    err.status = 403;
-    return callback(err);
+    console.warn(`[CORS] Rejected disallowed origin: ${origin}`);
+    return callback(null, false);
   },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: [

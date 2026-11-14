@@ -111,11 +111,13 @@ async function register(req, res) {
       .get());
 
     if (!usernameSnap.empty) {
-      return res.status(409).json({ success: false, message: 'Username already taken.' });
+      const msg = 'Username already taken.';
+      return res.status(409).json({ success: false, message: msg, error: msg });
     }
   } catch (e) {
     console.error('[register] Firestore username check failed. Message:', e.message, 'Code:', e.code, 'Details:', e.details);
-    return res.status(500).json({ success: false, error: 'Server error. Please try again.' });
+    const msg = 'Server error. Please try again.';
+    return res.status(500).json({ success: false, message: msg, error: msg });
   }
 
   // 7. Email uniqueness (Firebase Auth — createUser will also enforce this,
@@ -123,9 +125,11 @@ async function register(req, res) {
   try {
     await auth.getUserByEmail(email);
     // If we reach here the email already exists
+    const msg = 'Account already exists with this email.';
     return res.status(409).json({
       success: false,
-      message: 'Account already exists with this email.',
+      message: msg,
+      error:   msg,
     });
   } catch (e) {
     if (e.code !== 'auth/user-not-found') {

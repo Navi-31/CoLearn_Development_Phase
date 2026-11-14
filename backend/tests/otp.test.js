@@ -221,3 +221,108 @@ describe('Stats', () => {
   });
 
 });
+
+/* ══════════════════════════════════════════════════════════════
+   Suite 6 — Environment Configuration & Resolution
+   ══════════════════════════════════════════════════════════════ */
+describe('Environment & Endpoint Resolution', () => {
+
+  function resolveTestConfig({ hostname, port, metaBackendUrl, metaWsUrl, explicitBackendUrl }) {
+    const isLocalDev = Boolean(
+      !hostname ||
+      hostname === 'localhost' ||
+      hostname === '127.0.0.1' ||
+      hostname === '::1' ||
+      hostname.endsWith('.localhost') ||
+      /^192\.168\./.test(hostname)
+    );
+
+    const isTunnel = Boolean(
+      hostname.endsWith('.tunnel.to') ||
+      hostname.endsWith('.ngrok.io') ||
+      hostname.endsWith('.ngrok-free.app') ||
+      hostname.endsWith('.trycloudflare.com')
+    );
+
+    const currentOrigin = port ? `http://${hostname}:${port}` : `https://${hostname}`;
+
+    let apiBase = '';
+    if (explicitBackendUrl) {
+      apiBase = explicitBackendUrl;
+    } else if (isLocalDev) {
+      apiBase = port === '3000' ? currentOrigin : `http://${hostname}:3000`;
+    } else if (isTunnel) {
+      apiBase = currentOrigin;
+    } else if (metaBackendUrl) {
+      apiBase = metaBackendUrl;
+    }
+
+    let wsUrl = '';
+    if (isLocalDev) {
+      wsUrl = `ws://${hostname || 'localhost'}:3000/ws/video`;
+    } else if (isTunnel) {
+      wsUrl = `wss://${hostname}/ws/video`;
+    } else if (metaWsUrl) {
+      wsUrl = metaWsUrl;
+    }
+
+    return { isLocalDev, isTunnel, apiBase, wsUrl };
+  }
+
+  test('Localhost environment NEVER hijacked by remote Tunnelto meta tag', () => {
+    const res = resolveTestConfig({
+      hostname: 'localhost',
+      port: '3000',
+      metaBackendUrl: 'https://kind-wave-5610.tunnel.to',
+      metaWsUrl: 'wss://kind-wave-5610.tunnel.to/ws/video',
+    });
+
+    assert.equal(res.isLocalDev, true);
+    assert.equal(res.isTunnel, false);
+    assert.equal(res.apiBase, 'http://localhost:3000');
+    assert.equal(res.wsUrl, 'ws://localhost:3000/ws/video');
+  });
+
+  test('Tunnelto public URL automatically uses active tunnel without hardcoded meta', () => {
+    const res = resolveTestConfig({
+      hostname: 'kind-wave-5610.tunnel.to',
+      port: null,
+      metaBackendUrl: '',
+      metaWsUrl: '',
+    });
+
+    assert.equal(res.isLocalDev, false);
+    assert.equal(res.isTunnel, true);
+    assert.equal(res.apiBase, 'https://kind-wave-5610.tunnel.to');
+    assert.equal(res.wsUrl, 'wss://kind-wave-5610.tunnel.to/ws/video');
+  });
+
+  test('New temporary Tunnelto URL works dynamically on reconnect', () => {
+    const res = resolveTestConfig({
+      hostname: 'fresh-stream-9999.tunnel.to',
+      port: null,
+      metaBackendUrl: 'https://old-stale-tunnel.tunnel.to',
+      metaWsUrl: 'wss://old-stale-tunnel.tunnel.to/ws/video',
+    });
+
+    assert.equal(res.isLocalDev, false);
+    assert.equal(res.isTunnel, true);
+    assert.equal(res.apiBase, 'https://fresh-stream-9999.tunnel.to');
+    assert.equal(res.wsUrl, 'wss://fresh-stream-9999.tunnel.to/ws/video');
+  });
+
+  test('Cloudflare Pages production environment respects configured backend meta tag', () => {
+    const res = resolveTestConfig({
+      hostname: 'colearn.pages.dev',
+      port: null,
+      metaBackendUrl: 'https://api.colearn.app',
+      metaWsUrl: 'wss://api.colearn.app/ws/video',
+    });
+
+    assert.equal(res.isLocalDev, false);
+    assert.equal(res.isTunnel, false);
+    assert.equal(res.apiBase, 'https://api.colearn.app');
+    assert.equal(res.wsUrl, 'wss://api.colearn.app/ws/video');
+  });
+
+});

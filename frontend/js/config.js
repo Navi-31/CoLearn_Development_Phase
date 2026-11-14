@@ -68,32 +68,43 @@
   /* ── 3. Resolve Configuration Overrides ─────────────────────── */
   const userConfig = window.__COLEARN_CONFIG__ || window.__ENV__ || {};
 
-  // Backend / API base resolution
-  let rawBackendUrl =
+  // Explicit JavaScript overrides take highest priority if manually provided
+  const explicitBackendUrl =
     userConfig.BACKEND_URL ||
     userConfig.API_BASE ||
-    (typeof window.__CoLearn_API_BASE__ !== 'undefined' ? window.__CoLearn_API_BASE__ : '') ||
-    getMetaContent('colearn-backend-url');
+    (typeof window.__CoLearn_API_BASE__ !== 'undefined' ? window.__CoLearn_API_BASE__ : '');
+
+  const metaBackendUrl = getMetaContent('colearn-backend-url');
 
   let apiBase = '';
   let isConfigured = true;
 
-  if (rawBackendUrl) {
-    // Explicit backend URL configured
-    apiBase = String(rawBackendUrl).trim().replace(/\/$/, '');
-  } else if (isLocalDev || isTunnel) {
-    // In local development or development tunnels (Tunnelto, ngrok, etc.):
-    // If opened on port 3000 or accessed via tunnel (Express serving frontend), use current origin.
-    // If opened on another port (e.g. live-server, vite), default to Express on port 3000.
+  if (explicitBackendUrl) {
+    // 1. Explicit runtime JS configuration
+    apiBase = String(explicitBackendUrl).trim().replace(/\/$/, '');
+  } else if (isLocalDev) {
+    // 2. LOCALHOST / LAN DEVELOPMENT:
+    // ALWAYS route to the local Express backend directly.
+    // Never allow a remote tunnel meta tag to hijack localhost traffic.
     const port = window.location.port;
-    if (port === '3000' || isTunnel) {
+    if (port === '3000') {
       apiBase = currentOrigin;
     } else {
       const devHost = hostname || 'localhost';
       apiBase = `http://${devHost}:3000`;
     }
+  } else if (isTunnel) {
+    // 3. TUNNELTO / NGROK DEVELOPMENT:
+    // When accessed through any public dev tunnel (e.g. *.tunnel.to),
+    // Express serves both frontend and API on the same origin.
+    // Use currentOrigin so it works dynamically across all tunnel reconnects!
+    apiBase = currentOrigin;
+  } else if (metaBackendUrl) {
+    // 4. PRODUCTION (Cloudflare Pages / custom domain):
+    // Frontend is hosted separately from backend; use configured backend endpoint.
+    apiBase = String(metaBackendUrl).trim().replace(/\/$/, '');
   } else {
-    // In PRODUCTION on Cloudflare Pages / custom domain:
+    // 5. Unconfigured production environment:
     // Do NOT fall back to localhost! Do NOT guess!
     // Flag as unconfigured so UI and API calls provide a clear actionable message.
     apiBase = '';
@@ -107,28 +118,30 @@
   }
 
   /* ── 4. Resolve WebSocket Signaling URL ────────────────────── */
-  let rawWsUrl =
+  const explicitWsUrl =
     userConfig.WS_URL ||
-    userConfig.WEBSOCKET_URL ||
-    getMetaContent('colearn-ws-url');
+    userConfig.WEBSOCKET_URL;
+
+  const metaWsUrl = getMetaContent('colearn-ws-url');
 
   let wsUrl = '';
-  if (rawWsUrl) {
-    wsUrl = String(rawWsUrl).trim().replace(/\/$/, '');
+  if (explicitWsUrl) {
+    wsUrl = String(explicitWsUrl).trim().replace(/\/$/, '');
+  } else if (isLocalDev) {
+    wsUrl = `ws://${hostname || 'localhost'}:3000/ws/video`;
+  } else if (isTunnel) {
+    const wsProto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    wsUrl = `${wsProto}//${hostname}/ws/video`;
+  } else if (metaWsUrl) {
+    wsUrl = String(metaWsUrl).trim().replace(/\/$/, '');
   } else if (apiBase) {
     try {
       const parsedApi = new URL(apiBase);
       const wsProto = parsedApi.protocol === 'https:' ? 'wss:' : 'ws:';
       wsUrl = `${wsProto}//${parsedApi.host}/ws/video`;
     } catch (_) {
-      if (isLocalDev || isTunnel) {
-        const wsProto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        wsUrl = `${wsProto}//${hostname || 'localhost'}${window.location.port ? ':' + window.location.port : ''}/ws/video`;
-      }
+      wsUrl = '';
     }
-  } else if (isLocalDev || isTunnel) {
-    const wsProto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    wsUrl = `${wsProto}//${hostname || 'localhost'}${window.location.port ? ':' + window.location.port : ''}/ws/video`;
   } else {
     wsUrl = '';
   }

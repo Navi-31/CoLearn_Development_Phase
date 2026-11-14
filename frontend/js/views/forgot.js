@@ -43,9 +43,12 @@ async function sendResetOTP() {
       if (btn) { btn.disabled = false; btn.textContent = 'Request Reset Link'; }
       showTempError(alertEl, data.error || data.message || 'Failed to send OTP.', 4000);
     }
-  } catch {
+  } catch (err) {
     if (btn) { btn.disabled = false; btn.textContent = 'Request Reset Link'; }
-    showTempError(alertEl, '⚠️ Server unreachable. Is the backend running?', 4000);
+    console.error('[Forgot] Send Reset OTP failed:', err);
+    showTempError(alertEl, err.message && err.message.includes('Cannot connect')
+      ? '⚠️ Cannot connect to server. Check Wi-Fi/LAN and backend.'
+      : ((err && err.message) || '⚠️ Server unreachable. Is the backend running?'), 4000);
   }
 }
 
