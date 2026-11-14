@@ -43,8 +43,17 @@
     window.location.protocol === 'file:'
   );
 
-  const ENV = isLocalDev ? 'development' : 'production';
-  const IS_PRODUCTION = !isLocalDev;
+  // Check if accessed through a temporary public development tunnel (Tunnelto, Cloudflare, ngrok)
+  const isTunnel = Boolean(
+    hostname.endsWith('.tunnel.to') ||
+    hostname.endsWith('.ngrok.io') ||
+    hostname.endsWith('.ngrok-free.app') ||
+    hostname.endsWith('.loca.lt') ||
+    hostname.endsWith('.trycloudflare.com')
+  );
+
+  const ENV = (isLocalDev || isTunnel) ? 'development' : 'production';
+  const IS_PRODUCTION = !isLocalDev && !isTunnel;
 
   /* ── 2. Helper to read meta tags ───────────────────────────── */
   function getMetaContent(name) {
@@ -72,12 +81,12 @@
   if (rawBackendUrl) {
     // Explicit backend URL configured
     apiBase = String(rawBackendUrl).trim().replace(/\/$/, '');
-  } else if (isLocalDev) {
-    // In local development:
-    // If opened on port 3000 (Express serving frontend), use current origin.
+  } else if (isLocalDev || isTunnel) {
+    // In local development or development tunnels (Tunnelto, ngrok, etc.):
+    // If opened on port 3000 or accessed via tunnel (Express serving frontend), use current origin.
     // If opened on another port (e.g. live-server, vite), default to Express on port 3000.
     const port = window.location.port;
-    if (port === '3000') {
+    if (port === '3000' || isTunnel) {
       apiBase = currentOrigin;
     } else {
       const devHost = hostname || 'localhost';
@@ -112,12 +121,14 @@
       const wsProto = parsedApi.protocol === 'https:' ? 'wss:' : 'ws:';
       wsUrl = `${wsProto}//${parsedApi.host}/ws/video`;
     } catch (_) {
-      if (isLocalDev) {
-        wsUrl = `ws://${hostname || 'localhost'}:3000/ws/video`;
+      if (isLocalDev || isTunnel) {
+        const wsProto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        wsUrl = `${wsProto}//${hostname || 'localhost'}${window.location.port ? ':' + window.location.port : ''}/ws/video`;
       }
     }
-  } else if (isLocalDev) {
-    wsUrl = `ws://${hostname || 'localhost'}:3000/ws/video`;
+  } else if (isLocalDev || isTunnel) {
+    const wsProto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    wsUrl = `${wsProto}//${hostname || 'localhost'}${window.location.port ? ':' + window.location.port : ''}/ws/video`;
   } else {
     wsUrl = '';
   }

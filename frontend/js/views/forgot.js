@@ -41,7 +41,7 @@ async function sendResetOTP() {
       showForgotStep(2);
     } else {
       if (btn) { btn.disabled = false; btn.textContent = 'Request Reset Link'; }
-      showTempError(alertEl, data.error || 'Failed to send OTP.', 4000);
+      showTempError(alertEl, data.error || data.message || 'Failed to send OTP.', 4000);
     }
   } catch {
     if (btn) { btn.disabled = false; btn.textContent = 'Request Reset Link'; }
@@ -72,7 +72,7 @@ async function verifyResetStep() {
       showForgotStep(3);
     } else {
       if (btn) { btn.disabled = false; btn.textContent = 'Verify OTP'; }
-      showTempError(alertEl, data.error || 'Invalid OTP. Please try again.', 4000);
+      showTempError(alertEl, data.error || data.message || 'Invalid OTP. Please try again.', 4000);
     }
   } catch {
     if (btn) { btn.disabled = false; btn.textContent = 'Verify OTP'; }

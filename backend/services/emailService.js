@@ -196,9 +196,14 @@ function consoleFallback(purpose, toEmail, otp, requestId) {
  * @param {string} otp     - Plaintext OTP (in body only, never logged in prod)
  */
 async function sendOTPEmail(toEmail, otp, requestId) {
-  if (!emailConfig.configured) {
-    consoleFallback('Signup OTP', toEmail, otp, requestId);
-    return;   // dev mode — success without real send
+  if (!emailConfig.configured || !emailConfig.verified) {
+    if (!emailConfig.IS_PROD) {
+      consoleFallback('Signup OTP', toEmail, otp, requestId);
+      return;   // dev mode — success without real send
+    }
+    const err = new Error('SMTP email service is not configured or verified.');
+    err.code = 'SMTP_FAILED';
+    throw err;
   }
 
   const html = emailWrapper(`
@@ -225,7 +230,16 @@ async function sendOTPEmail(toEmail, otp, requestId) {
     'If you did not attempt to create a CoLearn account, ignore this email.',
   ].join('\n');
 
-  await sendEmailCore(toEmail, 'CoLearn — Verify Your Email', html, text, 'Signup OTP');
+  try {
+    await sendEmailCore(toEmail, 'CoLearn — Verify Your Email', html, text, 'Signup OTP');
+  } catch (err) {
+    if (!emailConfig.IS_PROD) {
+      console.warn(`[Email] SMTP delivery failed in development mode (${err.message}). Falling back to server console.`);
+      consoleFallback('Signup OTP', toEmail, otp, requestId);
+      return;
+    }
+    throw err;
+  }
 }
 
 /**
@@ -238,9 +252,14 @@ async function sendOTPEmail(toEmail, otp, requestId) {
  * @param {string} otp     - Plaintext OTP (in body only, never logged in prod)
  */
 async function sendResetOTPEmail(toEmail, otp, requestId) {
-  if (!emailConfig.configured) {
-    consoleFallback('Password Reset OTP', toEmail, otp, requestId);
-    return;   // dev mode — success without real send
+  if (!emailConfig.configured || !emailConfig.verified) {
+    if (!emailConfig.IS_PROD) {
+      consoleFallback('Password Reset OTP', toEmail, otp, requestId);
+      return;   // dev mode — success without real send
+    }
+    const err = new Error('SMTP email service is not configured or verified.');
+    err.code = 'SMTP_FAILED';
+    throw err;
   }
 
   const html = emailWrapper(`
@@ -268,7 +287,16 @@ async function sendResetOTPEmail(toEmail, otp, requestId) {
     'If you did not request a password reset, ignore this email — your password will not change.',
   ].join('\n');
 
-  await sendEmailCore(toEmail, 'CoLearn — Password Reset Code', html, text, 'Password Reset OTP');
+  try {
+    await sendEmailCore(toEmail, 'CoLearn — Password Reset Code', html, text, 'Password Reset OTP');
+  } catch (err) {
+    if (!emailConfig.IS_PROD) {
+      console.warn(`[Email] SMTP delivery failed in development mode (${err.message}). Falling back to server console.`);
+      consoleFallback('Password Reset OTP', toEmail, otp, requestId);
+      return;
+    }
+    throw err;
+  }
 }
 
 /**

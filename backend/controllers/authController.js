@@ -300,30 +300,36 @@ async function sendResetOTP(req, res) {
   const email     = store.normalizeEmail(req.body.email || '');
 
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    const msg = 'Please provide a valid email address.';
     return res.status(400).json({
       success: false,
       code:    'INVALID_EMAIL',
-      message: 'Please provide a valid email address.',
+      message: msg,
+      error:   msg,
     });
   }
 
   // ── Cooldown check (60s) ────────────────────────────────────────
   const cooldown = store.checkCooldown(email);
   if (!cooldown.allowed) {
+    const msg = `Please wait ${cooldown.retryAfter} seconds before requesting another OTP.`;
     return res.status(429).json({
       success:    false,
       code:       'OTP_COOLDOWN',
-      message:    `Please wait ${cooldown.retryAfter} seconds before requesting another OTP.`,
+      message:    msg,
+      error:      msg,
       retryAfter: cooldown.retryAfter,
     });
   }
 
   // ── In-flight send lock ──────────────────────────────────────────
   if (!store.acquireSendLock(email)) {
+    const msg = 'An OTP is already being sent. Please wait a moment.';
     return res.status(429).json({
       success: false,
       code:    'OTP_SEND_IN_PROGRESS',
-      message: 'An OTP is already being sent. Please wait a moment.',
+      message: msg,
+      error:   msg,
     });
   }
 
@@ -336,19 +342,23 @@ async function sendResetOTP(req, res) {
 
     if (snap.empty) {
       store.releaseSendLock(email);
+      const msg = 'No account found with this email. Please register first.';
       return res.status(404).json({
         success: false,
         code:    'USER_NOT_FOUND',
-        message: 'No account found. Please register first.',
+        message: msg,
+        error:   msg,
       });
     }
   } catch (e) {
     store.releaseSendLock(email);
     console.error(`[sendResetOTP] [${requestId}] Firestore check failed:`, e.message);
+    const msg = 'Server error. Please try again.';
     return res.status(500).json({
       success: false,
       code:    'SERVER_ERROR',
-      message: 'Server error. Please try again.',
+      message: msg,
+      error:   msg,
     });
   }
 
@@ -366,10 +376,12 @@ async function sendResetOTP(req, res) {
     store.recordFailed();
     console.error(`[sendResetOTP] [${requestId}] Email delivery failed:`, e.message);
     store.releaseSendLock(email);
+    const msg = 'Email delivery failed. Please check SMTP configuration or try again.';
     return res.status(503).json({
       success: false,
       code:    'SMTP_FAILED',
-      message: 'Email delivery failed. Please try again.',
+      message: msg,
+      error:   msg,
     });
   } finally {
     store.releaseSendLock(email);
@@ -386,10 +398,12 @@ function verifyResetOTP(req, res) {
   const otp   = (req.body.otp || '').trim();
 
   if (!email || !otp) {
+    const msg = 'Email and OTP are required.';
     return res.status(400).json({
       success: false,
       code:    'MISSING_FIELDS',
-      message: 'Email and OTP are required.',
+      message: msg,
+      error:   msg,
     });
   }
 
@@ -398,15 +412,23 @@ function verifyResetOTP(req, res) {
   switch (result) {
     case 'ok':
       return res.json({ success: true, message: 'OTP verified successfully.' });
-    case 'not_found':
-      return res.status(400).json({ success: false, code: 'OTP_NOT_FOUND',    message: 'No OTP found. Please request a new one.' });
-    case 'expired':
-      return res.status(400).json({ success: false, code: 'OTP_EXPIRED',      message: 'OTP expired. Please request a new one.' });
-    case 'max_attempts':
-      return res.status(429).json({ success: false, code: 'OTP_MAX_ATTEMPTS', message: 'Too many incorrect attempts. Please request a new OTP.' });
+    case 'not_found': {
+      const msg = 'No OTP found. Please request a new one.';
+      return res.status(400).json({ success: false, code: 'OTP_NOT_FOUND', message: msg, error: msg });
+    }
+    case 'expired': {
+      const msg = 'OTP expired. Please request a new one.';
+      return res.status(400).json({ success: false, code: 'OTP_EXPIRED', message: msg, error: msg });
+    }
+    case 'max_attempts': {
+      const msg = 'Too many incorrect attempts. Please request a new OTP.';
+      return res.status(429).json({ success: false, code: 'OTP_MAX_ATTEMPTS', message: msg, error: msg });
+    }
     case 'invalid':
-    default:
-      return res.status(400).json({ success: false, code: 'OTP_INVALID',      message: 'Invalid OTP. Please try again.' });
+    default: {
+      const msg = 'Invalid OTP. Please try again.';
+      return res.status(400).json({ success: false, code: 'OTP_INVALID', message: msg, error: msg });
+    }
   }
 }
 
@@ -474,30 +496,36 @@ async function sendOTP(req, res) {
   const email     = store.normalizeEmail(req.body.email || '');
 
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    const msg = 'Please provide a valid email address.';
     return res.status(400).json({
       success: false,
       code:    'INVALID_EMAIL',
-      message: 'Please provide a valid email address.',
+      message: msg,
+      error:   msg,
     });
   }
 
   // ── Cooldown check ────────────────────────────────────────────
   const cooldown = store.checkCooldown(email);
   if (!cooldown.allowed) {
+    const msg = `Please wait ${cooldown.retryAfter} seconds before requesting another OTP.`;
     return res.status(429).json({
       success:    false,
       code:       'OTP_COOLDOWN',
-      message:    `Please wait ${cooldown.retryAfter} seconds before requesting another OTP.`,
+      message:    msg,
+      error:      msg,
       retryAfter: cooldown.retryAfter,
     });
   }
 
   // ── In-flight send lock ───────────────────────────────────────
   if (!store.acquireSendLock(email)) {
+    const msg = 'An OTP is already being sent. Please wait a moment.';
     return res.status(429).json({
       success: false,
       code:    'OTP_SEND_IN_PROGRESS',
-      message: 'An OTP is already being sent. Please wait a moment.',
+      message: msg,
+      error:   msg,
     });
   }
 
@@ -505,10 +533,12 @@ async function sendOTP(req, res) {
   try {
     await auth.getUserByEmail(email);
     store.releaseSendLock(email);
+    const msg = 'Account already exists. Please login.';
     return res.status(409).json({
       success: false,
       code:    'EMAIL_EXISTS',
-      message: 'Account already exists. Please login.',
+      message: msg,
+      error:   msg,
     });
   } catch (e) {
     if (e.code !== 'auth/user-not-found') {
@@ -531,10 +561,12 @@ async function sendOTP(req, res) {
     store.recordFailed();
     console.error(`[sendOTP] [${requestId}] Email delivery failed:`, err.message);
     store.releaseSendLock(email);
+    const msg = 'Email delivery failed. Please check SMTP configuration or try again.';
     return res.status(503).json({
       success: false,
       code:    'SMTP_FAILED',
-      message: 'Email delivery failed. Please try again.',
+      message: msg,
+      error:   msg,
     });
   } finally {
     store.releaseSendLock(email);
@@ -551,10 +583,12 @@ function verifyOTP(req, res) {
   const otp   = (req.body.otp || '').trim();
 
   if (!email || !otp) {
+    const msg = 'Email and OTP are required.';
     return res.status(400).json({
       success: false,
       code:    'MISSING_FIELDS',
-      message: 'Email and OTP are required.',
+      message: msg,
+      error:   msg,
     });
   }
 
@@ -563,15 +597,23 @@ function verifyOTP(req, res) {
   switch (result) {
     case 'ok':
       return res.json({ success: true, message: 'OTP verified successfully.' });
-    case 'not_found':
-      return res.status(400).json({ success: false, code: 'OTP_NOT_FOUND',    message: 'No OTP found. Please request a new one.' });
-    case 'expired':
-      return res.status(400).json({ success: false, code: 'OTP_EXPIRED',      message: 'OTP expired. Please request a new one.' });
-    case 'max_attempts':
-      return res.status(429).json({ success: false, code: 'OTP_MAX_ATTEMPTS', message: 'Too many incorrect attempts. Please request a new OTP.' });
+    case 'not_found': {
+      const msg = 'No OTP found. Please request a new one.';
+      return res.status(400).json({ success: false, code: 'OTP_NOT_FOUND', message: msg, error: msg });
+    }
+    case 'expired': {
+      const msg = 'OTP expired. Please request a new one.';
+      return res.status(400).json({ success: false, code: 'OTP_EXPIRED', message: msg, error: msg });
+    }
+    case 'max_attempts': {
+      const msg = 'Too many incorrect attempts. Please request a new OTP.';
+      return res.status(429).json({ success: false, code: 'OTP_MAX_ATTEMPTS', message: msg, error: msg });
+    }
     case 'invalid':
-    default:
-      return res.status(400).json({ success: false, code: 'OTP_INVALID',      message: 'Invalid OTP. Please try again.' });
+    default: {
+      const msg = 'Invalid OTP. Please try again.';
+      return res.status(400).json({ success: false, code: 'OTP_INVALID', message: msg, error: msg });
+    }
   }
 }
 

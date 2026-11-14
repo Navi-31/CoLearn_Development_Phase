@@ -11,7 +11,9 @@
  *   npm run dev              (development, with nodemon)
  */
 
+const path = require('path');
 require('dotenv').config();
+require('dotenv').config({ path: path.join(__dirname, '.env') });
 
 /* ── Auto-derive GOOGLE_REDIRECT_URI from APP_URL / BACKEND_URL ────
    Production: set BACKEND_URL=https://api.yourdomain.com or APP_URL

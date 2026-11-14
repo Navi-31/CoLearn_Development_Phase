@@ -174,7 +174,7 @@ async function handleSignupContinue() {
       startOTPCountdown();
     } else {
       if (contBtn) { contBtn.disabled = false; contBtn.textContent = 'Continue'; }
-      showTempError(alertEl, data.error || 'Failed to send OTP. Try again.', 4000);
+      showTempError(alertEl, data.error || data.message || 'Failed to send OTP. Try again.', 4000);
     }
   } catch (err) {
     if (contBtn) { contBtn.disabled = false; contBtn.textContent = 'Continue'; }
@@ -215,7 +215,7 @@ async function sendOTP() {
       sendBtn.textContent   = 'Resend OTP';
       sendBtn.style.opacity = '1';
       sendBtn.style.cursor  = 'pointer';
-      showTempError(alertEl, data.error || 'Failed to send OTP.', 4000);
+      showTempError(alertEl, data.error || data.message || 'Failed to send OTP.', 4000);
     }
   } catch (err) {
     sendBtn.disabled      = false;
@@ -253,7 +253,7 @@ async function handleSignup() {
   try {
     const otpData = await API.verifyOTP(email, otp);
     if (!otpData.success) {
-      showTempError(alertEl, otpData.error || 'Invalid OTP. Please try again.', 3000);
+      showTempError(alertEl, otpData.error || otpData.message || 'Invalid OTP. Please try again.', 3000);
       if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Create Account'; }
       return;
     }

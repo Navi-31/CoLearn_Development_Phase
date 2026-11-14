@@ -12,16 +12,44 @@
  *    because a developer with no SMTP must be able to test the flow
  */
 
+const path = require('path');
+require('dotenv').config();
+require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
 const nodemailer = require('nodemailer');
-
-const SMTP_USER = (process.env.SMTP_USER || '').trim();
-const SMTP_PASS = (process.env.SMTP_PASS || '').trim();
-const FROM_NAME = (process.env.EMAIL_FROM_NAME || 'CoLearn').trim();
-const IS_PROD   = process.env.NODE_ENV === 'production';
 
 let transporter = null;
 let configured   = false;
 let verified     = false;   // true only after transporter.verify() succeeds
+
+function getCredentials() {
+  const user = (process.env.SMTP_USER || '').trim();
+  const pass = (process.env.SMTP_PASS || '').trim().replace(/\s+/g, '');
+  const fromName = (process.env.EMAIL_FROM_NAME || 'CoLearn').trim();
+  const host = (process.env.SMTP_HOST || 'smtp.gmail.com').trim();
+  const customPort = process.env.SMTP_PORT ? parseInt(process.env.SMTP_PORT, 10) : null;
+  const isProd = process.env.NODE_ENV === 'production';
+  return { user, pass, fromName, host, customPort, isProd };
+}
+
+function createTransportInstance(opts) {
+  const { user, pass, host, port, secure } = opts;
+  return nodemailer.createTransport({
+    host,
+    port,
+    secure,
+    auth: {
+      user,
+      pass,
+    },
+    tls: {
+      // Enforce strict TLS certificate verification unless explicitly overridden
+      rejectUnauthorized: process.env.SMTP_IGNORE_TLS !== 'true',
+    },
+    connectionTimeout: 10000,   // 10 s – fail fast if unreachable
+    socketTimeout:     15000,   // 15 s – fail fast if send stalls
+    greetingTimeout:   10000,   // 10 s – fail fast on bad handshake
+  });
+}
 
 /* ── Human-readable diagnostics for common Gmail SMTP errors ──── */
 function diagnoseSmtpError(err) {
@@ -78,7 +106,12 @@ function diagnoseSmtpError(err) {
 
 /* ── Initialise and verify the transporter ───────────────────── */
 async function init() {
-  if (!SMTP_USER || !SMTP_PASS) {
+  const { user, pass, host, customPort, isProd } = getCredentials();
+
+  if (!user || !pass) {
+    configured  = false;
+    verified    = false;
+    transporter = null;
     console.warn('');
     console.warn('  ⚠️  SMTP NOT CONFIGURED');
     console.warn('  ─────────────────────────────────────────────────');
@@ -90,35 +123,46 @@ async function init() {
     return;
   }
 
-  transporter = nodemailer.createTransport({
-    host:   'smtp.gmail.com',
-    port:   587,
-    secure: false,              // STARTTLS (upgrade after connect)
-    auth: {
-      user: SMTP_USER,
-      pass: SMTP_PASS,
-    },
-    tls: {
-      // Enforce strict TLS certificate verification unless explicitly overridden
-      rejectUnauthorized: process.env.SMTP_IGNORE_TLS !== 'true',
-    },
-    connectionTimeout: 10000,   // 10 s – fail fast if Gmail unreachable
-    socketTimeout:     15000,   // 15 s – fail fast if send stalls
-    greetingTimeout:   10000,   // 10 s – fail fast on bad handshake
-  });
+  // Determine initial port & secure settings
+  let port = customPort || 587;
+  let secure = process.env.SMTP_SECURE === 'true' || port === 465;
 
-  configured = true;
-  console.log(`📧  SMTP configured → ${SMTP_USER}`);
+  let testTransporter = createTransportInstance({ user, pass, host, port, secure });
 
   // ── Live verification ────────────────────────────────────────
-  // transporter.verify() opens a real TCP connection to Gmail and
+  // transporter.verify() opens a real TCP connection to SMTP host and
   // checks AUTH. Failures are logged with actionable diagnostics.
   // The server still starts normally — email is non-critical.
   try {
-    await transporter.verify();
-    verified = true;
-    console.log(`  ✅ SMTP Connected — Gmail authentication successful`);
+    await testTransporter.verify();
+    transporter = testTransporter;
+    configured  = true;
+    verified    = true;
+    console.log(`📧  SMTP configured → ${user} (${host}:${port})`);
+    console.log(`  ✅ SMTP Connected — SMTP authentication successful`);
+    return;
   } catch (err) {
+    const msg = (err.message || '').toLowerCase();
+    const isConnError = msg.includes('econnrefused') || msg.includes('enotfound') || msg.includes('etimedout') || msg.includes('greeting');
+
+    // If port 587 connection timed out / failed on Gmail and no custom port was specified,
+    // automatically attempt port 465 (SSL direct), which bypasses mobile carrier port blocks.
+    if (!customPort && host === 'smtp.gmail.com' && port === 587 && isConnError) {
+      console.warn(`[SMTP] Port 587 connection failed (${err.code || err.message}). Attempting port 465 (SSL direct)...`);
+      try {
+        const sslTransporter = createTransportInstance({ user, pass, host, port: 465, secure: true });
+        await sslTransporter.verify();
+        transporter = sslTransporter;
+        configured  = true;
+        verified    = true;
+        console.log(`📧  SMTP configured → ${user} (smtp.gmail.com:465 SSL)`);
+        console.log(`  ✅ SMTP Connected — Gmail authentication successful via port 465`);
+        return;
+      } catch (sslErr) {
+        err = sslErr; // Use latest error for diagnosis
+      }
+    }
+
     verified    = false;
     configured  = false;   // treat as unconfigured so fallback kicks in
     transporter = null;
@@ -141,7 +185,7 @@ module.exports = {
   get transporter() { return transporter; },
   get configured()  { return configured; },
   get verified()    { return verified; },
-  SMTP_USER,
-  FROM_NAME,
-  IS_PROD,
+  get SMTP_USER()   { return (process.env.SMTP_USER || '').trim(); },
+  get FROM_NAME()   { return (process.env.EMAIL_FROM_NAME || 'CoLearn').trim(); },
+  get IS_PROD()     { return process.env.NODE_ENV === 'production'; },
 };

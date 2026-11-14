@@ -65,7 +65,16 @@ async function apiFetch(path, options = {}) {
   try {
     const res = await fetch(finalUrl, config);
     // Parse JSON even on non-2xx so error bodies reach the caller
-    const data = await res.json();
+    let data;
+    try {
+      data = await res.json();
+    } catch (_) {
+      data = {
+        success: false,
+        error: res.statusText ? `Server returned status ${res.status}: ${res.statusText}` : `Server returned HTTP ${res.status}`,
+        message: res.statusText ? `Server returned status ${res.status}: ${res.statusText}` : `Server returned HTTP ${res.status}`,
+      };
+    }
 
     // If the server says auth is required and we have a stored session,
     // it means the uid was invalid — clear session to avoid infinite loops
