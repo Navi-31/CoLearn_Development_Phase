@@ -113,7 +113,6 @@ const http = require('http');
 const { WebSocketServer } = require('ws');
 const cors         = require('cors');
 const helmet       = require('helmet');
-const path         = require('path');
 const os           = require('os');
 
 // Initialise Firebase Admin before any routes import it
