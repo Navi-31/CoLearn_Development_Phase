@@ -36,7 +36,9 @@
   window.__COLEARN_CONFIG__.TUNNELTO_URL = TUNNELTO_URL.trim().replace(/\/$/, '');
 
   // Pre-configured public Firebase Web App parameters for Friendsync
+  // (apiKey can be set here, via meta tag in index.html, or fetched dynamically from backend /api/config/firebase)
   window.__COLEARN_CONFIG__.FIREBASE = window.__COLEARN_CONFIG__.FIREBASE || {
+    apiKey:      '',
     projectId:   'friendsync-89f12',
     authDomain:  'friendsync-89f12.firebaseapp.com',
     databaseURL: 'https://friendsync-89f12-default-rtdb.firebaseio.com',

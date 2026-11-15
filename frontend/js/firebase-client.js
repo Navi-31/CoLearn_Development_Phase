@@ -15,6 +15,7 @@
   function isPlaceholderConfig(cfg) {
     if (!cfg || !cfg.apiKey) return true;
     return (
+      cfg.apiKey === '' ||
       cfg.apiKey.includes('PLACEHOLDER') ||
       cfg.apiKey.includes('your-') ||
       (cfg.projectId && cfg.projectId.includes('your-project-id'))
@@ -67,7 +68,7 @@
     }
   }
 
-  window.initFirebaseClient = function (config) {
+  window.initFirebaseClient = async function (config) {
     if (!config || !config.apiKey) return false;
     try {
       if (typeof firebase === 'undefined' || !firebase.initializeApp) {
@@ -87,11 +88,9 @@
         }
 
         // Re-initialize with real credentials if previously on placeholder
-        currentApp.delete().then(() => {
-          firebase.initializeApp(config);
-          setupFirebaseServices();
-        }).catch(() => {});
-        return true;
+        try {
+          await currentApp.delete();
+        } catch (_) {}
       }
 
       firebase.initializeApp(config);
@@ -127,8 +126,8 @@
             window.__FIREBASE_CONFIG__ = cfgRes.firebase;
             if (window.CONFIG) window.CONFIG.FIREBASE = cfgRes.firebase;
             activeConfig = cfgRes.firebase;
-            window.initFirebaseClient(cfgRes.firebase);
-            return true;
+            await window.initFirebaseClient(cfgRes.firebase);
+            return Boolean(window.fsAuth);
           }
         }
       } catch (e) {

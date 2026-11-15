@@ -194,23 +194,27 @@
   }
 
   /* ── 6. Firebase Client Configuration ──────────────────────── */
-  const firebaseOverride =
+  const rawFirebaseOverride =
     userConfig.FIREBASE ||
     window.__FIREBASE_CONFIG__ ||
     (window.CONFIG && window.CONFIG.FIREBASE) ||
-    null;
+    {};
 
-  const firebaseConfig = firebaseOverride || {
+  const firebaseConfig = {
     apiKey:
+      rawFirebaseOverride.apiKey ||
       getMetaContent('colearn-firebase-api-key') ||
       'AIzaSy_DEV_TEST_KEY_PLACEHOLDER',
     authDomain:
+      rawFirebaseOverride.authDomain ||
       getMetaContent('colearn-firebase-auth-domain') ||
       'friendsync-89f12.firebaseapp.com',
     projectId:
+      rawFirebaseOverride.projectId ||
       getMetaContent('colearn-firebase-project-id') ||
       'friendsync-89f12',
     databaseURL:
+      rawFirebaseOverride.databaseURL ||
       getMetaContent('colearn-firebase-database-url') ||
       'https://friendsync-89f12-default-rtdb.firebaseio.com',
   };

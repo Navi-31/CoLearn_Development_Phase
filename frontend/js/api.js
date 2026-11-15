@@ -148,7 +148,7 @@ const API = {
 
   /**
    * POST /api/auth/login
-   * Supports both Firebase ID token verification and direct password verification.
+   * Authenticates user session using Firebase ID token (Admin SDK verification).
    * → { success, message, user: { uid, name, username, email } }
    * → { success: false, error }
    */

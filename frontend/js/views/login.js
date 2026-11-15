@@ -39,6 +39,33 @@ function toggleLoginPassword() {
   input.focus();
 }
 
+/**
+ * Maps Firebase Auth client error codes to clean, user-friendly messages.
+ */
+function getFirebaseAuthErrorMessage(err) {
+  if (!err) return 'Login failed. Please try again.';
+  const code = (err.code || '').toLowerCase();
+  switch (code) {
+    case 'auth/invalid-credential':
+    case 'auth/wrong-password':
+    case 'auth/user-not-found':
+      return 'Incorrect email or password. Please try again.';
+    case 'auth/invalid-email':
+      return 'Please enter a valid email address.';
+    case 'auth/user-disabled':
+      return 'This account has been disabled. Please contact support.';
+    case 'auth/too-many-requests':
+      return 'Access temporarily disabled due to many failed login attempts. Please reset your password or try again later.';
+    case 'auth/network-request-failed':
+      return 'Network connection error. Please check your internet connection.';
+    case 'auth/api-key-not-valid':
+    case 'auth/invalid-api-key':
+      return 'Firebase Web API key is not valid. Please verify your Firebase project configuration.';
+    default:
+      return err.message || 'Login failed. Please check your credentials or try again.';
+  }
+}
+
 async function handleLogin() {
   const email   = document.getElementById('login-email').value.trim().toLowerCase();
   const pw      = document.getElementById('login-password').value;
@@ -59,28 +86,43 @@ async function handleLogin() {
   if (btn) { btn.disabled = true; btn.textContent = 'Logging in…'; }
 
   try {
-    let idToken = null;
-
-    // Ensure client SDK is ready with active config before attempting sign in
+    // Ensure client SDK is ready with active configuration before attempting sign in
     if (typeof window.ensureFirebaseClientReady === 'function') {
       await window.ensureFirebaseClientReady().catch(() => {});
     }
 
-    // Attempt client-side Firebase Auth sign-in if client SDK is available
-    if (typeof window.fsAuth !== 'undefined' && window.fsAuth && typeof window.fsAuth.signInWithEmailAndPassword === 'function') {
-      try {
-        const userCred = await window.fsAuth.signInWithEmailAndPassword(email, pw);
-        if (userCred && userCred.user) {
-          idToken = await userCred.user.getIdToken();
-        }
-      } catch (clientAuthErr) {
-        // Safe diagnostic logging (never log passwords or sensitive data)
-        console.warn('[Login] Firebase Client SDK sign-in notice:', clientAuthErr.code || clientAuthErr.message);
-        // Fall back gracefully to backend verification
-      }
+    // Verify Firebase Client Auth is initialized
+    if (typeof window.fsAuth === 'undefined' || !window.fsAuth || typeof window.fsAuth.signInWithEmailAndPassword !== 'function') {
+      const errorMsg = 'Firebase client authentication service is not ready. Please verify project configuration.';
+      console.warn('[Login] Firebase Client Auth service unavailable.');
+      showTempError(alertEl, errorMsg, 6000);
+      return;
     }
 
-    const data = await API.login({ email, password: pw, idToken });
+    // Canonical Client-Side Authentication:
+    // Browser authenticates directly with Firebase Auth via Web SDK.
+    // This runs directly in the user browser and automatically supplies HTTP referrers,
+    // avoiding server-side REST API key restrictions.
+    let idToken = null;
+    try {
+      const userCred = await window.fsAuth.signInWithEmailAndPassword(email, pw);
+      if (userCred && userCred.user) {
+        idToken = await userCred.user.getIdToken();
+      }
+    } catch (clientAuthErr) {
+      console.warn('[Login] Firebase Client SDK authentication failed:', clientAuthErr.code || clientAuthErr.message);
+      const friendlyMsg = getFirebaseAuthErrorMessage(clientAuthErr);
+      showTempError(alertEl, friendlyMsg, 6000);
+      return; // Strict halt: never fall back to unauthenticated backend call
+    }
+
+    if (!idToken) {
+      showTempError(alertEl, 'Failed to obtain authentication token. Please try again.', 6000);
+      return;
+    }
+
+    // Send verified ID token to backend for Admin SDK verification and session setup
+    const data = await API.login({ email, idToken });
 
     if (data.success) {
       // Store user profile from server (no password)
@@ -93,7 +135,7 @@ async function handleLogin() {
       // Persist session to localStorage so refresh doesn't log out
       AppState.saveSession();
 
-      // Authenticate Firebase Client SDK (for Firestore chat + RTDB signaling)
+      // Authenticate Firebase Client SDK services (Firestore chat + RTDB signaling)
       if (typeof window.authenticateFirebaseClient === 'function') {
         window.authenticateFirebaseClient(data.user.uid).catch(() => {});
       } else if (typeof window.fsAuth !== 'undefined' && window.fsAuth && data.customToken) {
