@@ -74,10 +74,10 @@ async function handleLogin() {
       AppState.saveSession();
 
       // Authenticate Firebase Client SDK (for Firestore chat + RTDB signaling)
-      if (typeof window.fsAuth !== 'undefined' && window.fsAuth && data.customToken) {
-        window.fsAuth.signInWithCustomToken(data.customToken).catch(() => {});
-      } else if (typeof window.authenticateFirebaseClient === 'function') {
+      if (typeof window.authenticateFirebaseClient === 'function') {
         window.authenticateFirebaseClient(data.user.uid).catch(() => {});
+      } else if (typeof window.fsAuth !== 'undefined' && window.fsAuth && data.customToken) {
+        window.fsAuth.signInWithCustomToken(data.customToken).catch(() => {});
       }
 
       // Clear inputs

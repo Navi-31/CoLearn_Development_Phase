@@ -127,6 +127,14 @@ const API = {
   /* ── Authentication ──────────────────────────────────────────── */
 
   /**
+   * GET /api/config/firebase
+   * → { success: true, firebase: { apiKey, authDomain, projectId, databaseURL } }
+   */
+  async getFirebaseConfig() {
+    return apiFetch('/api/config/firebase');
+  },
+
+  /**
    * POST /api/auth/register
    * → { success, message, user: { uid, name, username, email } }
    * → { success: false, error }

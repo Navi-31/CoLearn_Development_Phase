@@ -19,6 +19,7 @@ const {
   deleteSuite,
   getSuiteById,
   createCustomToken,
+  getPublicFirebaseConfig,
 } = require('../controllers/authController');
 
 const router = express.Router();
@@ -136,6 +137,11 @@ router.get('/suites',         workspaceReadLimiter,  requireAuth, getSuites);
 router.get('/suites/:id',     workspaceReadLimiter,  requireAuth, getSuiteById);
 router.post('/suites',        workspaceWriteLimiter, requireAuth, createSuite);
 router.delete('/suites/:id',  workspaceWriteLimiter, requireAuth, deleteSuite);
+
+/* ── Public Firebase Client Configuration ────────────────────────── */
+// GET /api/config/firebase
+// Returns public client SDK config so frontend works dynamically in all environments
+router.get('/config/firebase', getPublicFirebaseConfig);
 
 /* ── Firebase Custom Token (for Client SDK auth) ─────────────────── */
 // POST /api/auth/token

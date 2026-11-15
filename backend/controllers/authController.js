@@ -207,30 +207,81 @@ async function login(req, res) {
 
   // We use the Firebase Auth REST API to verify credentials
   // (Admin SDK doesn't expose signInWithEmailAndPassword)
-  const FIREBASE_API_KEY = process.env.FIREBASE_API_KEY;
+  const FIREBASE_API_KEY = (process.env.FIREBASE_API_KEY || '').trim();
   if (!FIREBASE_API_KEY) {
     console.error('[login] FIREBASE_API_KEY not set in .env');
     return res.status(500).json({ success: false, error: 'Server configuration error.' });
   }
 
-  let signInResult;
-  try {
-    const response = await fetch(
-      `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${FIREBASE_API_KEY}`,
-      {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ email, password, returnSecureToken: false }),
+  const projectId  = (process.env.FIREBASE_PROJECT_ID || 'friendsync-89f12').trim();
+  const authDomain = (process.env.FIREBASE_AUTH_DOMAIN || `${projectId}.firebaseapp.com`).trim();
+
+  // Rotate through candidate header sets to satisfy Google Cloud Console API key restrictions:
+  // 1. Firebase Project Canonical Auth Domain (matches standard Firebase web key restrictions)
+  // 2. Incoming request referer/origin (matches localhost:3000 or custom allowed domains)
+  // 3. Plain headers (for server keys / unrestricted API keys)
+  const candidateHeaderSets = [
+    {
+      'Content-Type': 'application/json',
+      'Referer':      `https://${authDomain}/`,
+      'Origin':       `https://${authDomain}`,
+      'X-Firebase-Locale': 'en',
+    },
+    {
+      'Content-Type': 'application/json',
+      ...(req.headers.referer ? { 'Referer': req.headers.referer } : {}),
+      ...(req.headers.origin ? { 'Origin': req.headers.origin } : {}),
+      'X-Firebase-Locale': 'en',
+    },
+    {
+      'Content-Type': 'application/json',
+    },
+  ];
+
+  let signInResult = null;
+  let lastFetchError = null;
+
+  for (const headers of candidateHeaderSets) {
+    try {
+      const response = await fetch(
+        `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${encodeURIComponent(FIREBASE_API_KEY)}`,
+        {
+          method:  'POST',
+          headers,
+          body:    JSON.stringify({ email, password, returnSecureToken: false }),
+        }
+      );
+      const data = await response.json();
+      signInResult = data;
+
+      if (!data.error) {
+        break; // Verification call accepted
       }
-    );
-    signInResult = await response.json();
-  } catch (e) {
-    console.error('[login] Firebase REST call failed:', e.message);
+
+      const errMsg = (data.error && data.error.message) || '';
+      const isKeyRestrictionError =
+        errMsg.includes('API key not valid') ||
+        errMsg.includes('INVALID_KEY') ||
+        errMsg.includes('API_KEY_INVALID');
+
+      if (!isKeyRestrictionError) {
+        // Credential error (e.g. wrong password, user not found) -> Key was accepted!
+        break;
+      }
+      // If it was an API key restriction error, attempt next candidate header set
+      lastFetchError = data.error;
+    } catch (e) {
+      lastFetchError = e;
+    }
+  }
+
+  if (!signInResult && lastFetchError) {
+    console.error('[login] Firebase REST call failed:', lastFetchError.message || lastFetchError);
     return res.status(500).json({ success: false, error: 'Login service unavailable. Try again.' });
   }
 
   // Handle Firebase REST API errors
-  if (signInResult.error) {
+  if (signInResult && signInResult.error) {
     const code = signInResult.error.message || '';
     if (code.includes('EMAIL_NOT_FOUND') || code.includes('INVALID_EMAIL')) {
       return res.status(404).json({
@@ -247,7 +298,24 @@ async function login(req, res) {
         error: 'Account temporarily locked due to multiple failed attempts. Try again later.',
       });
     }
-    console.error('[login] Firebase error:', code);
+
+    if (code.includes('API key not valid') || code.includes('INVALID_KEY') || code.includes('API_KEY_INVALID')) {
+      console.error('\n❌  [login] Firebase Identity Toolkit rejected FIREBASE_API_KEY:');
+      console.error(`    Error: ${code}`);
+      console.error('    Actionable Steps for Google Cloud / Firebase Console:');
+      console.error('    1. Google Cloud Console (https://console.cloud.google.com/apis/credentials):');
+      console.error('       - Check that the API key exists and is enabled.');
+      console.error('       - If "Application restrictions" is set to "Websites (HTTP referrers)", add:');
+      console.error(`         * https://${authDomain}/*`);
+      console.error('         * http://localhost:3000/*');
+      console.error('         Or select "None" for development.');
+      console.error('       - Under "API restrictions", ensure "Identity Toolkit API" is enabled and allowed.');
+      console.error('    2. Firebase Console (https://console.firebase.google.com/):');
+      console.error(`       - Verify Project Settings → Web API Key matches FIREBASE_API_KEY in backend/.env.\n`);
+    } else {
+      console.error('[login] Firebase error:', code);
+    }
+
     return res.status(401).json({ success: false, error: 'Login failed. Please try again.' });
   }
 
@@ -872,6 +940,32 @@ async function createCustomToken(req, res) {
   }
 }
 
+/* ══════════════════════════════════════════════════════════════
+   PUBLIC FIREBASE CLIENT CONFIGURATION
+   ══════════════════════════════════════════════════════════════ */
+/**
+ * GET /api/config/firebase
+ * Returns public Firebase Web Client configuration (non-secret).
+ * Used by frontend SPA to initialize Firebase Client SDK across
+ * localhost, development tunnels (Tunnelto), and cloud deployments.
+ */
+function getPublicFirebaseConfig(req, res) {
+  const projectId   = (process.env.FIREBASE_PROJECT_ID || 'friendsync-89f12').trim();
+  const authDomain  = (process.env.FIREBASE_AUTH_DOMAIN || `${projectId}.firebaseapp.com`).trim();
+  const apiKey      = (process.env.FIREBASE_API_KEY || '').trim();
+  const databaseURL = (process.env.FIREBASE_DATABASE_URL || `https://${projectId}-default-rtdb.firebaseio.com`).trim();
+
+  return res.json({
+    success: true,
+    firebase: {
+      apiKey,
+      authDomain,
+      projectId,
+      databaseURL,
+    },
+  });
+}
+
 module.exports = {
   register, login,
   sendResetOTP, verifyResetOTP, resetPassword,
@@ -879,5 +973,6 @@ module.exports = {
   health,
   getSuites, createSuite, deleteSuite, getSuiteById,
   createCustomToken,
+  getPublicFirebaseConfig,
 };
 

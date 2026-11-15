@@ -168,13 +168,13 @@
       'AIzaSy_DEV_TEST_KEY_PLACEHOLDER',
     authDomain:
       getMetaContent('colearn-firebase-auth-domain') ||
-      'your-project-id.firebaseapp.com',
+      'friendsync-89f12.firebaseapp.com',
     projectId:
       getMetaContent('colearn-firebase-project-id') ||
-      'your-project-id',
+      'friendsync-89f12',
     databaseURL:
       getMetaContent('colearn-firebase-database-url') ||
-      'https://your-project-id-default-rtdb.firebaseio.com',
+      'https://friendsync-89f12-default-rtdb.firebaseio.com',
   };
 
   /* ── 7. Export CONFIG to Global Scope ──────────────────────── */

@@ -114,6 +114,7 @@ const { WebSocketServer } = require('ws');
 const cors         = require('cors');
 const helmet       = require('helmet');
 const os           = require('os');
+const fs           = require('fs');
 
 // Initialise Firebase Admin before any routes import it
 const { warmUpFirebase } = require('./config/firebase');
@@ -273,8 +274,52 @@ app.use(cors(corsOptions));
 app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 
-/* ── Static frontend ─────────────────────────────────────────── */
+/* ── Static frontend & Injected Client Config ─────────────────── */
 const FRONTEND_DIR = path.join(__dirname, '..', 'frontend');
+
+/**
+ * Injects public Firebase Client SDK configuration into index.html dynamically.
+ * This guarantees both localhost and public deployments (Tunnelto, Cloudflare)
+ * have the active non-secret Firebase web client parameters immediately.
+ */
+function getInjectedIndexHtml() {
+  const indexPath = path.join(FRONTEND_DIR, 'index.html');
+  try {
+    let html = fs.readFileSync(indexPath, 'utf8');
+    const projectId   = (process.env.FIREBASE_PROJECT_ID || 'friendsync-89f12').trim();
+    const authDomain  = (process.env.FIREBASE_AUTH_DOMAIN || `${projectId}.firebaseapp.com`).trim();
+    const apiKey      = (process.env.FIREBASE_API_KEY || '').trim();
+    const databaseURL = (process.env.FIREBASE_DATABASE_URL || `https://${projectId}-default-rtdb.firebaseio.com`).trim();
+
+    const clientConfig = {
+      apiKey,
+      authDomain,
+      projectId,
+      databaseURL,
+    };
+
+    const injection = `<script>window.__FIREBASE_CONFIG__ = ${JSON.stringify(clientConfig)};</script>`;
+    if (html.includes('<!-- Centralized Environment Configuration')) {
+      html = html.replace('<!-- Centralized Environment Configuration', `${injection}\n<!-- Centralized Environment Configuration`);
+    } else if (html.includes('</head>')) {
+      html = html.replace('</head>', `${injection}\n</head>`);
+    }
+    return html;
+  } catch (_) {
+    return null;
+  }
+}
+
+// Serve injected index.html for root and index requests
+app.get(['/', '/index.html'], (req, res, next) => {
+  const html = getInjectedIndexHtml();
+  if (html) {
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    return res.send(html);
+  }
+  next();
+});
+
 app.use(express.static(FRONTEND_DIR, {
   // Allow LAN clients to get fresh assets
   setHeaders: (res) => {
@@ -535,6 +580,11 @@ app.post('/api/debug/send-test-email', async (req, res) => {
 /* ── SPA fallback (serve index.html for all non-API routes) ─── */
 // This includes /invite/:token paths so the frontend router handles them
 app.get('*', (req, res) => {
+  const html = getInjectedIndexHtml();
+  if (html) {
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    return res.send(html);
+  }
   res.sendFile(path.join(FRONTEND_DIR, 'index.html'));
 });
 
