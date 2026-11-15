@@ -159,6 +159,8 @@
     wsUrl = String(explicitWsUrl).trim().replace(/\/$/, '');
   } else if (isLocalDev) {
     wsUrl = `ws://${hostname || 'localhost'}:3000/ws/video`;
+  } else if (metaWsUrl) {
+    wsUrl = String(metaWsUrl).trim().replace(/\/$/, '');
   } else if (isGitHubPages && apiBase) {
     try {
       const parsedApi = new URL(apiBase);
@@ -170,8 +172,6 @@
   } else if (isTunnel) {
     const wsProto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     wsUrl = `${wsProto}//${hostname}/ws/video`;
-  } else if (metaWsUrl) {
-    wsUrl = String(metaWsUrl).trim().replace(/\/$/, '');
   } else if (apiBase) {
     try {
       const parsedApi = new URL(apiBase);
