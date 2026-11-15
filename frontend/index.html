@@ -12,6 +12,25 @@
     <meta name="colearn-firebase-project-id" content="friendsync-89f12">
     <meta name="colearn-firebase-auth-domain" content="friendsync-89f12.firebaseapp.com">
     <meta name="colearn-firebase-database-url" content="https://friendsync-89f12-default-rtdb.firebaseio.com">
+    <script>
+      // Single Page App redirect handler for GitHub Pages (restores path from 404.html ?p=)
+      (function (l) {
+        if (l.search) {
+          var q = {};
+          l.search.slice(1).split('&').forEach(function (v) {
+            var a = v.split('=');
+            q[a[0]] = a.slice(1).join('=').replace(/~and~/g, '&');
+          });
+          if (q.p !== undefined) {
+            window.history.replaceState(null, null,
+              l.pathname.slice(0, -1) + decodeURIComponent(q.p || '') +
+              (q.q ? ('?' + q.q) : '') +
+              l.hash
+            );
+          }
+        }
+      }(window.location));
+    </script>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
@@ -157,8 +176,8 @@
             <li><a class="nav-link relative font-medium text-on-surface-variant hover:text-primary transition-colors" href="#faq">FAQ</a></li>
         </ul>
         <div class="flex items-center gap-md">
-            <a class="px-lg py-sm text-on-surface-variant font-semibold hover:text-primary transition-colors" href="/login" onclick="event.preventDefault(); navigate('view-login');">Sign In</a>
-            <a class="px-xl py-sm soft-gradient text-white rounded-lg font-semibold shadow-md hover:shadow-lg active:scale-95 transition-all" href="/login" onclick="event.preventDefault(); navigate('view-login');">Get Started</a>
+            <a class="px-lg py-sm text-on-surface-variant font-semibold hover:text-primary transition-colors" href="#login" onclick="event.preventDefault(); navigate('view-login');">Sign In</a>
+            <a class="px-xl py-sm soft-gradient text-white rounded-lg font-semibold shadow-md hover:shadow-lg active:scale-95 transition-all" href="#login" onclick="event.preventDefault(); navigate('view-login');">Get Started</a>
         </div>
     </nav>
 </header>
@@ -182,7 +201,7 @@
                 CoLearn is the all-in-one collaborative workspace for students. Real-time chat, shared whiteboards, and document sync built for the modern academic workflow.
             </p>
             <div class="flex flex-wrap gap-md pt-4">
-                <a href="/login" onclick="event.preventDefault(); navigate('view-login');" class="px-8 py-4 soft-gradient text-white rounded-xl font-bold shadow-xl hover:shadow-primary/25 hover:-translate-y-1 transition-all flex items-center gap-2">
+                <a href="#login" onclick="event.preventDefault(); navigate('view-login');" class="px-8 py-4 soft-gradient text-white rounded-xl font-bold shadow-xl hover:shadow-primary/25 hover:-translate-y-1 transition-all flex items-center gap-2">
                     Start Studying Free <span class="material-symbols-outlined">arrow_forward</span>
                 </a>
                 <a href="#why-colearn" class="px-8 py-4 bg-white border border-outline text-on-surface rounded-xl font-bold hover:bg-surface-container transition-all hover:-translate-y-1 inline-flex items-center justify-center">
@@ -422,7 +441,7 @@
                 <h2 class="text-4xl md:text-5xl font-extrabold leading-tight">Ready to Transform Your Group Study?</h2>
                 <p class="text-lg md:text-xl text-white/80">Join thousands of students and start your collaborative journey today. No credit card required.</p>
                 <div class="pt-8 flex flex-wrap justify-center gap-md">
-                    <a href="/login" onclick="event.preventDefault(); navigate('view-login');" class="px-10 py-5 bg-white text-primary rounded-xl font-bold shadow-xl hover:bg-background transition-all active:scale-95 inline-flex items-center justify-center">Create Free Account</a>
+                    <a href="#login" onclick="event.preventDefault(); navigate('view-login');" class="px-10 py-5 bg-white text-primary rounded-xl font-bold shadow-xl hover:bg-background transition-all active:scale-95 inline-flex items-center justify-center">Create Free Account</a>
                     <a href="#contact" class="px-10 py-5 bg-white/10 border border-white/20 text-white rounded-xl font-bold hover:bg-white/20 transition-all inline-flex items-center justify-center">Schedule a Demo</a>
                 </div>
             </div>
@@ -1520,14 +1539,8 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
-<!-- Centralized Environment Configuration (Automatic localhost detection + Cloudflare production support) -->
-<script id="colearn-env-config">
-  window.__COLEARN_CONFIG__ = window.__COLEARN_CONFIG__ || {};
-  // In development, CoLearn automatically defaults to http://localhost:3000.
-  // For Cloudflare production deployment, set your deployed backend URL:
-  // window.__COLEARN_CONFIG__.BACKEND_URL = "https://your-deployed-backend.com";
-  // window.__COLEARN_CONFIG__.WS_URL = "wss://your-deployed-backend.com/ws/video";
-</script>
+<!-- Centralized Runtime Deployment Configuration -->
+<script src="js/env-config.js"></script>
 <script src="js/config.js"></script>
 <script src="js/state.js"></script>
 <script src="js/utils.js"></script>

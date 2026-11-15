@@ -61,6 +61,11 @@ async function handleLogin() {
   try {
     let idToken = null;
 
+    // Ensure client SDK is ready with active config before attempting sign in
+    if (typeof window.ensureFirebaseClientReady === 'function') {
+      await window.ensureFirebaseClientReady().catch(() => {});
+    }
+
     // Attempt client-side Firebase Auth sign-in if client SDK is available
     if (typeof window.fsAuth !== 'undefined' && window.fsAuth && typeof window.fsAuth.signInWithEmailAndPassword === 'function') {
       try {

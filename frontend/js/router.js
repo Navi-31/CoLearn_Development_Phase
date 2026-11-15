@@ -170,14 +170,14 @@ function _initAppNav(hadSession) {
     }
   } else {
     // No session — check if path explicitly asks for auth view
-    const path = window.location.pathname;
-    if (path === '/login') {
+    const path = (window.location.pathname || '').replace(/\/$/, '');
+    if (path === '/login' || path.endsWith('/login')) {
       history.replaceState({ view: 'view-login' }, '');
       navigate('view-login', true);
-    } else if (path === '/signup') {
+    } else if (path === '/signup' || path.endsWith('/signup')) {
       history.replaceState({ view: 'view-signup' }, '');
       navigate('view-signup', true);
-    } else if (path === '/forgot') {
+    } else if (path === '/forgot' || path.endsWith('/forgot')) {
       history.replaceState({ view: 'view-forgot' }, '');
       navigate('view-forgot', true);
     } else {

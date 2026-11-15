@@ -28,19 +28,28 @@
   /* ── 1. Hostname & Environment Detection ───────────────────── */
   const hostname = (window.location.hostname || '').toLowerCase().trim();
   const currentOrigin = (window.location.origin || '').replace(/\/$/, '');
+  const pathname = (window.location.pathname || '/');
+
+  // Check if running on GitHub Pages (e.g. navi-31.github.io)
+  const isGitHubPages = Boolean(
+    hostname === 'navi-31.github.io' ||
+    hostname.endsWith('.github.io')
+  );
 
   // Check if running in a local / loopback / LAN development environment
   const isLocalDev = Boolean(
-    !hostname ||
-    hostname === 'localhost' ||
-    hostname === '127.0.0.1' ||
-    hostname === '::1' ||
-    hostname === '[::1]' ||
-    hostname.endsWith('.localhost') ||
-    /^192\.168\./.test(hostname) ||
-    /^10\./.test(hostname) ||
-    /^172\.(1[6-9]|2\d|3[01])\./.test(hostname) ||
-    window.location.protocol === 'file:'
+    !isGitHubPages && (
+      !hostname ||
+      hostname === 'localhost' ||
+      hostname === '127.0.0.1' ||
+      hostname === '::1' ||
+      hostname === '[::1]' ||
+      hostname.endsWith('.localhost') ||
+      /^192\.168\./.test(hostname) ||
+      /^10\./.test(hostname) ||
+      /^172\.(1[6-9]|2\d|3[01])\./.test(hostname) ||
+      window.location.protocol === 'file:'
+    )
   );
 
   // Check if accessed through a temporary public development tunnel (Tunnelto, Cloudflare, ngrok)
@@ -55,6 +64,11 @@
   const ENV = (isLocalDev || isTunnel) ? 'development' : 'production';
   const IS_PRODUCTION = !isLocalDev && !isTunnel;
 
+  // Base repository subpath (e.g. '/CoLearn_Development_Phase/' on GitHub Pages)
+  const basePath = (isGitHubPages && pathname.startsWith('/CoLearn_Development_Phase'))
+    ? '/CoLearn_Development_Phase/'
+    : '/';
+
   /* ── 2. Helper to read meta tags ───────────────────────────── */
   function getMetaContent(name) {
     try {
@@ -67,6 +81,9 @@
 
   /* ── 3. Resolve Configuration Overrides ─────────────────────── */
   const userConfig = window.__COLEARN_CONFIG__ || window.__ENV__ || {};
+
+  // Tunnelto URL configured in env-config.js
+  const tunneltoUrl = (userConfig.TUNNELTO_URL || '').trim().replace(/\/$/, '');
 
   // Explicit JavaScript overrides take highest priority if manually provided
   const explicitBackendUrl =
@@ -85,7 +102,7 @@
   } else if (isLocalDev) {
     // 2. LOCALHOST / LAN DEVELOPMENT:
     // ALWAYS route to the local Express backend directly.
-    // Never allow a remote tunnel meta tag to hijack localhost traffic.
+    // Never allow a remote tunnel URL to hijack localhost traffic.
     const port = window.location.port;
     if (port === '3000') {
       apiBase = currentOrigin;
@@ -93,26 +110,39 @@
       const devHost = hostname || 'localhost';
       apiBase = `http://${devHost}:3000`;
     }
+  } else if (isGitHubPages) {
+    // 3. PERMANENT GITHUB PAGES FRONTEND (https://navi-31.github.io/CoLearn_Development_Phase/):
+    // Routes to the currently configured Tunnelto URL in env-config.js.
+    // NEVER falls back to localhost on GitHub Pages!
+    if (tunneltoUrl) {
+      apiBase = tunneltoUrl;
+    } else if (metaBackendUrl) {
+      apiBase = String(metaBackendUrl).trim().replace(/\/$/, '');
+    } else {
+      apiBase = '';
+      isConfigured = false;
+      console.error(
+        '[CoLearn Config] Tunnelto backend URL is NOT configured.\n' +
+        'Please set your active Tunnelto URL in frontend/js/env-config.js (TUNNELTO_URL).\n' +
+        'Requests will NOT fall back to localhost on GitHub Pages.'
+      );
+    }
   } else if (isTunnel) {
-    // 3. TUNNELTO / NGROK DEVELOPMENT:
-    // When accessed through any public dev tunnel (e.g. *.tunnel.to),
+    // 4. TUNNELTO / NGROK DEVELOPMENT (when browsing directly via tunnel):
     // Express serves both frontend and API on the same origin.
-    // Use currentOrigin so it works dynamically across all tunnel reconnects!
     apiBase = currentOrigin;
   } else if (metaBackendUrl) {
-    // 4. PRODUCTION (Cloudflare Pages / custom domain):
-    // Frontend is hosted separately from backend; use configured backend endpoint.
+    // 5. PRODUCTION (Cloudflare Pages / custom domain):
     apiBase = String(metaBackendUrl).trim().replace(/\/$/, '');
+  } else if (tunneltoUrl) {
+    apiBase = tunneltoUrl;
   } else {
-    // 5. Unconfigured production environment:
-    // Do NOT fall back to localhost! Do NOT guess!
-    // Flag as unconfigured so UI and API calls provide a clear actionable message.
+    // 6. Unconfigured production environment:
     apiBase = '';
     isConfigured = false;
     console.error(
       '[CoLearn Config] Production backend URL is NOT configured.\n' +
-      'Please set your deployed backend URL via window.__COLEARN_CONFIG__.BACKEND_URL ' +
-      'or <meta name="colearn-backend-url" content="https://your-api.com">.\n' +
+      'Please set your deployed backend URL in frontend/js/env-config.js.\n' +
       'Requests will NOT fall back to localhost in production.'
     );
   }
@@ -129,6 +159,14 @@
     wsUrl = String(explicitWsUrl).trim().replace(/\/$/, '');
   } else if (isLocalDev) {
     wsUrl = `ws://${hostname || 'localhost'}:3000/ws/video`;
+  } else if (isGitHubPages && apiBase) {
+    try {
+      const parsedApi = new URL(apiBase);
+      const wsProto = parsedApi.protocol === 'https:' ? 'wss:' : 'ws:';
+      wsUrl = `${wsProto}//${parsedApi.host}/ws/video`;
+    } catch (_) {
+      wsUrl = '';
+    }
   } else if (isTunnel) {
     const wsProto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     wsUrl = `${wsProto}//${hostname}/ws/video`;
@@ -182,8 +220,10 @@
     ENV,
     IS_PRODUCTION,
     IS_LOCAL: isLocalDev,
+    IS_GITHUB_PAGES: isGitHubPages,
     IS_CONFIGURED: isConfigured,
     IS_CROSS_ORIGIN: isCrossOrigin,
+    BASE_PATH: basePath,
 
     /**
      * Base URL for all API calls, e.g. "http://localhost:3000" or "https://api.colearn.app".

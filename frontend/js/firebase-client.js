@@ -103,22 +103,54 @@
     }
   };
 
+  let _configFetchPromise = null;
+
+  /**
+   * Ensures the Firebase Client SDK is initialized with valid non-placeholder configuration.
+   * If running with placeholders, fetches the public client config from backend /api/config/firebase.
+   */
+  window.ensureFirebaseClientReady = async function () {
+    let currentConfig = getActiveConfig();
+    if (!isPlaceholderConfig(currentConfig) && window.fsAuth) {
+      return true;
+    }
+
+    if (_configFetchPromise) {
+      return _configFetchPromise;
+    }
+
+    _configFetchPromise = (async () => {
+      try {
+        if (typeof apiFetch === 'function') {
+          const cfgRes = await apiFetch('/api/config/firebase');
+          if (cfgRes && cfgRes.success && cfgRes.firebase && !isPlaceholderConfig(cfgRes.firebase)) {
+            window.__FIREBASE_CONFIG__ = cfgRes.firebase;
+            if (window.CONFIG) window.CONFIG.FIREBASE = cfgRes.firebase;
+            activeConfig = cfgRes.firebase;
+            window.initFirebaseClient(cfgRes.firebase);
+            return true;
+          }
+        }
+      } catch (e) {
+        console.warn('[CoLearn] Could not fetch Firebase public config from backend:', e.message);
+      } finally {
+        _configFetchPromise = null;
+      }
+      return Boolean(window.fsAuth);
+    })();
+
+    return _configFetchPromise;
+  };
+
   // Initial attempt with current active config
   let activeConfig = getActiveConfig();
   if (typeof firebase !== 'undefined' && firebase.initializeApp) {
     window.initFirebaseClient(activeConfig);
   }
 
-  // If running with placeholder keys, asynchronously fetch public config from backend
+  // Pre-fetch public config from backend if running with placeholder keys
   if (isPlaceholderConfig(activeConfig) && typeof apiFetch === 'function') {
-    apiFetch('/api/config/firebase').then(res => {
-      if (res && res.success && res.firebase && !isPlaceholderConfig(res.firebase)) {
-        window.__FIREBASE_CONFIG__ = res.firebase;
-        if (window.CONFIG) window.CONFIG.FIREBASE = res.firebase;
-        activeConfig = res.firebase;
-        window.initFirebaseClient(res.firebase);
-      }
-    }).catch(() => {});
+    window.ensureFirebaseClientReady().catch(() => {});
   }
 
   let _authInFlightPromise = null;
@@ -133,18 +165,7 @@
     if (!uid) return false;
 
     // Ensure Firebase client is initialized with valid non-placeholder config
-    let currentConfig = getActiveConfig();
-    if (isPlaceholderConfig(currentConfig) && typeof apiFetch === 'function') {
-      try {
-        const cfgRes = await apiFetch('/api/config/firebase');
-        if (cfgRes && cfgRes.success && cfgRes.firebase && !isPlaceholderConfig(cfgRes.firebase)) {
-          window.__FIREBASE_CONFIG__ = cfgRes.firebase;
-          if (window.CONFIG) window.CONFIG.FIREBASE = cfgRes.firebase;
-          currentConfig = cfgRes.firebase;
-          window.initFirebaseClient(cfgRes.firebase);
-        }
-      } catch (_) {}
-    }
+    await window.ensureFirebaseClientReady();
 
     if (!window.fsAuth) return false;
 

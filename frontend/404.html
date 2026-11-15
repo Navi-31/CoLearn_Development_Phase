@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>CoLearn</title>
+  <script>
+    // GitHub Pages SPA router redirect
+    // Redirects subpath queries (e.g. /CoLearn_Development_Phase/login) to index.html with query param ?p=
+    (function () {
+      var pathSegmentsToKeep = 1; // 1 segment for repository: /CoLearn_Development_Phase/
+      var l = window.location;
+      var repoPrefix = l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/');
+      var routePath = l.pathname.slice(1).split('/').slice(pathSegmentsToKeep).join('/');
+
+      l.replace(
+        l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+        repoPrefix + '/?p=' + encodeURIComponent(routePath + (l.search ? '&q=' + l.search.slice(1) : '') + l.hash)
+      );
+    })();
+  </script>
+</head>
+<body>
+  <p>Loading CoLearn...</p>
+</body>
+</html>

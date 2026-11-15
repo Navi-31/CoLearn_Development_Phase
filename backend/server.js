@@ -166,6 +166,7 @@ app.use(helmet({
 
 /* ── CORS – Centralized Environment-Aware Configuration ───────── */
 const rawAllowed = [
+  'https://navi-31.github.io',
   process.env.ALLOWED_ORIGINS || '',
   process.env.ALLOWED_ORIGIN || '',
   process.env.FRONTEND_URL || '',
@@ -189,7 +190,7 @@ function isOriginAllowed(origin) {
 
   const normalized = origin.trim().replace(/\/$/, '');
 
-  // 1. Explicitly configured origins
+  // 1. Explicitly configured origins (including https://navi-31.github.io)
   if (configuredOrigins.some(c => c.toLowerCase() === normalized.toLowerCase())) {
     return true;
   }
@@ -213,10 +214,12 @@ function isOriginAllowed(origin) {
     }
   } catch (_) {}
 
-  // 3. Localhost, LAN & development tunnels
+  // 3. GitHub Pages, Localhost, LAN & development tunnels
   try {
     const { hostname } = new URL(normalized);
     if (
+      hostname === 'navi-31.github.io' ||
+      hostname.endsWith('.github.io') ||
       hostname === 'localhost' ||
       hostname === '127.0.0.1' ||
       hostname === '::1' ||

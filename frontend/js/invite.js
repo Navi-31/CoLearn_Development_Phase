@@ -358,17 +358,19 @@ async function handleInviteUrlOnLoad() {
   let inviteData = null;
   try {
     const res = await API.validateInviteToken(token);
+    const cleanUrl = (window.CONFIG && window.CONFIG.BASE_PATH) || '/';
     if (!res.success) {
       // Invalid/expired — just navigate to login with a message
       sessionStorage.removeItem('pendingInviteToken');
       showToast('main-toast', `⚠️ ${res.error || 'This invitation link is invalid.'}`);
       // Clean URL and stay on login
-      history.replaceState({}, '', '/');
+      history.replaceState({}, '', cleanUrl);
       return;
     }
     inviteData = { suiteId: res.suiteId, suiteName: res.suiteName, token };
   } catch (e) {
-    history.replaceState({}, '', '/');
+    const cleanUrl = (window.CONFIG && window.CONFIG.BASE_PATH) || '/';
+    history.replaceState({}, '', cleanUrl);
     return;
   }
 
@@ -378,7 +380,8 @@ async function handleInviteUrlOnLoad() {
   sessionStorage.setItem('pendingInviteSuiteName', inviteData.suiteName);
 
   // Clean the URL
-  history.replaceState({}, '', '/');
+  const cleanUrl = (window.CONFIG && window.CONFIG.BASE_PATH) || '/';
+  history.replaceState({}, '', cleanUrl);
 
   const user = AppState.currentUser;
   if (user) {
