@@ -13,6 +13,7 @@
 const crypto                   = require('crypto');
 const { google }           = require('googleapis');
 const { db, firestoreWithRetry } = require('../config/firebase');
+const publicConfigService        = require('./publicConfigService');
 
 /* ── OAuth State HMAC signing & CSRF protection ─────────────────── */
 const STATE_SECRET = process.env.APP_SECRET || process.env.SESSION_SECRET || process.env.GOOGLE_CLIENT_SECRET || 'colearn-secure-state-key';
@@ -38,11 +39,18 @@ function getLocalRedirectUri() {
 
 /**
  * Returns the resolved redirect URI for public / tunnel deployment.
+ * Prioritizes the centralized public configuration (frontend/config/public.json).
  */
 function getPublicRedirectUri() {
+  // 1. Centralized public configuration service
+  const fromConfig = publicConfigService.getPublicRedirectUri();
+  if (fromConfig) return fromConfig;
+
+  // 2. Explicit environment variable override
   const explicit = (process.env.GOOGLE_REDIRECT_URI_PUBLIC || process.env.GOOGLE_PUBLIC_REDIRECT_URI || '').trim();
   if (explicit) return explicit;
 
+  // 3. Fallback tunnel URL
   const tunnel = (process.env.TUNNELTO_URL || process.env.PUBLIC_BACKEND_URL || '').trim().replace(/\/$/, '');
   if (tunnel) return `${tunnel}/api/drive/callback`;
 

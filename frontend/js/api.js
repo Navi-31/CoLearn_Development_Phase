@@ -14,9 +14,16 @@
 
 /* ── Shared fetch helper ─────────────────────────────────── */
 async function apiFetch(path, options = {}) {
+  // Await centralized configuration readiness before dispatching API requests
+  if (typeof window.ensureConfigReady === 'function') {
+    try {
+      await window.ensureConfigReady();
+    } catch (_) {}
+  }
+
   // Guard against unconfigured production backend
   if (window.CONFIG && window.CONFIG.IS_PRODUCTION && !window.CONFIG.API_BASE) {
-    const configError = '❌ Production backend URL is not configured. Please configure your deployed backend endpoint in window.__COLEARN_CONFIG__.BACKEND_URL or via meta tag.';
+    const configError = '❌ Production backend URL is not configured. Please ensure frontend/config/public.json has a valid backendUrl.';
     console.error('[CoLearn API]', configError);
     throw new Error(configError);
   }

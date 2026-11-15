@@ -24,6 +24,7 @@ const {
   getLocalRedirectUri,
   getPublicRedirectUri,
 } = require('./services/driveAuthService');
+const publicConfigService = require('./services/publicConfigService');
 
 (function setupGoogleOAuthRedirects() {
   const localUri = getLocalRedirectUri();
@@ -39,7 +40,7 @@ const {
   if (publicUri) {
     console.log(`[Drive]   • Public:    ${publicUri}`);
   } else {
-    console.log('[Drive]   • Public:    (not configured — set GOOGLE_REDIRECT_URI_PUBLIC or TUNNELTO_URL in .env)');
+    console.log('[Drive]   • Public:    (centralized via frontend/config/public.json)');
   }
 })();
 
@@ -769,8 +770,14 @@ async function startServer() {
     }
   }
 
+  // Initialize and warm up centralized public configuration
+  publicConfigService.init().catch(err => {
+    console.warn('[Server] publicConfigService init error:', err.message);
+  });
+
   httpServer.listen(PORT, HOST, () => {
     const ip = getLocalIP();
+    const publicUrl = publicConfigService.getPublicBackendUrl();
     const line = '═'.repeat(58);
     const smtpStatus = emailConfig.configured
       ? (emailConfig.verified ? '  ✅ SMTP Connected           ' : '  ⚠️  SMTP configured (unverified)')
@@ -781,6 +788,9 @@ async function startServer() {
     console.log(`╠${line}╣`);
     console.log(`║  Local   →  http://localhost:${PORT}                         ║`);
     console.log(`║  Network →  http://${ip}:${PORT}                     ║`);
+    if (publicUrl) {
+      console.log(`║  Public  →  ${publicUrl.padEnd(46)}║`);
+    }
     console.log(`╠${line}╣`);
     console.log(`║  📧  Email Status:                                        ║`);
     console.log(`║  ${smtpStatus.padEnd(56)}║`);

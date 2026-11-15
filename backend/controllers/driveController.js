@@ -71,9 +71,8 @@ function getAuthUrl(req, res) {
       error: 'DRIVE_PUBLIC_REDIRECT_NOT_CONFIGURED',
       message:
         'Google Drive public redirect URI is not configured for public deployment. ' +
-        'Please set GOOGLE_REDIRECT_URI_PUBLIC or TUNNELTO_URL in backend/.env ' +
-        '(e.g. GOOGLE_REDIRECT_URI_PUBLIC=https://early-orbit-807.tunnel.to/api/drive/callback) ' +
-        'and add it to Authorized redirect URIs in Google Cloud Console.',
+        'Please configure backendUrl in frontend/config/public.json (or TUNNELTO_URL in backend/.env) ' +
+        'and add the derived callback to Authorized redirect URIs in Google Cloud Console.',
     });
   }
 

@@ -110,7 +110,14 @@ document.querySelectorAll('.modal-overlay').forEach(overlay => {
  * Restores session from localStorage BEFORE any view is shown.
  * This prevents the flash to login page on refresh.
  */
-function initApp() {
+async function initApp() {
+  // Ensure centralized configuration has loaded before session/API initialization
+  if (typeof window.ensureConfigReady === 'function') {
+    try {
+      await window.ensureConfigReady();
+    } catch (_) {}
+  }
+
   const hadSession = AppState.restoreSession();
 
   // Re-authenticate Firebase Client SDK if session was restored

@@ -6,16 +6,18 @@
  *  • LOCAL / DEVELOPMENT:
  *      Detected when accessed via localhost, 127.0.0.1, [::1], or private LAN IPs.
  *      API calls and WebSocket signaling route to the local Express server.
- *  • PRODUCTION (Cloudflare Pages / custom domain):
- *      Detected on public hostnames.
- *      API calls route to the configured deployed backend URL.
- *      WebSocket signaling routes to the configured secure WebSocket endpoint.
+ *  • PRODUCTION / GITHUB PAGES:
+ *      Detected on public hostnames (e.g. navi-31.github.io).
+ *      Loads centralized public configuration asynchronously from:
+ *        frontend/config/public.json
+ *      Single source of truth for the active Tunnelto backend URL.
+ *      WebSocket signaling is dynamically derived (https -> wss).
  *      NEVER falls back to localhost or silently redirects production traffic.
  *
  * Configuration sources (in priority order):
  *  1. window.__COLEARN_CONFIG__  (explicit configuration object)
- *  2. window.__ENV__             (environment configuration object)
- *  3. window.__CoLearn_API_BASE__(legacy override)
+ *  2. frontend/config/public.json (centralized public deployment configuration)
+ *  3. window.__ENV__             (environment configuration object)
  *  4. HTML meta tags:
  *       <meta name="colearn-backend-url" content="...">
  *       <meta name="colearn-ws-url" content="...">
@@ -52,7 +54,7 @@
     )
   );
 
-  // Check if accessed through a temporary public development tunnel (Tunnelto, Cloudflare, ngrok)
+  // Check if accessed through a temporary public development tunnel directly (Express hosting)
   const isTunnel = Boolean(
     hostname.endsWith('.tunnel.to') ||
     hostname.endsWith('.ngrok.io') ||
@@ -79,11 +81,11 @@
     }
   }
 
-  /* ── 3. Resolve Configuration Overrides ─────────────────────── */
+  /* ── 3. Resolve Synchronous Configuration Baseline ─────────── */
   const userConfig = window.__COLEARN_CONFIG__ || window.__ENV__ || {};
 
-  // Tunnelto URL configured in env-config.js
-  const tunneltoUrl = (userConfig.TUNNELTO_URL || '').trim().replace(/\/$/, '');
+  // Optional fallback configured in env-config.js
+  const fallbackTunneltoUrl = (userConfig.TUNNELTO_URL || '').trim().replace(/\/$/, '');
 
   // Explicit JavaScript overrides take highest priority if manually provided
   const explicitBackendUrl =
@@ -110,41 +112,17 @@
       const devHost = hostname || 'localhost';
       apiBase = `http://${devHost}:3000`;
     }
-  } else if (isGitHubPages) {
-    // 3. PERMANENT GITHUB PAGES FRONTEND (https://navi-31.github.io/CoLearn_Development_Phase/):
-    // Routes to the currently configured Tunnelto URL in env-config.js.
-    // NEVER falls back to localhost on GitHub Pages!
-    if (tunneltoUrl) {
-      apiBase = tunneltoUrl;
-    } else if (metaBackendUrl) {
-      apiBase = String(metaBackendUrl).trim().replace(/\/$/, '');
-    } else {
-      apiBase = '';
-      isConfigured = false;
-      console.error(
-        '[CoLearn Config] Tunnelto backend URL is NOT configured.\n' +
-        'Please set your active Tunnelto URL in frontend/js/env-config.js (TUNNELTO_URL).\n' +
-        'Requests will NOT fall back to localhost on GitHub Pages.'
-      );
-    }
   } else if (isTunnel) {
-    // 4. TUNNELTO / NGROK DEVELOPMENT (when browsing directly via tunnel):
-    // Express serves both frontend and API on the same origin.
+    // 3. Direct tunnel browsing (Express serves both frontend and API on same origin)
     apiBase = currentOrigin;
+  } else if (fallbackTunneltoUrl) {
+    apiBase = fallbackTunneltoUrl;
   } else if (metaBackendUrl) {
-    // 5. PRODUCTION (Cloudflare Pages / custom domain):
     apiBase = String(metaBackendUrl).trim().replace(/\/$/, '');
-  } else if (tunneltoUrl) {
-    apiBase = tunneltoUrl;
   } else {
-    // 6. Unconfigured production environment:
+    // Initial placeholder for production while public.json is being fetched
     apiBase = '';
     isConfigured = false;
-    console.error(
-      '[CoLearn Config] Production backend URL is NOT configured.\n' +
-      'Please set your deployed backend URL in frontend/js/env-config.js.\n' +
-      'Requests will NOT fall back to localhost in production.'
-    );
   }
 
   /* ── 4. Resolve WebSocket Signaling URL ────────────────────── */
@@ -161,14 +139,6 @@
     wsUrl = `ws://${hostname || 'localhost'}:3000/ws/video`;
   } else if (metaWsUrl) {
     wsUrl = String(metaWsUrl).trim().replace(/\/$/, '');
-  } else if (isGitHubPages && apiBase) {
-    try {
-      const parsedApi = new URL(apiBase);
-      const wsProto = parsedApi.protocol === 'https:' ? 'wss:' : 'ws:';
-      wsUrl = `${wsProto}//${parsedApi.host}/ws/video`;
-    } catch (_) {
-      wsUrl = '';
-    }
   } else if (isTunnel) {
     const wsProto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     wsUrl = `${wsProto}//${hostname}/ws/video`;
@@ -180,8 +150,6 @@
     } catch (_) {
       wsUrl = '';
     }
-  } else {
-    wsUrl = '';
   }
 
   /* ── 5. Cross-Origin Check ─────────────────────────────────── */
@@ -219,7 +187,7 @@
       'https://friendsync-89f12-default-rtdb.firebaseio.com',
   };
 
-  /* ── 7. Export CONFIG to Global Scope ──────────────────────── */
+  /* ── 7. Export Initial CONFIG to Global Scope ──────────────── */
   window.CONFIG = {
     ENV,
     IS_PRODUCTION,
@@ -230,13 +198,13 @@
     BASE_PATH: basePath,
 
     /**
-     * Base URL for all API calls, e.g. "http://localhost:3000" or "https://api.colearn.app".
-     * Guaranteed no trailing slash. Empty string if unconfigured in production.
+     * Base URL for all API calls, e.g. "http://localhost:3000" or "https://early-orbit-807.tunnel.to".
+     * Guaranteed no trailing slash. Updated dynamically when public.json is fetched.
      */
     API_BASE: apiBase,
 
     /**
-     * WebSocket URL for WebRTC signaling, e.g. "ws://localhost:3000/ws/video" or "wss://api.colearn.app/ws/video".
+     * WebSocket URL for WebRTC signaling, e.g. "ws://localhost:3000/ws/video" or "wss://early-orbit-807.tunnel.to/ws/video".
      */
     WS_URL: wsUrl,
 
@@ -254,10 +222,105 @@
     ],
   };
 
-  // Diagnostic log for developers and testers
+  /* ── 8. Asynchronous Centralized Config Loader ─────────────── */
+  let _configPromise = null;
+
+  async function loadPublicConfig() {
+    // Local development does not require remote public.json fetching
+    if (isLocalDev) {
+      return window.CONFIG;
+    }
+
+    // Explicit runtime manual override takes precedence
+    if (explicitBackendUrl) {
+      return window.CONFIG;
+    }
+
+    // Determine path to public.json
+    // On GitHub Pages: /CoLearn_Development_Phase/config/public.json
+    // On root deployment: /config/public.json
+    const configPath = `${basePath.replace(/\/$/, '')}/config/public.json`;
+    const resolvedUrl = new URL(configPath, window.location.origin).href;
+
+    try {
+      // Use cache: 'no-store' and a timestamp query to bypass GitHub Pages / browser caching
+      const fetchUrl = `${resolvedUrl}?_t=${Date.now()}`;
+      const response = await fetch(fetchUrl, {
+        cache: 'no-store',
+        headers: { 'Accept': 'application/json' },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status} ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      if (data && typeof data.backendUrl === 'string' && data.backendUrl.trim()) {
+        const publicBackend = data.backendUrl.trim().replace(/\/$/, '');
+        window.CONFIG.API_BASE = publicBackend;
+        window.CONFIG.IS_CONFIGURED = true;
+
+        // Dynamically derive WebSocket URL (https -> wss, http -> ws, append /ws/video)
+        try {
+          const parsed = new URL(publicBackend);
+          const proto = parsed.protocol === 'https:' ? 'wss:' : 'ws:';
+          window.CONFIG.WS_URL = `${proto}//${parsed.host}/ws/video`;
+          window.CONFIG.IS_CROSS_ORIGIN = (parsed.origin !== currentOrigin);
+        } catch (_) {
+          window.CONFIG.WS_URL = publicBackend.replace(/^http/, 'ws') + '/ws/video';
+        }
+
+        console.info(`[CoLearn Config] 🌐 Centralized public configuration loaded from ${configPath}:`, {
+          backendUrl: window.CONFIG.API_BASE,
+          wsUrl: window.CONFIG.WS_URL,
+        });
+        return window.CONFIG;
+      } else {
+        throw new Error('public.json missing valid "backendUrl" property.');
+      }
+    } catch (err) {
+      console.warn(`[CoLearn Config] ⚠️ Could not fetch centralized ${configPath}: ${err.message}.`);
+      // If fallback URL available, ensure it is configured
+      if (!window.CONFIG.API_BASE && (fallbackTunneltoUrl || metaBackendUrl)) {
+        const fallbackUrl = fallbackTunneltoUrl || metaBackendUrl;
+        window.CONFIG.API_BASE = fallbackUrl;
+        window.CONFIG.IS_CONFIGURED = true;
+        try {
+          const parsed = new URL(fallbackUrl);
+          const proto = parsed.protocol === 'https:' ? 'wss:' : 'ws:';
+          window.CONFIG.WS_URL = `${proto}//${parsed.host}/ws/video`;
+          window.CONFIG.IS_CROSS_ORIGIN = (parsed.origin !== currentOrigin);
+        } catch (_) {}
+      }
+
+      if (!window.CONFIG.API_BASE && isGitHubPages) {
+        console.error(
+          '[CoLearn Config] Public backend URL is NOT configured.\n' +
+          'Please ensure frontend/config/public.json exists and has a valid "backendUrl".'
+        );
+      }
+      return window.CONFIG;
+    }
+  }
+
+  function ensureConfigReady() {
+    if (!_configPromise) {
+      _configPromise = loadPublicConfig();
+    }
+    return _configPromise;
+  }
+
+  // Immediately initiate public configuration fetch
+  ensureConfigReady();
+
+  // Export helper functions to global window scope
+  window.ensureConfigReady = ensureConfigReady;
+  window.loadPublicConfig = ensureConfigReady;
+
+  // Diagnostic log
   if (isLocalDev) {
     console.info(`[CoLearn Config] 🛠️ Environment: development | API: ${window.CONFIG.API_BASE} | WS: ${window.CONFIG.WS_URL}`);
   } else {
-    console.info(`[CoLearn Config] 🚀 Environment: production | Configured: ${isConfigured} | API: ${window.CONFIG.API_BASE || '(not set)'} | WS: ${window.CONFIG.WS_URL || '(not set)'}`);
+    console.info(`[CoLearn Config] 🚀 Environment: production | Initial API: ${window.CONFIG.API_BASE || '(resolving via public.json...)'}`);
   }
 })();
