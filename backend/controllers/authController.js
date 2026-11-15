@@ -217,10 +217,25 @@ async function login(req, res) {
   const authDomain = (process.env.FIREBASE_AUTH_DOMAIN || `${projectId}.firebaseapp.com`).trim();
 
   // Rotate through candidate header sets to satisfy Google Cloud Console API key restrictions:
-  // 1. Firebase Project Canonical Auth Domain (matches standard Firebase web key restrictions)
-  // 2. Incoming request referer/origin (matches localhost:3000 or custom allowed domains)
-  // 3. Plain headers (for server keys / unrestricted API keys)
+  // 1. Explicit localhost:3000 (standard authorized local dev origin in Google Cloud Console)
+  // 2. Incoming request's actual referer/origin (if whitelisted, e.g. custom domain or tunnel)
+  // 3. Firebase Project Canonical Auth Domain (https://<projectId>.firebaseapp.com)
+  // 4. Alternate loopback 127.0.0.1:3000
+  // 5. Host header origin (e.g. active tunnel host)
+  // 6. Plain headers (for server keys / unrestricted API keys)
   const candidateHeaderSets = [
+    {
+      'Content-Type': 'application/json',
+      'Referer':      'http://localhost:3000/',
+      'Origin':       'http://localhost:3000',
+      'X-Firebase-Locale': 'en',
+    },
+    {
+      'Content-Type': 'application/json',
+      ...(req.headers.referer ? { 'Referer': req.headers.referer } : {}),
+      ...(req.headers.origin ? { 'Origin': req.headers.origin } : {}),
+      'X-Firebase-Locale': 'en',
+    },
     {
       'Content-Type': 'application/json',
       'Referer':      `https://${authDomain}/`,
@@ -229,8 +244,14 @@ async function login(req, res) {
     },
     {
       'Content-Type': 'application/json',
-      ...(req.headers.referer ? { 'Referer': req.headers.referer } : {}),
-      ...(req.headers.origin ? { 'Origin': req.headers.origin } : {}),
+      'Referer':      'http://127.0.0.1:3000/',
+      'Origin':       'http://127.0.0.1:3000',
+      'X-Firebase-Locale': 'en',
+    },
+    {
+      'Content-Type': 'application/json',
+      'Referer':      `${req.protocol || 'https'}://${req.get('host') || 'localhost:3000'}/`,
+      'Origin':       `${req.protocol || 'https'}://${req.get('host') || 'localhost:3000'}`,
       'X-Firebase-Locale': 'en',
     },
     {
@@ -276,47 +297,99 @@ async function login(req, res) {
   }
 
   if (!signInResult && lastFetchError) {
-    console.error('[login] Firebase REST call failed:', lastFetchError.message || lastFetchError);
-    return res.status(500).json({ success: false, error: 'Login service unavailable. Try again.' });
+    console.error('[login] [stage: credentials-verification] Firebase REST call failed:', lastFetchError.message || lastFetchError);
+    return res.status(500).json({
+      success: false,
+      code: 'LOGIN_SERVICE_UNAVAILABLE',
+      error: 'Login service unavailable. Please try again.',
+      stage: 'credentials-verification',
+    });
   }
 
   // Handle Firebase REST API errors
   if (signInResult && signInResult.error) {
-    const code = signInResult.error.message || '';
+    const rawError = signInResult.error;
+    const code = rawError.message || '';
+    console.error(`[login] [stage: credentials-verification] Firebase error: ${code}`);
+
     if (code.includes('EMAIL_NOT_FOUND') || code.includes('INVALID_EMAIL')) {
       return res.status(404).json({
         success: false,
+        code: 'EMAIL_NOT_FOUND',
         error: 'No account found with this email. Please create an account.',
+        message: 'No account found with this email. Please create an account.',
+        stage: 'credentials-verification',
       });
     }
     if (code.includes('INVALID_PASSWORD') || code.includes('INVALID_LOGIN_CREDENTIALS')) {
-      return res.status(401).json({ success: false, error: 'Incorrect password.' });
+      return res.status(401).json({
+        success: false,
+        code: 'INVALID_CREDENTIALS',
+        error: 'Incorrect password. Please verify and try again.',
+        message: 'Incorrect password. Please verify and try again.',
+        stage: 'credentials-verification',
+      });
     }
-    if (code.includes('TOO_MANY_ATTEMPTS_TRY_LATER') || code.includes('USER_DISABLED')) {
+    if (code.includes('TOO_MANY_ATTEMPTS_TRY_LATER')) {
       return res.status(429).json({
         success: false,
+        code: 'TOO_MANY_ATTEMPTS',
         error: 'Account temporarily locked due to multiple failed attempts. Try again later.',
+        message: 'Account temporarily locked due to multiple failed attempts. Try again later.',
+        stage: 'credentials-verification',
+      });
+    }
+    if (code.includes('USER_DISABLED')) {
+      return res.status(403).json({
+        success: false,
+        code: 'USER_DISABLED',
+        error: 'This user account has been disabled.',
+        message: 'This user account has been disabled.',
+        stage: 'credentials-verification',
+      });
+    }
+    if (code.includes('OPERATION_NOT_ALLOWED')) {
+      console.error('\n❌  [login] [stage: credentials-verification] Email/Password provider is disabled in Firebase Console.');
+      return res.status(503).json({
+        success: false,
+        code: 'AUTH_PROVIDER_DISABLED',
+        error: 'Email/Password authentication is disabled in Firebase Console.',
+        message: 'Email/Password authentication is disabled in Firebase Console.',
+        stage: 'credentials-verification',
       });
     }
 
     if (code.includes('API key not valid') || code.includes('INVALID_KEY') || code.includes('API_KEY_INVALID')) {
-      console.error('\n❌  [login] Firebase Identity Toolkit rejected FIREBASE_API_KEY:');
+      console.error('\n❌  [login] [stage: credentials-verification] Firebase Identity Toolkit rejected FIREBASE_API_KEY:');
       console.error(`    Error: ${code}`);
       console.error('    Actionable Steps for Google Cloud / Firebase Console:');
       console.error('    1. Google Cloud Console (https://console.cloud.google.com/apis/credentials):');
       console.error('       - Check that the API key exists and is enabled.');
-      console.error('       - If "Application restrictions" is set to "Websites (HTTP referrers)", add:');
-      console.error(`         * https://${authDomain}/*`);
+      console.error('       - If "Application restrictions" is set to "Websites (HTTP referrers)", ensure allowed referrers include:');
       console.error('         * http://localhost:3000/*');
-      console.error('         Or select "None" for development.');
+      console.error(`         * https://${authDomain}/*`);
+      console.error('         * https://*.tunnel.to/* (for Tunnelto access)');
+      console.error('         Or set Application restrictions to "None" during development.');
       console.error('       - Under "API restrictions", ensure "Identity Toolkit API" is enabled and allowed.');
       console.error('    2. Firebase Console (https://console.firebase.google.com/):');
       console.error(`       - Verify Project Settings → Web API Key matches FIREBASE_API_KEY in backend/.env.\n`);
-    } else {
-      console.error('[login] Firebase error:', code);
+
+      return res.status(502).json({
+        success: false,
+        code: 'FIREBASE_API_KEY_REJECTED',
+        error: 'Authentication service rejected the API key. Please verify Google Cloud Console key restrictions.',
+        message: 'Authentication service rejected the API key. Please verify Google Cloud Console key restrictions.',
+        stage: 'credentials-verification',
+      });
     }
 
-    return res.status(401).json({ success: false, error: 'Login failed. Please try again.' });
+    return res.status(401).json({
+      success: false,
+      code: code || 'LOGIN_FAILED',
+      error: 'Login failed. Please check your credentials or try again.',
+      message: 'Login failed. Please check your credentials or try again.',
+      stage: 'credentials-verification',
+    });
   }
 
   // Fetch user profile from Firestore — with retry on UNAUTHENTICATED cold-start
@@ -326,15 +399,23 @@ async function login(req, res) {
       db.collection('users').doc(signInResult.localId).get()
     );
     if (!snap.exists) {
+      console.warn(`[login] [stage: user-profile-fetch] User authenticated in Firebase Auth (${signInResult.localId}) but missing Firestore document.`);
       return res.status(404).json({
         success: false,
-        error: 'No account found with this email. Please create an account.',
+        code: 'USER_PROFILE_NOT_FOUND',
+        error: 'User profile not found. Please register or contact support.',
+        stage: 'user-profile-fetch',
       });
     }
     userDoc = snap.data();
   } catch (e) {
-    console.error('[login] Firestore fetch failed (after retries):', e.message);
-    return res.status(500).json({ success: false, error: 'Server error. Please try again.' });
+    console.error('[login] [stage: user-profile-fetch] Firestore fetch failed (after retries):', e.message);
+    return res.status(500).json({
+      success: false,
+      code: 'DATABASE_ERROR',
+      error: 'Server error retrieving user profile. Please try again.',
+      stage: 'user-profile-fetch',
+    });
   }
 
   // Update lastLogin — fire-and-forget (never blocks the login response)

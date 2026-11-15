@@ -273,8 +273,8 @@ describe('Environment & Endpoint Resolution', () => {
     const res = resolveTestConfig({
       hostname: 'localhost',
       port: '3000',
-      metaBackendUrl: 'https://kind-wave-5610.tunnel.to',
-      metaWsUrl: 'wss://kind-wave-5610.tunnel.to/ws/video',
+      metaBackendUrl: 'https://honest-delta-4947.tunnel.to',
+      metaWsUrl: 'wss://honest-delta-4947.tunnel.to/ws/video',
     });
 
     assert.equal(res.isLocalDev, true);
@@ -285,7 +285,7 @@ describe('Environment & Endpoint Resolution', () => {
 
   test('Tunnelto public URL automatically uses active tunnel without hardcoded meta', () => {
     const res = resolveTestConfig({
-      hostname: 'kind-wave-5610.tunnel.to',
+      hostname: 'honest-delta-4947.tunnel.to',
       port: null,
       metaBackendUrl: '',
       metaWsUrl: '',
@@ -293,8 +293,8 @@ describe('Environment & Endpoint Resolution', () => {
 
     assert.equal(res.isLocalDev, false);
     assert.equal(res.isTunnel, true);
-    assert.equal(res.apiBase, 'https://kind-wave-5610.tunnel.to');
-    assert.equal(res.wsUrl, 'wss://kind-wave-5610.tunnel.to/ws/video');
+    assert.equal(res.apiBase, 'https://honest-delta-4947.tunnel.to');
+    assert.equal(res.wsUrl, 'wss://honest-delta-4947.tunnel.to/ws/video');
   });
 
   test('New temporary Tunnelto URL works dynamically on reconnect', () => {

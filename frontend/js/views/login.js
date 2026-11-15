@@ -94,11 +94,20 @@ async function handleLogin() {
       navigate('view-dashboard');
       loadUserSuites();
     } else {
-      // Display server error message (exact text from spec)
-      showTempError(alertEl, data.error || 'Login failed. Please try again.', 5000);
+      // Capture safe error diagnostic in browser console without leaking credentials
+      const errorCode = data.code || 'UNKNOWN_AUTH_ERROR';
+      const errorMsg = data.error || data.message || 'Login failed. Please try again.';
+      console.warn('[Login] Authentication failure diagnostic:', {
+        code: errorCode,
+        error: errorMsg,
+        stage: data.stage || 'auth-response',
+      });
+
+      // Display server error message (exact text from spec / safe user-facing message)
+      showTempError(alertEl, errorMsg, 6000);
     }
   } catch (err) {
-    console.error('[Login] Exception:', err);
+    console.error('[Login] Request exception:', err);
     // err.message contains full LAN guidance from api.js apiFetch()
     const msg = (err && err.message && err.message.includes('Cannot connect'))
       ? '⚠️ Cannot connect to server. Check that both devices are on the same Wi-Fi/LAN and the backend is running.'

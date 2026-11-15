@@ -82,7 +82,7 @@ const registerValidation = [
     .trim()
     .toLowerCase()
     .isEmail().withMessage('Please provide a valid email address.')
-    .normalizeEmail(),
+    .normalizeEmail({ gmail_remove_dots: false }),
   body('password')
     .notEmpty().withMessage('Password is required.'),
 ];
@@ -91,7 +91,8 @@ const loginValidation = [
   body('email')
     .trim()
     .toLowerCase()
-    .isEmail().withMessage('Please provide a valid email address.'),
+    .isEmail().withMessage('Please provide a valid email address.')
+    .normalizeEmail({ gmail_remove_dots: false }),
   body('password')
     .notEmpty().withMessage('Password is required.'),
 ];
