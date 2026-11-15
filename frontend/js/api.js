@@ -148,13 +148,14 @@ const API = {
 
   /**
    * POST /api/auth/login
+   * Supports both Firebase ID token verification and direct password verification.
    * → { success, message, user: { uid, name, username, email } }
    * → { success: false, error }
    */
-  async login({ email, password }) {
+  async login({ email, password, idToken }) {
     return apiFetch('/api/auth/login', {
       method: 'POST',
-      body:   JSON.stringify({ email, password }),
+      body:   JSON.stringify({ email, password, idToken }),
     });
   },
 

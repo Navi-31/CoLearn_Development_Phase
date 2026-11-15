@@ -58,9 +58,24 @@ async function handleLogin() {
   // Disable button during request
   if (btn) { btn.disabled = true; btn.textContent = 'Logging in…'; }
 
-
   try {
-    const data = await API.login({ email, password: pw });
+    let idToken = null;
+
+    // Attempt client-side Firebase Auth sign-in if client SDK is available
+    if (typeof window.fsAuth !== 'undefined' && window.fsAuth && typeof window.fsAuth.signInWithEmailAndPassword === 'function') {
+      try {
+        const userCred = await window.fsAuth.signInWithEmailAndPassword(email, pw);
+        if (userCred && userCred.user) {
+          idToken = await userCred.user.getIdToken();
+        }
+      } catch (clientAuthErr) {
+        // Safe diagnostic logging (never log passwords or sensitive data)
+        console.warn('[Login] Firebase Client SDK sign-in notice:', clientAuthErr.code || clientAuthErr.message);
+        // Fall back gracefully to backend verification
+      }
+    }
+
+    const data = await API.login({ email, password: pw, idToken });
 
     if (data.success) {
       // Store user profile from server (no password)

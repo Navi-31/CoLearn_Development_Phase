@@ -94,7 +94,16 @@ const loginValidation = [
     .isEmail().withMessage('Please provide a valid email address.')
     .normalizeEmail({ gmail_remove_dots: false }),
   body('password')
-    .notEmpty().withMessage('Password is required.'),
+    .optional({ values: 'falsy' }),
+  body('idToken')
+    .optional({ values: 'falsy' })
+    .isString().withMessage('idToken must be a valid string.'),
+  body().custom((value, { req }) => {
+    if (!req.body.password && !req.body.idToken) {
+      throw new Error('Password or Firebase ID token is required.');
+    }
+    return true;
+  }),
 ];
 
 /* ── Health ──────────────────────────────────────────────────── */
