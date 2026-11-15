@@ -388,10 +388,12 @@ const API = {
 
   /**
    * GET /api/drive/auth-url
-   * Returns { success, url } – Google OAuth2 consent URL
+   * Returns { success, url, env } – Google OAuth2 consent URL
    */
   async getDriveAuthUrl() {
-    return apiFetch('/api/drive/auth-url', { method: 'GET' });
+    const isPublic = Boolean(window.CONFIG && !window.CONFIG.IS_LOCAL);
+    const envParam = isPublic ? '?env=public' : '?env=local';
+    return apiFetch(`/api/drive/auth-url${envParam}`, { method: 'GET' });
   },
 
   /**

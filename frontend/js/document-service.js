@@ -285,6 +285,11 @@ async function connectGoogleDrive() {
           '⚙️ Google Drive not configured — add real credentials to backend/.env and restart the server.',
           'dark');
         console.error('[Drive] Server says:', data.message);
+      } else if (data.error === 'DRIVE_PUBLIC_REDIRECT_NOT_CONFIGURED') {
+        showToast('main-toast',
+          '⚙️ ' + (data.message || 'Google Drive public redirect URI is not configured in backend/.env.'),
+          'dark');
+        console.error('[Drive] Server says:', data.message);
       } else {
         showToast('main-toast', '⚠️ Could not get auth URL: ' + (data.error || 'Unknown error'), 'dark');
       }

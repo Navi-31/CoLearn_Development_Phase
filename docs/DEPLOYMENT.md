@@ -252,7 +252,11 @@ All variables belong in `backend/.env`. Copy from `backend/.env.example`.
 |----------|----------|-------------|
 | `GOOGLE_CLIENT_ID` | Yes | OAuth2 client ID |
 | `GOOGLE_CLIENT_SECRET` | Yes | OAuth2 client secret |
-| `GOOGLE_REDIRECT_URI` | No | Auto-derived from `APP_URL` if not set |
+| `GOOGLE_REDIRECT_URI_LOCAL` | No | Localhost redirect URI (defaults to `http://localhost:3000/api/drive/callback`) |
+| `GOOGLE_REDIRECT_URI_PUBLIC` | No | Public / Tunnelto redirect URI (e.g. `https://<tunnel>.tunnel.to/api/drive/callback`) |
+| `TUNNELTO_URL` | No | Active Tunnelto URL — used to auto-derive `GOOGLE_REDIRECT_URI_PUBLIC` |
+| `FRONTEND_URL` | No | Permanent frontend URL (e.g. `https://navi-31.github.io/CoLearn_Development_Phase/`) |
+| `GOOGLE_REDIRECT_URI` | No | Legacy fallback redirect URI |
 
 ---
 

@@ -15,13 +15,148 @@ const { google }           = require('googleapis');
 const { db, firestoreWithRetry } = require('../config/firebase');
 
 /* ── OAuth State HMAC signing & CSRF protection ─────────────────── */
-const STATE_SECRET = process.env.APP_SECRET || process.env.GOOGLE_CLIENT_SECRET || 'colearn-secure-state-key';
+const STATE_SECRET = process.env.APP_SECRET || process.env.SESSION_SECRET || process.env.GOOGLE_CLIENT_SECRET || 'colearn-secure-state-key';
 const STATE_TTL_MS = 15 * 60 * 1000; // 15 minutes
 
-function generateOAuthState(uid) {
+/* ── Environment & Redirect URI Resolution ──────────────────────── */
+
+/**
+ * Returns the resolved redirect URI for localhost development.
+ */
+function getLocalRedirectUri() {
+  const explicit = (process.env.GOOGLE_REDIRECT_URI_LOCAL || '').trim();
+  if (explicit) return explicit;
+
+  const legacy = (process.env.GOOGLE_REDIRECT_URI || '').trim();
+  if (legacy && (legacy.startsWith('http://localhost') || legacy.startsWith('http://127.0.0.1'))) {
+    return legacy;
+  }
+
+  const port = process.env.PORT || '3000';
+  return `http://localhost:${port}/api/drive/callback`;
+}
+
+/**
+ * Returns the resolved redirect URI for public / tunnel deployment.
+ */
+function getPublicRedirectUri() {
+  const explicit = (process.env.GOOGLE_REDIRECT_URI_PUBLIC || process.env.GOOGLE_PUBLIC_REDIRECT_URI || '').trim();
+  if (explicit) return explicit;
+
+  const tunnel = (process.env.TUNNELTO_URL || process.env.PUBLIC_BACKEND_URL || '').trim().replace(/\/$/, '');
+  if (tunnel) return `${tunnel}/api/drive/callback`;
+
+  const backendUrl = (process.env.BACKEND_URL || process.env.APP_URL || '').trim().replace(/\/$/, '');
+  if (backendUrl && backendUrl.startsWith('https://')) {
+    return `${backendUrl}/api/drive/callback`;
+  }
+
+  const legacy = (process.env.GOOGLE_REDIRECT_URI || '').trim();
+  if (legacy && legacy.startsWith('https://')) {
+    return legacy;
+  }
+
+  return null;
+}
+
+/**
+ * Returns the public frontend URL for redirecting users back to GitHub Pages.
+ */
+function getPublicFrontendUrl(req) {
+  const configured = (process.env.FRONTEND_URL || '').trim();
+  if (configured) return configured;
+
+  const origin = req ? (req.headers.origin || req.headers.referer || '') : '';
+  if (origin && (origin.includes('github.io') || origin.includes('pages.dev'))) {
+    try {
+      const u = new URL(origin);
+      if (u.pathname.startsWith('/CoLearn_Development_Phase')) {
+        return `${u.origin}/CoLearn_Development_Phase/`;
+      }
+      return `${u.origin}/`;
+    } catch (_) {}
+  }
+
+  return 'https://navi-31.github.io/CoLearn_Development_Phase/';
+}
+
+/**
+ * Returns the localhost frontend URL for local development.
+ */
+function getLocalFrontendUrl(req) {
+  const port = process.env.PORT || '3000';
+  return `http://localhost:${port}/`;
+}
+
+/**
+ * Resolves the OAuth environment (local vs. public) for a given request.
+ * Strictly selects from pre-configured trusted callback URIs.
+ * Never allows arbitrary Host headers to forge a redirect URI.
+ */
+function resolveOAuthEnvironment(req) {
+  const origin = req ? (req.headers.origin || req.headers.referer || '').toLowerCase().trim() : '';
+  const host = req ? (req.headers['x-forwarded-host'] || req.headers.host || '').toLowerCase().trim() : '';
+  const envQuery = req && req.query ? (req.query.env || '').toLowerCase().trim() : '';
+
+  const publicRedirect = getPublicRedirectUri();
+  const localRedirect = getLocalRedirectUri();
+
+  // 1. Explicit query parameter requested by client SDK
+  if (envQuery === 'public') {
+    return {
+      env: 'public',
+      redirectUri: publicRedirect,
+      frontendUrl: getPublicFrontendUrl(req),
+      isPublic: true,
+    };
+  }
+  if (envQuery === 'local') {
+    return {
+      env: 'local',
+      redirectUri: localRedirect,
+      frontendUrl: getLocalFrontendUrl(req),
+      isPublic: false,
+    };
+  }
+
+  // 2. Detection from Origin / Referer (e.g. GitHub Pages or custom frontend)
+  const isGitHubPages = origin.includes('navi-31.github.io') || origin.includes('.github.io');
+  const isTunnelOrigin = origin.includes('.tunnel.to') || origin.includes('.ngrok') || origin.includes('.trycloudflare.com');
+  const isTunnelHost = host.includes('.tunnel.to') || host.includes('.ngrok') || host.includes('.trycloudflare.com');
+
+  let publicHost = '';
+  if (publicRedirect) {
+    try {
+      publicHost = new URL(publicRedirect).hostname.toLowerCase();
+    } catch (_) {}
+  }
+  const isMatchingPublicHost = Boolean(publicHost && (host === publicHost || host.startsWith(publicHost)));
+
+  if (isGitHubPages || isTunnelOrigin || isTunnelHost || isMatchingPublicHost) {
+    return {
+      env: 'public',
+      redirectUri: publicRedirect,
+      frontendUrl: getPublicFrontendUrl(req),
+      isPublic: true,
+    };
+  }
+
+  // 3. Default to Localhost
+  return {
+    env: 'local',
+    redirectUri: localRedirect,
+    frontendUrl: getLocalFrontendUrl(req),
+    isPublic: false,
+  };
+}
+
+function generateOAuthState(uid, options = {}) {
   if (!uid) throw new Error('UID is required to generate OAuth state.');
   const payload = JSON.stringify({
     uid,
+    redirectUri: options.redirectUri || '',
+    frontendUrl: options.frontendUrl || '',
+    env: options.env || 'local',
     ts: Date.now(),
     nonce: crypto.randomBytes(16).toString('hex'),
   });
@@ -39,7 +174,7 @@ function verifyOAuthState(state) {
   if (!state.includes('.')) {
     if (process.env.NODE_ENV !== 'production' && /^[a-zA-Z0-9_-]{1,128}$/.test(state)) {
       console.warn('[DriveAuth] Warning: Unsigned legacy OAuth state accepted in development mode.');
-      return state;
+      return { uid: state, env: 'local' };
     }
     throw new Error('Invalid OAuth state format.');
   }
@@ -72,19 +207,24 @@ function verifyOAuthState(state) {
     throw new Error('OAuth state expired. Please re-authenticate.');
   }
 
-  return parsed.uid;
+  return {
+    uid: parsed.uid,
+    redirectUri: parsed.redirectUri || '',
+    frontendUrl: parsed.frontendUrl || '',
+    env: parsed.env || 'local',
+  };
 }
 
 /* ── OAuth2 client factory ───────────────────────────────────────── */
-function createOAuthClient() {
+function createOAuthClient(customRedirectUri) {
   const clientId     = process.env.GOOGLE_CLIENT_ID;
   const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
-  const redirectUri  = process.env.GOOGLE_REDIRECT_URI;
+  const redirectUri  = customRedirectUri || getLocalRedirectUri();
 
   if (!clientId || !clientSecret || !redirectUri) {
     throw new Error(
       'Google OAuth2 not configured. Set GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, ' +
-      'and GOOGLE_REDIRECT_URI in backend/.env'
+      'and GOOGLE_REDIRECT_URI_LOCAL / GOOGLE_REDIRECT_URI_PUBLIC in backend/.env'
     );
   }
 
@@ -99,16 +239,22 @@ const DRIVE_SCOPES = [
 /* ══════════════════════════════════════════════════════════════════
    getAuthUrl
    Returns the Google OAuth2 consent page URL.
-   state = uid (to identify user on callback)
+   Seals user uid, redirectUri, and frontendUrl in signed state.
    ══════════════════════════════════════════════════════════════════ */
-function getAuthUrl(uid) {
-  const oauth2 = createOAuthClient();
-  const state = generateOAuthState(uid);
+function getAuthUrl(uid, options = {}) {
+  const redirectUri = options.redirectUri || getLocalRedirectUri();
+  const oauth2 = createOAuthClient(redirectUri);
+  const state = generateOAuthState(uid, {
+    redirectUri,
+    frontendUrl: options.frontendUrl || '',
+    env: options.env || 'local',
+  });
   return oauth2.generateAuthUrl({
     access_type:  'offline',    // request refresh_token
     prompt:       'consent',    // always show consent so we always get refresh_token
     scope:        DRIVE_SCOPES,
-    state,                      // cryptographically signed state token with timestamp
+    state,                      // cryptographically signed state token with timestamp and redirectUri
+    redirect_uri: redirectUri,
   });
 }
 
@@ -117,8 +263,9 @@ function getAuthUrl(uid) {
    Exchange one-time auth code for tokens and persist refresh_token.
    Called from driveController.handleCallback().
    ══════════════════════════════════════════════════════════════════ */
-async function exchangeCode(code, uid) {
-  const oauth2 = createOAuthClient();
+async function exchangeCode(code, uid, redirectUri) {
+  const resolvedRedirectUri = redirectUri || getLocalRedirectUri();
+  const oauth2 = createOAuthClient(resolvedRedirectUri);
   const { tokens } = await oauth2.getToken(code);
 
   if (!tokens.refresh_token) {
@@ -357,4 +504,9 @@ module.exports = {
   getConnectionInfo,
   revokeAccess,
   DriveNotConnectedError,
+  getLocalRedirectUri,
+  getPublicRedirectUri,
+  getLocalFrontendUrl,
+  getPublicFrontendUrl,
+  resolveOAuthEnvironment,
 };

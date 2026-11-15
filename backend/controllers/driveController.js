@@ -45,6 +45,8 @@ async function getDriveStatus(req, res) {
 /* ═══════════════════════════════════════════════════════
    GET /api/drive/auth-url
    Returns the Google OAuth2 consent page URL.
+   Selects between local and public callback URLs based
+   on requesting environment and trusted configuration.
    ═══════════════════════════════════════════════════════ */
 function getAuthUrl(req, res) {
   // Guard: credentials not yet configured
@@ -54,16 +56,31 @@ function getAuthUrl(req, res) {
       error: 'DRIVE_NOT_CONFIGURED',
       message:
         'Google Drive credentials are not configured. ' +
-        'Open backend/.env and set GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, ' +
-        'and GOOGLE_REDIRECT_URI with real values from Google Cloud Console. ' +
-        'Then restart the server.',
+        'Open backend/.env and set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET ' +
+        'with real values from Google Cloud Console. Then restart the server.',
+    });
+  }
+
+  // Resolve whether request originated from local dev or public deployment
+  const oauthEnv = driveAuthService.resolveOAuthEnvironment(req);
+
+  // If public environment but no public callback URI is configured, alert caller
+  if (oauthEnv.isPublic && !oauthEnv.redirectUri) {
+    return res.status(503).json({
+      success: false,
+      error: 'DRIVE_PUBLIC_REDIRECT_NOT_CONFIGURED',
+      message:
+        'Google Drive public redirect URI is not configured for public deployment. ' +
+        'Please set GOOGLE_REDIRECT_URI_PUBLIC or TUNNELTO_URL in backend/.env ' +
+        '(e.g. GOOGLE_REDIRECT_URI_PUBLIC=https://early-orbit-807.tunnel.to/api/drive/callback) ' +
+        'and add it to Authorized redirect URIs in Google Cloud Console.',
     });
   }
 
   const uid = req.verifiedUid;
   try {
-    const url = driveAuthService.getAuthUrl(uid);
-    return res.json({ success: true, url });
+    const url = driveAuthService.getAuthUrl(uid, oauthEnv);
+    return res.json({ success: true, url, env: oauthEnv.env });
   } catch (e) {
     console.error('[driveController] getAuthUrl error:', e.message);
     return res.status(500).json({ success: false, error: e.message });
@@ -75,12 +92,13 @@ function getAuthUrl(req, res) {
    OAuth2 callback from Google. Exchanges code for tokens.
    On success: renders a self-closing popup page that
    sends postMessage to the parent window.
+   Fallback: redirects to frontendUrl if opened without opener.
    ═══════════════════════════════════════════════════════ */
 async function handleCallback(req, res) {
   const { code, state, error } = req.query;
 
   // Render helper that sends postMessage and closes popup safely
-  function renderCallbackPage(success, message) {
+  function renderCallbackPage(success, message, options = {}) {
     const safeMsg = String(message)
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
@@ -88,27 +106,44 @@ async function handleCallback(req, res) {
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#039;');
     const payload = JSON.stringify({ type: 'drive_oauth', success, message: safeMsg });
+    const frontendUrl = options.frontendUrl || driveAuthService.getPublicFrontendUrl(req);
+    const safeFrontendUrl = String(frontendUrl)
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+
     return res.send(`<!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CoLearn – Drive Connect</title>
 </head>
-<body style="font-family:Arial,sans-serif;background:#f8f9fa;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;">
-  <div style="text-align:center;background:#fff;border-radius:12px;padding:2rem 3rem;box-shadow:0 4px 24px rgba(0,0,0,0.1);">
+<body style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f8f9fa;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;padding:1rem;box-sizing:border-box;">
+  <div style="text-align:center;background:#fff;border-radius:12px;padding:2rem 2.5rem;max-width:440px;width:100%;box-shadow:0 4px 24px rgba(0,0,0,0.1);">
     <div style="font-size:2.5rem;margin-bottom:0.6rem;">${success ? '✅' : '❌'}</div>
-    <div style="font-weight:700;color:#212529;margin-bottom:0.3rem;">${success ? 'Google Drive Connected!' : 'Connection Failed'}</div>
-    <div style="color:#6c757d;font-size:0.9rem;">${safeMsg}</div>
-    <div style="color:#adb5bd;font-size:0.8rem;margin-top:1rem;">This window will close automatically…</div>
+    <div style="font-weight:700;font-size:1.25rem;color:#212529;margin-bottom:0.5rem;">${success ? 'Google Drive Connected!' : 'Connection Failed'}</div>
+    <div style="color:#495057;font-size:0.95rem;line-height:1.4;margin-bottom:1.5rem;">${safeMsg}</div>
+    <div id="close-msg" style="color:#6c757d;font-size:0.85rem;margin-bottom:1rem;">This window will close automatically…</div>
+    <a id="return-btn" href="${safeFrontendUrl}" style="display:inline-block;padding:0.6rem 1.25rem;background:#2563eb;color:#fff;text-decoration:none;border-radius:6px;font-weight:600;font-size:0.9rem;">Return to CoLearn</a>
   </div>
   <script>
     try {
       if (window.opener) {
         // Send status safely to opener window regardless of deployment origin
         window.opener.postMessage(${payload}, '*');
+        setTimeout(function() { window.close(); }, 2000);
+      } else {
+        var msgEl = document.getElementById('close-msg');
+        if (msgEl) msgEl.textContent = 'Redirecting back to CoLearn…';
+        setTimeout(function() {
+          window.location.href = ${JSON.stringify(frontendUrl)};
+        }, 2500);
       }
-    } catch(e) {}
-    setTimeout(function() { window.close(); }, 2000);
+    } catch(e) {
+      setTimeout(function() {
+        window.location.href = ${JSON.stringify(frontendUrl)};
+      }, 2500);
+    }
   </script>
 </body>
 </html>`);
@@ -117,27 +152,38 @@ async function handleCallback(req, res) {
   // Google returned an error (user denied)
   if (error) {
     console.warn('[driveController] OAuth error from Google:', error);
-    return renderCallbackPage(false, 'Authorization was cancelled or denied.');
+    return renderCallbackPage(false, 'Authorization was cancelled or denied: ' + error);
   }
 
   if (!code || !state) {
     return renderCallbackPage(false, 'Invalid callback parameters.');
   }
 
-  let uid;
+  let stateData;
   try {
-    uid = driveAuthService.verifyOAuthState(state);
+    stateData = driveAuthService.verifyOAuthState(state);
   } catch (stateErr) {
     console.warn('[driveController] State verification failed:', stateErr.message);
     return renderCallbackPage(false, 'Security check failed: ' + stateErr.message);
   }
 
+  const uid = typeof stateData === 'object' ? stateData.uid : stateData;
+  const redirectUri = (typeof stateData === 'object' && stateData.redirectUri)
+    ? stateData.redirectUri
+    : driveAuthService.resolveOAuthEnvironment(req).redirectUri;
+  const frontendUrl = (typeof stateData === 'object' && stateData.frontendUrl)
+    ? stateData.frontendUrl
+    : (stateData.env === 'public' ? driveAuthService.getPublicFrontendUrl(req) : driveAuthService.getLocalFrontendUrl(req));
+
   try {
-    const result = await driveAuthService.exchangeCode(code, uid);
-    return renderCallbackPage(true, `Connected as ${result.email}. You can close this window.`);
+    const result = await driveAuthService.exchangeCode(code, uid, redirectUri);
+    return renderCallbackPage(true, `Connected as ${result.email}. You can close this window.`, {
+      frontendUrl,
+      email: result.email,
+    });
   } catch (e) {
     console.error('[driveController] exchangeCode error:', e.message);
-    return renderCallbackPage(false, 'Could not connect Google Drive. Please try again.');
+    return renderCallbackPage(false, 'Could not connect Google Drive: ' + e.message, { frontendUrl });
   }
 }
 

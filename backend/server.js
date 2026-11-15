@@ -15,21 +15,31 @@ const path = require('path');
 require('dotenv').config();
 require('dotenv').config({ path: path.join(__dirname, '.env') });
 
-/* ── Auto-derive GOOGLE_REDIRECT_URI from APP_URL / BACKEND_URL ────
-   Production: set BACKEND_URL=https://api.yourdomain.com or APP_URL
-   Local dev: defaults to http://localhost:PORT/api/drive/callback
+/* ── Configure Google OAuth Redirect URIs ─────────────────────────
+   Supports dual callback configurations for:
+     1. Localhost development (GOOGLE_REDIRECT_URI_LOCAL)
+     2. Public deployment / Tunnelto (GOOGLE_REDIRECT_URI_PUBLIC)
    ────────────────────────────────────────────────────────────────── */
-(function deriveRedirectUri() {
+const {
+  getLocalRedirectUri,
+  getPublicRedirectUri,
+} = require('./services/driveAuthService');
+
+(function setupGoogleOAuthRedirects() {
+  const localUri = getLocalRedirectUri();
+  const publicUri = getPublicRedirectUri();
+
+  // Set primary GOOGLE_REDIRECT_URI for legacy consumers
   if (!process.env.GOOGLE_REDIRECT_URI) {
-    const appUrl = (process.env.BACKEND_URL || process.env.APP_URL || '').trim().replace(/\/$/, '');
-    if (appUrl) {
-      process.env.GOOGLE_REDIRECT_URI = appUrl + '/api/drive/callback';
-      console.log('[Drive] GOOGLE_REDIRECT_URI auto-derived:', process.env.GOOGLE_REDIRECT_URI);
-    } else {
-      // Fallback for local dev with no APP_URL
-      process.env.GOOGLE_REDIRECT_URI = 'http://localhost:' + (process.env.PORT || '3000') + '/api/drive/callback';
-      console.log('[Drive] GOOGLE_REDIRECT_URI defaulted to:', process.env.GOOGLE_REDIRECT_URI);
-    }
+    process.env.GOOGLE_REDIRECT_URI = publicUri || localUri;
+  }
+
+  console.log('[Drive] Google OAuth Callback URLs configured:');
+  console.log(`[Drive]   • Localhost: ${localUri}`);
+  if (publicUri) {
+    console.log(`[Drive]   • Public:    ${publicUri}`);
+  } else {
+    console.log('[Drive]   • Public:    (not configured — set GOOGLE_REDIRECT_URI_PUBLIC or TUNNELTO_URL in .env)');
   }
 })();
 
@@ -40,7 +50,6 @@ require('dotenv').config({ path: path.join(__dirname, '.env') });
 (function checkGoogleOAuthConfig() {
   const id     = process.env.GOOGLE_CLIENT_ID     || '';
   const secret = process.env.GOOGLE_CLIENT_SECRET || '';
-  const redir  = process.env.GOOGLE_REDIRECT_URI  || '';
   const env    = process.env.NODE_ENV || 'development';
   const isProd = env === 'production';
 
@@ -57,10 +66,11 @@ require('dotenv').config({ path: path.join(__dirname, '.env') });
   if (!secret)                          missing.push('GOOGLE_CLIENT_SECRET');
   else if (PLACEHOLDER_RE.test(secret)) problems.push('GOOGLE_CLIENT_SECRET is still a placeholder — paste the real value from Google Cloud Console');
 
-  if (!redir) missing.push('GOOGLE_REDIRECT_URI');
+  const localUri = getLocalRedirectUri();
+  const publicUri = getPublicRedirectUri();
 
-  if (isProd && redir && redir.startsWith('http://')) {
-    problems.push('GOOGLE_REDIRECT_URI uses http:// in production — must be https://');
+  if (isProd && !publicUri) {
+    missing.push('GOOGLE_REDIRECT_URI_PUBLIC (or TUNNELTO_URL)');
   }
 
   if (missing.length || problems.length) {
@@ -84,11 +94,12 @@ require('dotenv').config({ path: path.join(__dirname, '.env') });
     console.error('║  1. https://console.cloud.google.com/                            ║');
     console.error('║  2. APIs & Services → Credentials                                ║');
     console.error('║  3. Create OAuth 2.0 Client ID → Web application                 ║');
-    console.error('║  4. Add Authorized Redirect URI:                                  ║');
-    if (isProd) {
-      console.error('║     https://YOUR_DOMAIN/api/drive/callback                        ║');
+    console.error('║  4. Add Authorized Redirect URIs (add BOTH to Google Cloud):     ║');
+    console.error(('║     • Localhost: ' + localUri).padEnd(67) + '║');
+    if (publicUri) {
+      console.error(('║     • Public:    ' + publicUri).padEnd(67) + '║');
     } else {
-      console.error('║     http://localhost:' + (process.env.PORT || '3000') + '/api/drive/callback                    ║');
+      console.error('║     • Public:    https://<your-tunnel-url>.tunnel.to/api/drive/callback ║');
     }
     console.error('║  5. Paste Client ID + Secret into backend/.env                    ║');
     console.error('║  6. Restart server                                                ║');
@@ -104,7 +115,8 @@ require('dotenv').config({ path: path.join(__dirname, '.env') });
     const envTag  = isProd ? '🟢 production' : '🟡 development';
     console.log('🔑  Google Drive OAuth [' + envTag + ']');
     console.log('    Client ID  : ' + maskId);
-    console.log('    Redirect   : ' + redir);
+    console.log('    Localhost  : ' + localUri);
+    console.log('    Public     : ' + (publicUri || '(not configured)'));
   }
 })();
 
