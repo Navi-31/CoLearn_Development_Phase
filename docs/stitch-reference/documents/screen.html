@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CoLearn - Document Management &amp; Research Viewer</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-surface": "#1b1c1c",
+            "on-tertiary-fixed-variant": "#594311",
+            "secondary": "#4b6077",
+            "surface-dim": "#dcd9d9",
+            "surface-container-low": "#f6f3f2",
+            "outline": "#737784",
+            "on-tertiary": "#ffffff",
+            "secondary-fixed": "#cee5ff",
+            "surface-variant": "#e4e2e1",
+            "on-error-container": "#93000a",
+            "secondary-container": "#cbe2fc",
+            "primary": "#003280",
+            "surface-container": "#f0eded",
+            "primary-fixed-dim": "#b2c5ff",
+            "on-tertiary-fixed": "#261a00",
+            "secondary-fixed-dim": "#b2c9e3",
+            "on-primary-container": "#a7beff",
+            "tertiary-fixed": "#ffdfa0",
+            "error-container": "#ffdad6",
+            "background": "#fcf9f8",
+            "surface-container-highest": "#e4e2e1",
+            "on-surface-variant": "#434653",
+            "surface-container-high": "#eae7e7",
+            "outline-variant": "#c3c6d5",
+            "on-primary-fixed": "#001847",
+            "tertiary-fixed-dim": "#e2c384",
+            "tertiary": "#483403",
+            "on-secondary-container": "#4f657b",
+            "error": "#ba1a1a",
+            "on-tertiary-container": "#dbbc7e",
+            "surface-container-lowest": "#ffffff",
+            "inverse-primary": "#b2c5ff",
+            "tertiary-container": "#614b18",
+            "on-secondary": "#ffffff",
+            "surface-bright": "#fcf9f8",
+            "on-primary-fixed-variant": "#0040a0",
+            "surface": "#fcf9f8",
+            "inverse-on-surface": "#f3f0f0",
+            "surface-tint": "#2559bf",
+            "on-secondary-fixed": "#041d30",
+            "primary-fixed": "#dae2ff",
+            "on-error": "#ffffff",
+            "on-primary": "#ffffff",
+            "on-background": "#1b1c1c",
+            "inverse-surface": "#303030",
+            "primary-container": "#0247ae",
+            "on-secondary-fixed-variant": "#33495e"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "gutter": "1.5rem",
+            "space-xs": "0.25rem",
+            "margin-mobile": "1rem",
+            "space-lg": "1.5rem",
+            "space-sm": "0.5rem",
+            "space-xl": "2rem",
+            "space-md": "1rem",
+            "gutter-mobile": "1rem",
+            "margin": "2rem"
+          },
+          "fontFamily": {
+            "body-sm": ["Inter"],
+            "headline-lg-mobile": ["Inter"],
+            "body-md": ["Inter"],
+            "label-lg": ["Inter"],
+            "headline-lg": ["Inter"],
+            "headline-sm": ["Inter"],
+            "title-md": ["Inter"],
+            "body-lg": ["Inter"],
+            "title-lg": ["Inter"],
+            "label-sm": ["Inter"],
+            "display-lg-mobile": ["Inter"],
+            "display-lg": ["Inter"],
+            "headline-md": ["Inter"],
+            "label-md": ["Inter"]
+          },
+          "fontSize": {
+            "body-sm": ["12px", { "lineHeight": "18px", "letterSpacing": "0.01em", "fontWeight": "400" }],
+            "headline-lg-mobile": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "body-md": ["14px", { "lineHeight": "22px", "letterSpacing": "0em", "fontWeight": "400" }],
+            "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500" }],
+            "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.015em", "fontWeight": "600" }],
+            "headline-sm": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.005em", "fontWeight": "600" }],
+            "title-md": ["16px", { "lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "500" }],
+            "body-lg": ["16px", { "lineHeight": "26px", "letterSpacing": "0em", "fontWeight": "400" }],
+            "title-lg": ["18px", { "lineHeight": "26px", "letterSpacing": "0em", "fontWeight": "600" }],
+            "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "600" }],
+            "display-lg-mobile": ["30px", { "lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "display-lg": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .math-font {
+      font-family: 'Cambria Math', 'Times New Roman', serif;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #FFFAFA;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #c3c6d5;
+      border-radius: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #737784;
+    }
+  </style>
+</head>
+<body class="bg-[#FFFAFA] text-on-surface antialiased font-body-md text-body-md flex flex-col h-screen overflow-hidden select-none">
+<!-- 1. Workspace Top Bar (#ws-topbar) -->
+<header class="h-[52px] bg-surface-container-lowest border-b border-outline-variant/60 px-4 flex items-center justify-between z-40 shrink-0 shadow-[0_1px_3px_rgba(45,67,88,0.03)]" id="ws-topbar">
+<!-- Left: Suite identity -->
+<div class="flex items-center space-x-3">
+<div class="flex items-center space-x-2">
+<span class="w-7 h-7 bg-primary-container text-on-primary rounded flex items-center justify-center font-bold text-sm tracking-tight shadow-sm">CL</span>
+<span class="font-headline-sm text-headline-sm font-bold tracking-tight text-primary">CoLearn</span>
+</div>
+<span class="text-outline-variant font-light">/</span>
+<div class="flex items-center space-x-2">
+<span class="text-on-surface font-title-md text-title-md font-semibold truncate max-w-[340px]">Suite 402: Advanced Calculus &amp; Linear Systems (MATH-301)</span>
+<span class="bg-[#FEFCBF] text-[#B7791F] border border-[#F6E05E]/50 px-2 py-0.5 rounded-full text-label-sm font-label-sm uppercase tracking-wider">Private Suite</span>
+</div>
+</div>
+<!-- Center: Operational indicators & pills -->
+<div class="hidden lg:flex items-center space-x-2.5">
+<button class="flex items-center space-x-1.5 px-3 py-1 bg-surface-container-low hover:bg-surface-container border border-outline-variant/50 rounded-full transition-colors duration-150">
+<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+<span class="text-on-surface text-label-md font-label-md">Return to Call</span>
+<span class="text-secondary text-label-sm font-mono font-medium">· 00:28:44</span>
+</button>
+<div class="flex items-center space-x-1.5 px-3 py-1 bg-secondary-fixed/50 border border-secondary-container rounded-full">
+<span class="material-symbols-outlined text-[16px] text-primary" data-icon="screen_share">screen_share</span>
+<span class="text-secondary text-label-md font-label-md">J. Roy is sharing canvas</span>
+</div>
+</div>
+<!-- Right: Suite Actions & Profile -->
+<div class="flex items-center space-x-2">
+<button class="w-8 h-8 rounded hover:bg-surface-container flex items-center justify-center text-secondary transition-colors" title="Settings">
+<span class="material-symbols-outlined text-[19px]" data-icon="settings">settings</span>
+</button>
+<button class="w-8 h-8 rounded hover:bg-surface-container flex items-center justify-center text-secondary transition-colors relative" title="Notifications">
+<span class="material-symbols-outlined text-[19px]" data-icon="notifications">notifications</span>
+<span class="absolute top-1 right-1 w-4 h-4 bg-primary-container text-white text-[10px] font-bold rounded-full flex items-center justify-center ring-2 ring-white">2</span>
+</button>
+<div class="h-5 w-px bg-outline-variant/60 mx-1"></div>
+<div class="flex items-center space-x-2 pl-1 cursor-pointer group">
+<div class="w-7 h-7 rounded-full bg-[#0247AE] text-white flex items-center justify-center text-label-sm font-label-sm font-semibold shadow-sm">
+          DR
+        </div>
+<span class="text-on-surface text-label-md font-label-md font-medium group-hover:text-primary">Dr. Ross</span>
+</div>
+</div>
+</header>
+<!-- 2. Sub-Header Navigation & Sync Status Bar -->
+<section class="h-11 bg-surface-container-lowest border-b border-outline-variant/60 px-6 flex items-center justify-between shrink-0">
+<div class="flex items-center space-x-3 text-label-md font-label-md">
+<div class="flex items-center space-x-1.5 text-secondary">
+<span>Workspaces</span>
+<span class="material-symbols-outlined text-[14px]" data-icon="chevron_right">chevron_right</span>
+<span>MATH-301</span>
+<span class="material-symbols-outlined text-[14px]" data-icon="chevron_right">chevron_right</span>
+<span class="text-primary font-semibold">Documents &amp; Research Papers</span>
+</div>
+<div class="h-3.5 w-px bg-outline-variant/60"></div>
+<!-- Drive sync status -->
+<div class="flex items-center space-x-1.5 px-2.5 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200">
+<span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+<span class="text-label-sm font-label-sm font-medium">Google Drive Connected (MIT Academic Shared Drive v4) · Auto-Sync Active</span>
+</div>
+</div>
+<!-- Storage quota & Quick Actions -->
+<div class="flex items-center space-x-4">
+<div class="flex items-center space-x-2">
+<span class="text-secondary text-label-sm font-label-sm">14.2 GB of 50 GB used (28.4%)</span>
+<div class="w-24 h-1.5 bg-surface-variant rounded-full overflow-hidden">
+<div class="h-full bg-primary-container rounded-full" style="width: 28.4%;"></div>
+</div>
+</div>
+<div class="h-4 w-px bg-outline-variant/60"></div>
+<div class="flex items-center space-x-2">
+<button class="px-2.5 py-1 text-label-md font-label-md text-secondary hover:text-primary bg-surface-container-low hover:bg-surface-variant rounded border border-outline-variant/60 flex items-center space-x-1 transition-colors">
+<span class="material-symbols-outlined text-[15px]" data-icon="sync">sync</span>
+<span>Sync Now</span>
+</button>
+<button class="px-2.5 py-1 text-label-md font-label-md text-secondary hover:text-primary bg-surface-container-low hover:bg-surface-variant rounded border border-outline-variant/60 flex items-center space-x-1 transition-colors">
+<span class="material-symbols-outlined text-[15px]" data-icon="create_new_folder">create_new_folder</span>
+<span>New Folder</span>
+</button>
+<button class="px-3 py-1 text-label-md font-label-md text-white bg-primary-container hover:bg-[#023788] active:bg-[#012B6A] rounded flex items-center space-x-1 transition-all shadow-sm">
+<span class="material-symbols-outlined text-[16px]" data-icon="upload_file">upload_file</span>
+<span>Upload File</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Main Viewport Layout -->
+<div class="flex flex-1 overflow-hidden relative">
+<!-- 3. MAIN SPLIT VIEWPORT (#ws-state-docs) -->
+<main class="flex-1 flex overflow-hidden" id="ws-state-docs">
+<!-- LEFT PANEL: Document Browser & Upload Queue (~360px) -->
+<section class="w-[380px] bg-surface-container-lowest border-r border-outline-variant/60 flex flex-col shrink-0">
+<!-- Search & Filter Controls -->
+<div class="p-4 border-b border-outline-variant/60 space-y-3">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-2.5 top-2.5 text-[18px] text-secondary" data-icon="search">search</span>
+<input class="w-full h-9 pl-9 pr-3 text-body-md font-body-md bg-surface-container-low border border-outline-variant/60 rounded focus:bg-white focus:border-primary-container focus:ring-1 focus:ring-primary-container placeholder:text-secondary text-on-surface outline-none transition-all" placeholder="Filter documents, tags, or citations..." type="text"/>
+</div>
+<!-- Category Pills Filter -->
+<div class="flex items-center gap-1.5 overflow-x-auto pb-1 custom-scrollbar text-label-sm font-label-sm">
+<button class="px-2.5 py-1 rounded-full bg-primary-container text-white font-medium shadow-xs">All (45)</button>
+<button class="px-2.5 py-1 rounded-full bg-[#FFFAFA] border border-outline-variant/60 text-secondary hover:text-primary hover:border-secondary transition-colors">PDFs (18)</button>
+<button class="px-2.5 py-1 rounded-full bg-[#FFFAFA] border border-outline-variant/60 text-secondary hover:text-primary hover:border-secondary transition-colors">DOCX (6)</button>
+<button class="px-2.5 py-1 rounded-full bg-[#FFFAFA] border border-outline-variant/60 text-secondary hover:text-primary hover:border-secondary transition-colors">Slides (9)</button>
+<button class="px-2.5 py-1 rounded-full bg-[#FFFAFA] border border-outline-variant/60 text-secondary hover:text-primary hover:border-secondary transition-colors">Datasets (8)</button>
+<button class="px-2.5 py-1 rounded-full bg-[#FFFAFA] border border-outline-variant/60 text-secondary hover:text-primary hover:border-secondary transition-colors">LaTeX (4)</button>
+</div>
+</div>
+<!-- Document List View -->
+<div class="flex-1 overflow-y-auto custom-scrollbar divide-y divide-outline-variant/30">
+<!-- Document Item 1 (ACTIVE / SELECTED) -->
+<div class="p-3.5 bg-[#F6E7D2]/40 border-l-[3px] border-primary-container cursor-pointer transition-colors relative">
+<div class="flex items-start justify-between">
+<div class="flex items-start space-x-2.5 min-w-0">
+<span class="w-8 h-8 rounded bg-rose-50 text-rose-700 border border-rose-200 flex items-center justify-center shrink-0 mt-0.5 font-bold text-[10px]">PDF</span>
+<div class="min-w-0">
+<h4 class="text-body-md font-body-md font-semibold text-on-surface truncate leading-tight">Problem_Set_04_Vector_Spaces.pdf</h4>
+<div class="flex items-center space-x-2 text-label-sm font-label-sm text-secondary mt-1">
+<span>1.4 MB</span>
+<span>•</span>
+<span>Dr. Ross</span>
+<span>•</span>
+<span>22m ago</span>
+</div>
+</div>
+</div>
+<span class="inline-flex items-center space-x-1 px-1.5 py-0.5 rounded bg-primary-fixed text-primary font-medium text-[11px]">
+<span class="material-symbols-outlined text-[13px]" data-icon="chat_bubble">chat_bubble</span>
+<span>3</span>
+</span>
+</div>
+<div class="mt-2 pl-10 flex items-center space-x-2">
+<span class="text-[11px] font-label-sm px-1.5 py-0.2 bg-white/80 border border-outline-variant/50 rounded text-secondary">Linear Algebra</span>
+<span class="text-[11px] font-label-sm px-1.5 py-0.2 bg-white/80 border border-outline-variant/50 rounded text-secondary">Week 4</span>
+</div>
+</div>
+<!-- Document Item 2 -->
+<div class="p-3.5 hover:bg-[#FFFAFA] cursor-pointer transition-colors border-l-[3px] border-transparent">
+<div class="flex items-start justify-between">
+<div class="flex items-start space-x-2.5 min-w-0">
+<span class="w-8 h-8 rounded bg-blue-50 text-blue-700 border border-blue-200 flex items-center justify-center shrink-0 mt-0.5 font-bold text-[10px]">DOCX</span>
+<div class="min-w-0">
+<h4 class="text-body-md font-body-md font-medium text-on-surface truncate leading-tight">Spectral_Decomposition_Theorem_Draft_v2.docx</h4>
+<div class="flex items-center space-x-2 text-label-sm font-label-sm text-secondary mt-1">
+<span>840 KB</span>
+<span>•</span>
+<span>Prof. Lindqvist</span>
+<span>•</span>
+<span>2h ago</span>
+</div>
+</div>
+</div>
+<span class="inline-flex items-center space-x-1 px-1.5 py-0.5 rounded bg-surface-container text-secondary font-medium text-[11px]">
+<span class="material-symbols-outlined text-[13px]" data-icon="forum">forum</span>
+<span>4</span>
+</span>
+</div>
+</div>
+<!-- Document Item 3 -->
+<div class="p-3.5 hover:bg-[#FFFAFA] cursor-pointer transition-colors border-l-[3px] border-transparent">
+<div class="flex items-start justify-between">
+<div class="flex items-start space-x-2.5 min-w-0">
+<span class="w-8 h-8 rounded bg-amber-50 text-amber-700 border border-amber-200 flex items-center justify-center shrink-0 mt-0.5 font-bold text-[10px]">PPTX</span>
+<div class="min-w-0">
+<h4 class="text-body-md font-body-md font-medium text-on-surface truncate leading-tight">Lecture_08_Gram_Schmidt_Slides.pptx</h4>
+<div class="flex items-center space-x-2 text-label-sm font-label-sm text-secondary mt-1">
+<span>6.2 MB</span>
+<span>•</span>
+<span>Dr. Ross</span>
+<span>•</span>
+<span>Yesterday</span>
+</div>
+</div>
+</div>
+<span class="material-symbols-outlined text-secondary/50 text-[18px]" data-icon="cloud_done">cloud_done</span>
+</div>
+</div>
+<!-- Document Item 4 -->
+<div class="p-3.5 hover:bg-[#FFFAFA] cursor-pointer transition-colors border-l-[3px] border-transparent">
+<div class="flex items-start justify-between">
+<div class="flex items-start space-x-2.5 min-w-0">
+<span class="w-8 h-8 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center justify-center shrink-0 mt-0.5 font-bold text-[10px]">PY</span>
+<div class="min-w-0">
+<h4 class="text-body-md font-body-md font-medium text-on-surface truncate leading-tight">gram_schmidt_ortho_test.py</h4>
+<div class="flex items-center space-x-2 text-label-sm font-label-sm text-secondary mt-1">
+<span>18.4 KB</span>
+<span>•</span>
+<span>Julian Roy</span>
+<span>•</span>
+<span>May 12</span>
+</div>
+</div>
+</div>
+<span class="material-symbols-outlined text-secondary/50 text-[18px]" data-icon="code">code</span>
+</div>
+</div>
+<!-- Document Item 5 -->
+<div class="p-3.5 hover:bg-[#FFFAFA] cursor-pointer transition-colors border-l-[3px] border-transparent">
+<div class="flex items-start justify-between">
+<div class="flex items-start space-x-2.5 min-w-0">
+<span class="w-8 h-8 rounded bg-purple-50 text-purple-700 border border-purple-200 flex items-center justify-center shrink-0 mt-0.5 font-bold text-[10px]">TEX</span>
+<div class="min-w-0">
+<h4 class="text-body-md font-body-md font-medium text-on-surface truncate leading-tight">Inner_Product_Space_Proof_Notes.tex</h4>
+<div class="flex items-center space-x-2 text-label-sm font-label-sm text-secondary mt-1">
+<span>44 KB</span>
+<span>•</span>
+<span>Marcus Vance</span>
+<span>•</span>
+<span>May 10</span>
+</div>
+</div>
+</div>
+<span class="material-symbols-outlined text-secondary/50 text-[18px]" data-icon="article">article</span>
+</div>
+</div>
+</div>
+<!-- Upload Drop Zone & Progress Queue Area -->
+<div class="p-3.5 bg-surface-container-low border-t border-outline-variant/60 space-y-3">
+<!-- Drop Area -->
+<div class="border-2 border-dashed border-outline-variant hover:border-primary-container rounded-lg p-3 text-center bg-white cursor-pointer transition-colors group">
+<span class="material-symbols-outlined text-primary-container text-[24px] group-hover:scale-110 transition-transform" data-icon="cloud_upload">cloud_upload</span>
+<p class="text-label-md font-label-md text-on-surface mt-1">Drag &amp; drop academic papers, sets, or code</p>
+<p class="text-label-sm font-label-sm text-secondary">or <span class="text-primary font-semibold underline underline-offset-2">Browse files</span></p>
+</div>
+<!-- Upload Status Stack -->
+<div class="space-y-2">
+<!-- Active Upload Item -->
+<div class="bg-white p-2.5 rounded border border-outline-variant/60 shadow-xs">
+<div class="flex items-center justify-between text-label-sm font-label-sm mb-1.5">
+<span class="font-medium text-on-surface truncate max-w-[210px]">Hilbert_Space_Spectral_Proof_Appendix.pdf</span>
+<button class="text-secondary hover:text-error">
+<span class="material-symbols-outlined text-[15px]" data-icon="close">close</span>
+</button>
+</div>
+<div class="w-full bg-surface-variant h-1.5 rounded-full overflow-hidden">
+<div class="bg-primary-container h-full rounded-full transition-all duration-300" style="width: 78%;"></div>
+</div>
+<div class="flex items-center justify-between text-[11px] text-secondary mt-1">
+<span>4.2 MB / 5.4 MB</span>
+<span class="font-medium text-primary">78% · 2s left</span>
+</div>
+</div>
+<!-- Completed Upload Item -->
+<div class="bg-white p-2 rounded border border-outline-variant/60 flex items-center justify-between">
+<div class="flex items-center space-x-2 truncate">
+<span class="material-symbols-outlined text-emerald-600 text-[16px]" data-icon="check_circle">check_circle</span>
+<span class="text-label-sm font-label-sm text-on-surface truncate max-w-[220px]">Eigenvalue_Computation_Matrix.m</span>
+</div>
+<span class="text-[11px] font-label-sm text-secondary">Just now</span>
+</div>
+</div>
+</div>
+</section>
+<!-- RIGHT PANEL: Document Preview Engine & Full Viewer (~65%) -->
+<section class="flex-1 flex flex-col bg-[#FFFAFA] overflow-hidden">
+<!-- Viewer Control Masthead -->
+<div class="h-12 bg-surface-container-lowest border-b border-outline-variant/60 px-5 flex items-center justify-between shrink-0">
+<!-- Document metadata & title -->
+<div class="flex items-center space-x-3">
+<span class="font-title-md text-title-md font-semibold text-on-surface">Problem_Set_04_Vector_Spaces.pdf</span>
+<span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200 text-label-sm font-label-sm">v3.2 · Approved by Dr. Ross</span>
+</div>
+<!-- Page navigation & zoom controls -->
+<div class="flex items-center space-x-2">
+<div class="flex items-center bg-surface-container-low border border-outline-variant/60 rounded px-1 py-0.5">
+<button class="p-1 text-secondary hover:text-on-surface transition-colors" title="Previous Page">
+<span class="material-symbols-outlined text-[16px]" data-icon="arrow_back">arrow_back</span>
+</button>
+<span class="px-2 text-label-md font-label-md font-medium text-on-surface">Page 3 of 12</span>
+<button class="p-1 text-secondary hover:text-on-surface transition-colors" title="Next Page">
+<span class="material-symbols-outlined text-[16px]" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+<div class="h-4 w-px bg-outline-variant/60"></div>
+<div class="flex items-center bg-surface-container-low border border-outline-variant/60 rounded px-1 py-0.5">
+<button class="p-1 text-secondary hover:text-on-surface" title="Zoom Out">
+<span class="material-symbols-outlined text-[16px]" data-icon="zoom_out">zoom_out</span>
+</button>
+<span class="px-1.5 text-label-sm font-label-sm font-mono text-on-surface">100%</span>
+<button class="p-1 text-secondary hover:text-on-surface" title="Zoom In">
+<span class="material-symbols-outlined text-[16px]" data-icon="zoom_in">zoom_in</span>
+</button>
+<button class="p-1 text-secondary hover:text-on-surface ml-1 border-l border-outline-variant/50" title="Rotate">
+<span class="material-symbols-outlined text-[16px]" data-icon="rotate_right">rotate_right</span>
+</button>
+</div>
+<div class="h-4 w-px bg-outline-variant/60"></div>
+<!-- Viewer Actions -->
+<div class="flex items-center space-x-1.5">
+<button class="p-1.5 text-secondary hover:text-primary rounded hover:bg-surface-container" title="Download">
+<span class="material-symbols-outlined text-[18px]" data-icon="download">download</span>
+</button>
+<button class="px-2.5 py-1 text-label-md font-label-md text-secondary hover:text-primary rounded border border-outline-variant/60 flex items-center space-x-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="comment">comment</span>
+<span>Annotate (3)</span>
+</button>
+<button class="px-2.5 py-1 text-label-md font-label-md text-secondary hover:text-primary rounded border border-outline-variant/60 flex items-center space-x-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="format_quote">format_quote</span>
+<span>Citations</span>
+</button>
+<button class="px-3 py-1 text-label-md font-label-md bg-primary-container text-white rounded hover:bg-[#023788] flex items-center space-x-1.5 transition-colors" id="open-overlay-btn">
+<span class="material-symbols-outlined text-[16px]" data-icon="fullscreen">fullscreen</span>
+<span>Fullscreen Preview</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Render Canvas Area -->
+<div class="flex-1 overflow-y-auto p-8 flex justify-center custom-scrollbar bg-[#FFFAFA]">
+<!-- Authentic Academic Manuscript Paper -->
+<div class="w-[780px] bg-white border border-[#E1DFE2] rounded-lg shadow-[0_2px_8px_rgba(45,67,88,0.06)] p-12 relative flex flex-col justify-between min-h-[980px]">
+<!-- Document Header -->
+<div>
+<div class="border-b border-outline-variant/40 pb-4 mb-8 flex justify-between items-baseline">
+<div>
+<span class="text-label-sm font-label-sm uppercase tracking-wider text-secondary">Department of Mathematics • Spring 2025</span>
+<h1 class="text-headline-md font-headline-md font-bold text-on-surface mt-1">Problem Set 04: Vector Spaces &amp; Projections</h1>
+</div>
+<div class="text-right">
+<span class="text-label-sm font-label-sm text-secondary">Course: MATH-301</span>
+<div class="text-label-sm font-label-sm font-mono text-primary font-medium">Due: Feb 28, 23:59 EST</div>
+</div>
+</div>
+<!-- Problem Section with Annotation Anchor -->
+<div class="relative mb-8 p-4 rounded-md bg-amber-50/20 border-l-2 border-primary-container">
+<div class="flex items-center justify-between">
+<h3 class="text-title-md font-title-md font-semibold text-on-surface">Problem 4.1: Orthogonal Projection onto Closed Subspaces</h3>
+<span class="text-label-sm font-label-sm text-secondary font-mono">[20 Points]</span>
+</div>
+<p class="text-body-md font-body-md text-on-surface-variant mt-2 leading-relaxed">
+                  Let <span class="math-font italic font-semibold">V</span> be an inner product space over <span class="math-font">ℝ</span> with standard inner product <span class="math-font">⟨·, ·⟩</span>. For any finite-dimensional closed subspace <span class="math-font italic font-semibold">W</span> = span{<span class="math-font italic">u</span><sub>1</sub>, <span class="math-font italic">u</span><sub>2</sub>, ..., <span class="math-font italic">u</span><sub><span class="math-font italic">k</span></sub>}, we define the projection operator <span class="math-font italic">P<sub>W</sub></span>: <span class="math-font italic">V → W</span>.
+                </p>
+<!-- LaTeX / Mathematical Proof Box -->
+<div class="my-4 p-4 bg-[#FFFAFA] border border-outline-variant/60 rounded font-mono text-[13px] text-on-surface leading-loose text-center shadow-inner">
+<span class="math-font text-[16px] text-on-surface">
+                    P<sub>W</sub>(v) = ∑<sub>i=1</sub><sup>k</sup>
+<span class="inline-block text-center align-middle mx-1">
+<span class="block border-b border-on-surface px-1">⟨v, u<sub>i</sub>⟩</span>
+<span class="block">||u<sub>i</sub>||²</span>
+</span>
+                    u<sub>i</sub>
+</span>
+<div class="mt-2 text-secondary text-body-sm">
+                    Prove that <span class="math-font text-on-surface font-semibold">⟨v - P<sub>W</sub>(v), w⟩ = 0</span> for all <span class="math-font text-on-surface">w ∈ W</span>.
+                  </div>
+</div>
+<!-- Margin Annotation Card -->
+<div class="absolute -right-4 top-10 translate-x-full w-[260px] bg-white border border-[#E1DFE2] rounded-lg p-3.5 shadow-[0_8px_24px_rgba(45,67,88,0.08)] z-20">
+<div class="flex items-center space-x-2 mb-2">
+<div class="w-6 h-6 rounded-full bg-secondary-fixed text-primary text-label-sm font-label-sm font-bold flex items-center justify-center">
+                      EL
+                    </div>
+<div>
+<h5 class="text-label-sm font-label-sm font-semibold text-on-surface">Prof. Elena Lindqvist</h5>
+<span class="text-[10px] text-secondary">18 mins ago</span>
+</div>
+</div>
+<p class="text-body-sm font-body-sm text-on-surface-variant leading-snug">
+                    "Verify if the basis {u_1, ..., u_k} is strictly orthonormal or arbitrary orthogonal before applying theorem 3.4."
+                  </p>
+<div class="mt-3 pt-2.5 border-t border-outline-variant/40">
+<input class="w-full text-[12px] bg-surface-container-low border border-outline-variant/60 rounded px-2 py-1 focus:bg-white focus:outline-none focus:border-primary-container text-on-surface" placeholder="Write a reply..." type="text"/>
+<div class="flex justify-end mt-1.5">
+<button class="px-2 py-0.5 bg-primary-container text-white text-label-sm font-label-sm rounded hover:bg-[#023788]">Reply</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Vector Projection Schematic Diagram (SVG Native) -->
+<div class="my-6 border border-outline-variant/40 rounded-lg p-4 bg-[#FFFAFA] flex flex-col items-center">
+<span class="text-label-sm font-label-sm text-secondary mb-2 uppercase tracking-wide">Figure 4.1: Geometric Decomposition of v into Subspace W and Orthogonal Complement W^⊥</span>
+<svg class="overflow-visible" height="190" viewbox="0 0 420 190" width="420">
+<!-- Subspace Plane W -->
+<polygon fill="#EAE7E7" points="40,160 200,160 380,110 220,110" stroke="#737784" stroke-dasharray="3,3" stroke-width="1.2"></polygon>
+<text fill="#4B6077" font-family="Inter" font-size="12" font-weight="600" x="340" y="140">Subspace W</text>
+<!-- Vector Projection P_W(v) -->
+<line marker-end="url(#arrow-blue)" stroke="#0247AE" stroke-width="2.5" x1="120" x2="260" y1="140" y2="132"></line>
+<text fill="#0247AE" font-family="Inter" font-size="12" font-weight="700" x="200" y="152">P_W(v)</text>
+<!-- Orthogonal Complement (v - P_W(v)) -->
+<line stroke="#737784" stroke-dasharray="4,4" stroke-width="1.8" x1="260" x2="260" y1="132" y2="40"></line>
+<text fill="#434653" font-family="Inter" font-size="12" font-style="italic" x="270" y="85">v - P_W(v) ∈ W^⊥</text>
+<!-- Original Vector v -->
+<line marker-end="url(#arrow-dark)" stroke="#003280" stroke-width="2.5" x1="120" x2="260" y1="140" y2="40"></line>
+<text fill="#003280" font-family="Inter" font-size="13" font-weight="700" x="175" y="80">Vector v</text>
+<!-- Right angle indicator -->
+<polyline fill="none" points="260,118 248,118 248,132" stroke="#4B6077" stroke-width="1.2"></polyline>
+<!-- Markers -->
+<defs>
+<marker id="arrow-blue" markerheight="6" markerwidth="6" orient="auto-start-reverse" refx="5" refy="5" viewbox="0 0 10 10">
+<path d="M 0 0 L 10 5 L 0 10 z" fill="#0247AE"></path>
+</marker>
+<marker id="arrow-dark" markerheight="6" markerwidth="6" orient="auto-start-reverse" refx="5" refy="5" viewbox="0 0 10 10">
+<path d="M 0 0 L 10 5 L 0 10 z" fill="#003280"></path>
+</marker>
+</defs>
+</svg>
+</div>
+<!-- Problem 4.2 snippet -->
+<div class="p-3 border-t border-outline-variant/30">
+<div class="flex items-center justify-between">
+<h4 class="text-title-md font-title-md font-semibold text-on-surface">Problem 4.2: Parseval's Identity in Generalized Hilbert Spaces</h4>
+<span class="text-label-sm font-label-sm text-secondary font-mono">[15 Points]</span>
+</div>
+<p class="text-body-sm font-body-sm text-secondary mt-1">
+                  Using the definition of complete orthogonal systems from Theorem 4.3, show that the norm ||v||² equals the sum of squared Fourier coefficients...
+                </p>
+</div>
+</div>
+<!-- Page Footer Bar in Paper -->
+<div class="pt-6 border-t border-outline-variant/40 flex justify-between items-center text-label-sm font-label-sm text-secondary">
+<span>CoLearn Academic Network • Verified Course Material</span>
+<span>MATH-301 • Page 3</span>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- 5. Collapsible Right Sidebar (#ws-sidebar) -->
+<aside class="w-[280px] bg-surface-container-lowest border-l border-outline-variant/60 flex flex-col shrink-0" id="ws-sidebar">
+<!-- Voice Call Status Bar -->
+<div class="p-3.5 border-b border-outline-variant/60 bg-surface-container-low">
+<div class="flex items-center justify-between">
+<div class="flex items-center space-x-2">
+<span class="material-symbols-outlined text-[18px] text-emerald-600 animate-pulse" data-icon="mic">mic</span>
+<span class="text-label-md font-label-md font-semibold text-on-surface">Voice Suite (5)</span>
+</div>
+<span class="px-2 py-0.5 rounded text-[10px] font-mono font-medium bg-emerald-100 text-emerald-800">PTT Ready</span>
+</div>
+<div class="mt-2 flex items-center justify-between text-label-sm font-label-sm text-secondary">
+<span>Push-to-Talk: <kbd class="px-1 py-0.5 bg-white border border-outline-variant rounded font-mono text-[10px]">Space</kbd></span>
+<span class="text-emerald-700 font-medium">Dr. Ross speaking</span>
+</div>
+</div>
+<!-- Members List with Roles -->
+<div class="flex-1 overflow-y-auto p-3.5 space-y-4 custom-scrollbar">
+<div>
+<span class="text-label-sm font-label-sm uppercase tracking-wider text-secondary font-semibold">Active Scholars &amp; Faculty (5)</span>
+<ul class="mt-2.5 space-y-2.5">
+<!-- Member 1: Dr. Ross (Host) -->
+<li class="flex items-center justify-between">
+<div class="flex items-center space-x-2.5">
+<div class="relative">
+<div class="w-7 h-7 rounded-full bg-primary-container text-white flex items-center justify-center text-label-sm font-label-sm font-semibold">
+                    DR
+                  </div>
+<span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-500 border-2 border-white rounded-full"></span>
+</div>
+<div>
+<div class="flex items-center space-x-1.5">
+<span class="text-label-md font-label-md font-semibold text-on-surface">Dr. Ross</span>
+<span class="bg-[#F6E7D2] text-[#2C2C2C] border border-[#C8AA6E] px-1.5 py-0.2 rounded-full text-[10px] font-semibold">Host</span>
+</div>
+<span class="text-label-sm font-label-sm text-secondary">MIT Faculty Lab</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-[16px] text-emerald-600" data-icon="mic">mic</span>
+</li>
+<!-- Member 2: Prof. Lindqvist (Admin) -->
+<li class="flex items-center justify-between">
+<div class="flex items-center space-x-2.5">
+<div class="relative">
+<div class="w-7 h-7 rounded-full bg-[#587D90] text-white flex items-center justify-center text-label-sm font-label-sm font-semibold">
+                    EL
+                  </div>
+<span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-500 border-2 border-white rounded-full"></span>
+</div>
+<div>
+<div class="flex items-center space-x-1.5">
+<span class="text-label-md font-label-md font-semibold text-on-surface">Prof. Lindqvist</span>
+<span class="bg-secondary-fixed text-primary px-1.5 py-0.2 rounded-full text-[10px] font-semibold">Admin</span>
+</div>
+<span class="text-label-sm font-label-sm text-secondary">Stockholm Inst.</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-[16px] text-secondary" data-icon="mic_off">mic_off</span>
+</li>
+<!-- Member 3: Julian Roy -->
+<li class="flex items-center justify-between">
+<div class="flex items-center space-x-2.5">
+<div class="relative">
+<div class="w-7 h-7 rounded-full bg-surface-container text-on-surface flex items-center justify-center text-label-sm font-label-sm font-semibold">
+                    JR
+                  </div>
+<span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-500 border-2 border-white rounded-full"></span>
+</div>
+<div>
+<div class="flex items-center space-x-1">
+<span class="text-label-md font-label-md font-medium text-on-surface">Julian Roy</span>
+<span class="material-symbols-outlined text-[14px] text-primary" data-icon="screen_share" title="Sharing Canvas">screen_share</span>
+</div>
+<span class="text-label-sm font-label-sm text-secondary">Teaching Fellow</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-[16px] text-secondary" data-icon="mic_off">mic_off</span>
+</li>
+<!-- Member 4: Marcus Vance -->
+<li class="flex items-center justify-between">
+<div class="flex items-center space-x-2.5">
+<div class="relative">
+<div class="w-7 h-7 rounded-full bg-surface-container text-on-surface flex items-center justify-center text-label-sm font-label-sm font-semibold">
+                    MV
+                  </div>
+<span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-500 border-2 border-white rounded-full"></span>
+</div>
+<div>
+<span class="text-label-md font-label-md font-medium text-on-surface">Marcus Vance</span>
+<p class="text-label-sm font-label-sm text-secondary">Graduate Researcher</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-[16px] text-secondary" data-icon="mic_off">mic_off</span>
+</li>
+<!-- Member 5: Sarah Chen -->
+<li class="flex items-center justify-between">
+<div class="flex items-center space-x-2.5">
+<div class="relative">
+<div class="w-7 h-7 rounded-full bg-surface-container text-on-surface flex items-center justify-center text-label-sm font-label-sm font-semibold">
+                    SC
+                  </div>
+<span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-amber-400 border-2 border-white rounded-full"></span>
+</div>
+<div>
+<span class="text-label-md font-label-md font-medium text-on-surface">Sarah Chen</span>
+<p class="text-label-sm font-label-sm text-secondary">Peer Reviewer</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-[16px] text-secondary" data-icon="mic_off">mic_off</span>
+</li>
+</ul>
+</div>
+<!-- Suite Quick Information & Sync Stats -->
+<div class="pt-4 border-t border-outline-variant/60 space-y-2">
+<span class="text-label-sm font-label-sm uppercase tracking-wider text-secondary font-semibold">Suite Audit</span>
+<div class="bg-surface-container-low p-2.5 rounded border border-outline-variant/40 space-y-1.5 text-label-sm font-label-sm">
+<div class="flex justify-between text-secondary">
+<span>Drive Revision:</span>
+<span class="font-mono text-on-surface">rev_491.b</span>
+</div>
+<div class="flex justify-between text-secondary">
+<span>Last Verification:</span>
+<span class="text-on-surface">1 min ago</span>
+</div>
+<div class="flex justify-between text-secondary">
+<span>Access Level:</span>
+<span class="text-on-surface">Math Dept Strict</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Sidebar Navigation Actions -->
+<div class="p-3.5 border-t border-outline-variant/60 bg-surface-container-lowest space-y-2">
+<button class="w-full h-9 bg-surface-container-low hover:bg-surface-variant border border-outline-variant/60 text-on-surface rounded text-label-md font-label-md font-medium flex items-center justify-center space-x-1.5 transition-colors">
+<span class="material-symbols-outlined text-[16px]" data-icon="meeting_room">meeting_room</span>
+<span>Enter Room Hub</span>
+</button>
+<button class="w-full h-9 bg-transparent hover:bg-rose-50 text-rose-700 border border-transparent hover:border-rose-200 rounded text-label-md font-label-md font-medium flex items-center justify-center space-x-1.5 transition-colors">
+<span class="material-symbols-outlined text-[16px]" data-icon="arrow_back">arrow_back</span>
+<span>Leave Suite</span>
+</button>
+</div>
+</aside>
+</div>
+<!-- 4. Full-Screen Document Viewer Overlay (#doc-overlay-container) -->
+<div class="fixed inset-0 bg-[#2D4358]/35 backdrop-blur-[2px] z-50 hidden flex items-center justify-center p-6" id="doc-overlay-container">
+<div class="bg-white w-[92vw] h-[921px] rounded-lg shadow-[0_16px_40px_rgba(45,67,88,0.18)] border border-[#E1DFE2] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+<!-- Overlay Header -->
+<div class="h-14 bg-surface-container-lowest border-b border-outline-variant/60 px-6 flex items-center justify-between shrink-0">
+<div class="flex items-center space-x-3">
+<span class="w-7 h-7 bg-primary-container text-white rounded flex items-center justify-center font-bold text-xs">PDF</span>
+<div>
+<h3 class="font-title-md text-title-md font-semibold text-on-surface">Problem_Set_04_Vector_Spaces.pdf</h3>
+<span class="text-label-sm font-label-sm text-secondary">Split Verification Mode · Parallel Citation Review</span>
+</div>
+</div>
+<div class="flex items-center space-x-3">
+<div class="flex items-center space-x-1 bg-surface-container-low px-2 py-1 rounded border border-outline-variant/60 text-label-sm font-label-sm">
+<span class="text-secondary">Comparing with:</span>
+<span class="font-semibold text-primary">Theorem_3.4_Gram_Orthogonality.tex</span>
+</div>
+<button class="w-8 h-8 rounded-full hover:bg-surface-container flex items-center justify-center text-secondary hover:text-on-surface transition-colors" id="close-overlay-btn">
+<span class="material-symbols-outlined text-[20px]" data-icon="close">close</span>
+</button>
+</div>
+</div>
+<!-- Overlay Split Body -->
+<div class="flex-1 flex overflow-hidden">
+<!-- Left Pane: Full Paper Page -->
+<div class="flex-1 bg-[#FFFAFA] p-8 overflow-y-auto flex justify-center custom-scrollbar border-r border-outline-variant/60">
+<div class="w-[720px] bg-white border border-[#E1DFE2] rounded p-10 shadow-sm min-h-[900px]">
+<h2 class="text-headline-sm font-headline-sm font-bold text-on-surface border-b pb-2 mb-6">Section 4: Projection Theorems &amp; Spectral Proofs</h2>
+<p class="text-body-md font-body-md leading-relaxed text-on-surface-variant">
+              In finite-dimensional inner product spaces, every subspace <span class="math-font italic font-semibold">W</span> induces an orthogonal direct sum decomposition:
+            </p>
+<div class="my-6 p-4 bg-[#FFFAFA] border border-outline-variant/60 rounded text-center font-mono text-title-md text-primary">
+              V = W ⊕ W<sup>⊥</sup>
+</div>
+<p class="text-body-md font-body-md leading-relaxed text-on-surface-variant">
+              Every vector <span class="math-font italic">v ∈ V</span> can be uniquely expressed as <span class="math-font italic">v = w + w'</span> where <span class="math-font italic">w ∈ W</span> and <span class="math-font italic">w' ∈ W<sup>⊥</sup></span>.
+            </p>
+</div>
+</div>
+<!-- Right Pane: Citation and Verification Inspector -->
+<div class="w-[420px] bg-surface-container-lowest p-6 flex flex-col justify-between overflow-y-auto custom-scrollbar">
+<div class="space-y-4">
+<h4 class="font-title-md text-title-md font-semibold text-on-surface flex items-center space-x-1.5">
+<span class="material-symbols-outlined text-primary text-[20px]" data-icon="verified">verified</span>
+<span>Citation &amp; Theorem Matcher</span>
+</h4>
+<div class="p-3 bg-amber-50/50 rounded border border-amber-200 text-body-sm font-body-sm text-tertiary">
+              Matched Citation: <strong>Rudin, W.</strong> <em>Real and Complex Analysis (3rd Edition)</em>, Chapter 4: Elementary Hilbert Space Theory, Theorem 4.11 (Orthogonal Projection).
+            </div>
+<div class="space-y-2">
+<span class="text-label-sm font-label-sm font-semibold uppercase tracking-wider text-secondary">Verified Cross-References</span>
+<ul class="text-label-md font-label-md space-y-2">
+<li class="p-2.5 bg-surface-container-low rounded border border-outline-variant/40 flex items-center justify-between">
+<span class="truncate">Lemma 2.1 (Cauchy-Schwarz)</span>
+<span class="text-emerald-700 font-semibold text-label-sm">Verified</span>
+</li>
+<li class="p-2.5 bg-surface-container-low rounded border border-outline-variant/40 flex items-center justify-between">
+<span class="truncate">Proposition 3.3 (Closed Kernels)</span>
+<span class="text-emerald-700 font-semibold text-label-sm">Verified</span>
+</li>
+</ul>
+</div>
+</div>
+<div class="pt-4 border-t border-outline-variant/60 flex justify-end space-x-2">
+<button class="px-4 py-2 border border-outline-variant/60 rounded text-label-md font-label-md text-secondary hover:text-on-surface" id="close-overlay-footer">Exit Fullscreen</button>
+<button class="px-4 py-2 bg-primary-container text-white rounded text-label-md font-label-md hover:bg-[#023788]">Confirm Annotations</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- 6. Bottom Floating Toolbar (.bottom-toolbar) -->
+<footer class="bottom-toolbar fixed bottom-5 left-1/2 -translate-x-1/2 h-[54px] bg-surface-container-lowest/95 backdrop-blur-md border border-[#E1DFE2] rounded-full shadow-[0_8px_24px_rgba(45,67,88,0.12)] px-4 flex items-center space-x-1.5 z-40">
+<!-- Room Hub -->
+<button class="w-10 h-10 rounded-full hover:bg-surface-container flex items-center justify-center text-secondary transition-colors" title="Room Hub">
+<span class="material-symbols-outlined text-[20px]" data-icon="dashboard">dashboard</span>
+</button>
+<!-- Chat -->
+<button class="w-10 h-10 rounded-full hover:bg-surface-container flex items-center justify-center text-secondary transition-colors" title="Chat">
+<span class="material-symbols-outlined text-[20px]" data-icon="chat">chat</span>
+</button>
+<!-- Members -->
+<button class="w-10 h-10 rounded-full hover:bg-surface-container flex items-center justify-center text-secondary transition-colors" title="Members">
+<span class="material-symbols-outlined text-[20px]" data-icon="group">group</span>
+</button>
+<div class="h-5 w-px bg-outline-variant/60 mx-1"></div>
+<!-- Documents (ACTIVE with Blue Indicator) -->
+<button class="relative w-10 h-10 rounded-full bg-primary-fixed/60 text-primary-container flex items-center justify-center font-semibold transition-colors" title="Documents &amp; Research">
+<span class="material-symbols-outlined text-[20px]" data-icon="description">description</span>
+<span class="absolute -bottom-1 w-1.5 h-1.5 rounded-full bg-primary-container"></span>
+</button>
+<!-- Whiteboard -->
+<button class="w-10 h-10 rounded-full hover:bg-surface-container flex items-center justify-center text-secondary transition-colors" title="Whiteboard">
+<span class="material-symbols-outlined text-[20px]" data-icon="draw">draw</span>
+</button>
+<!-- Notes -->
+<button class="w-10 h-10 rounded-full hover:bg-surface-container flex items-center justify-center text-secondary transition-colors" title="Notes">
+<span class="material-symbols-outlined text-[20px]" data-icon="edit_note">edit_note</span>
+</button>
+<div class="h-5 w-px bg-outline-variant/60 mx-1"></div>
+<!-- Mic (Muted) -->
+<button class="w-10 h-10 rounded-full bg-rose-50 text-rose-700 hover:bg-rose-100 flex items-center justify-center transition-colors" title="Unmute Mic">
+<span class="material-symbols-outlined text-[20px]" data-icon="mic_off">mic_off</span>
+</button>
+<!-- Camera -->
+<button class="w-10 h-10 rounded-full hover:bg-surface-container flex items-center justify-center text-secondary transition-colors" title="Toggle Camera">
+<span class="material-symbols-outlined text-[20px]" data-icon="videocam">videocam</span>
+</button>
+<!-- Screen Share -->
+<button class="w-10 h-10 rounded-full hover:bg-surface-container flex items-center justify-center text-secondary transition-colors" title="Share Screen">
+<span class="material-symbols-outlined text-[20px]" data-icon="present_to_all">present_to_all</span>
+</button>
+<div class="h-5 w-px bg-outline-variant/60 mx-1"></div>
+<!-- Red Leave Call Button -->
+<button class="h-9 px-3.5 rounded-full bg-[#BA1A1A] hover:bg-[#93000A] text-white flex items-center space-x-1 transition-colors shadow-xs" title="Leave Call">
+<span class="material-symbols-outlined text-[18px]" data-icon="call_end">call_end</span>
+<span class="text-label-md font-label-md font-medium">Leave</span>
+</button>
+</footer>
+<!-- Modal Interaction Script -->
+<script>
+    const overlay = document.getElementById('doc-overlay-container');
+    const openBtn = document.getElementById('open-overlay-btn');
+    const closeBtn = document.getElementById('close-overlay-btn');
+    const closeFooterBtn = document.getElementById('close-overlay-footer');
+
+    if (openBtn && overlay) {
+      openBtn.addEventListener('click', () => {
+        overlay.classList.remove('hidden');
+      });
+    }
+
+    if (closeBtn && overlay) {
+      closeBtn.addEventListener('click', () => {
+        overlay.classList.add('hidden');
+      });
+    }
+
+    if (closeFooterBtn && overlay) {
+      closeFooterBtn.addEventListener('click', () => {
+        overlay.classList.add('hidden');
+      });
+    }
+  </script>
+</body></html>

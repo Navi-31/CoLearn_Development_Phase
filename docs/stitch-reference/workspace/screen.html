@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CoLearn Suite Workspace | Suite 402: Advanced Calculus &amp; Linear Systems</title>
+<!-- Google Fonts: Inter -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS v3 -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Theme Configuration verbatim from instructions -->
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "surface-container-lowest": "#ffffff",
+            "primary-fixed": "#dae2ff",
+            "inverse-surface": "#303030",
+            "on-tertiary": "#ffffff",
+            "surface-bright": "#fcf9f8",
+            "on-secondary": "#ffffff",
+            "on-tertiary-container": "#dbbc7e",
+            "on-background": "#1b1c1c",
+            "on-tertiary-fixed-variant": "#594311",
+            "on-surface": "#1b1c1c",
+            "on-error": "#ffffff",
+            "inverse-primary": "#b2c5ff",
+            "surface-container-highest": "#e4e2e1",
+            "on-primary-fixed-variant": "#0040a0",
+            "inverse-on-surface": "#f3f0f0",
+            "error-container": "#ffdad6",
+            "on-secondary-fixed-variant": "#33495e",
+            "secondary-container": "#cbe2fc",
+            "surface-container-high": "#eae7e7",
+            "secondary": "#4b6077",
+            "background": "#fcf9f8",
+            "tertiary-container": "#614b18",
+            "primary": "#003280",
+            "surface-container": "#f0eded",
+            "on-primary-fixed": "#001847",
+            "tertiary": "#483403",
+            "on-primary": "#ffffff",
+            "secondary-fixed-dim": "#b2c9e3",
+            "surface-tint": "#2559bf",
+            "primary-fixed-dim": "#b2c5ff",
+            "on-primary-container": "#a7beff",
+            "on-error-container": "#93000a",
+            "surface-variant": "#e4e2e1",
+            "on-surface-variant": "#434653",
+            "tertiary-fixed-dim": "#e2c384",
+            "surface-dim": "#dcd9d9",
+            "outline": "#737784",
+            "surface": "#fcf9f8",
+            "on-tertiary-fixed": "#261a00",
+            "outline-variant": "#c3c6d5",
+            "primary-container": "#0247ae",
+            "on-secondary-container": "#4f657b",
+            "on-secondary-fixed": "#041d30",
+            "surface-container-low": "#f6f3f2",
+            "tertiary-fixed": "#ffdfa0",
+            "error": "#ba1a1a",
+            "secondary-fixed": "#cee5ff"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "gutter": "1.5rem",
+            "margin": "2rem",
+            "margin-mobile": "1rem",
+            "gutter-mobile": "1rem",
+            "space-md": "1rem",
+            "space-xl": "2rem",
+            "space-lg": "1.5rem",
+            "space-xs": "0.25rem",
+            "space-sm": "0.5rem"
+          },
+          "fontFamily": {
+            "title-md": ["Inter"],
+            "headline-sm": ["Inter"],
+            "title-lg": ["Inter"],
+            "label-md": ["Inter"],
+            "headline-lg-mobile": ["Inter"],
+            "label-lg": ["Inter"],
+            "display-lg-mobile": ["Inter"],
+            "body-sm": ["Inter"],
+            "body-md": ["Inter"],
+            "headline-lg": ["Inter"],
+            "display-lg": ["Inter"],
+            "label-sm": ["Inter"],
+            "body-lg": ["Inter"],
+            "headline-md": ["Inter"]
+          },
+          "fontSize": {
+            "title-md": ["16px", { "lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "500" }],
+            "headline-sm": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.005em", "fontWeight": "600" }],
+            "title-lg": ["18px", { "lineHeight": "26px", "letterSpacing": "0em", "fontWeight": "600" }],
+            "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500" }],
+            "headline-lg-mobile": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500" }],
+            "display-lg-mobile": ["30px", { "lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "body-sm": ["12px", { "lineHeight": "18px", "letterSpacing": "0.01em", "fontWeight": "400" }],
+            "body-md": ["14px", { "lineHeight": "22px", "letterSpacing": "0em", "fontWeight": "400" }],
+            "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.015em", "fontWeight": "600" }],
+            "display-lg": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "600" }],
+            "body-lg": ["16px", { "lineHeight": "26px", "letterSpacing": "0em", "fontWeight": "400" }],
+            "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    /* Continuous hairline borders and precise custom shadows matching style guide */
+    .border-hairline {
+      border: 1px solid #E1DFE2;
+    }
+    .shadow-ambient {
+      box-shadow: 0 2px 8px rgba(45, 67, 88, 0.06);
+    }
+    .shadow-dock {
+      box-shadow: 0 4px 16px rgba(45, 67, 88, 0.08);
+    }
+    /* Custom pulsing dot */
+    @keyframes pulse-subtle {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.45; transform: scale(0.85); }
+    }
+    .status-pulse {
+      animation: pulse-subtle 2s infinite ease-in-out;
+    }
+  </style>
+</head>
+<body class="bg-[#FFFAFA] text-[#2C2C2C] font-body-md text-body-md antialiased min-h-screen flex flex-col selection:bg-secondary-container selection:text-primary">
+<!-- 1. WORKSPACE TOP BAR (#ws-topbar) -->
+<header class="h-[52px] bg-[#FFFFFF] border-b border-[#E1DFE2] px-4 flex items-center justify-between sticky top-0 z-40 select-none shadow-[0_1px_3px_rgba(45,67,88,0.03)]" id="ws-topbar">
+<!-- Left Section: Brand mark, Suite Title & Privacy Pill -->
+<div class="flex items-center space-x-3 overflow-hidden">
+<!-- CoLearn Brand Logo Anchor -->
+<a class="flex items-center gap-1.5 flex-shrink-0 group" href="#">
+<span class="w-7 h-7 rounded bg-[#0247AE] text-[#FFFFFF] flex items-center justify-center font-bold text-[13px] tracking-tight">CL</span>
+<span class="font-title-md text-title-md font-semibold text-[#003280] tracking-tight hidden sm:inline">CoLearn</span>
+</a>
+<span class="text-[#E1DFE2] text-sm">/</span>
+<!-- Suite Title -->
+<div class="flex items-center space-x-2 truncate">
+<h1 class="font-title-md text-title-md font-semibold text-[#2C2C2C] truncate tracking-tight">
+          Suite 402: Advanced Calculus &amp; Linear Systems <span class="font-normal text-[#587D90] text-body-sm">(MATH-301)</span>
+</h1>
+<!-- Privacy Pill -->
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-label-sm font-label-sm bg-[#FEFCBF] text-[#B7791F] border border-[#F6E7D2] flex-shrink-0">
+<span class="material-symbols-outlined text-[13px]" data-icon="lock">lock</span>
+<span>Private Suite</span>
+</span>
+</div>
+</div>
+<!-- Center Section: Active Presence & Call Return Status Indicators -->
+<div class="hidden lg:flex items-center space-x-2">
+<!-- Active Call Return Pill -->
+<a class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-label-md font-label-md bg-[#EBF8FF] text-[#0247AE] border border-[#CEE5FF] hover:bg-[#cbe2fc] transition-colors duration-150" href="#call-room">
+<span class="w-2 h-2 rounded-full bg-emerald-500 status-pulse"></span>
+<span class="material-symbols-outlined text-[15px]" data-icon="videocam">videocam</span>
+<span>Return to Call · 00:24:18</span>
+</a>
+<!-- Active Screen Share Pill -->
+<div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-label-md font-label-md bg-[#F0EDED] text-[#2D4358] border border-[#E1DFE2]">
+<span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+<span class="material-symbols-outlined text-[15px]" data-icon="screen_share">screen_share</span>
+<span>J. Roy is sharing canvas</span>
+</div>
+</div>
+<!-- Right Section: Suite Settings, Notification & User Profile -->
+<div class="flex items-center space-x-1.5">
+<!-- Suite Settings Button -->
+<button class="w-8 h-8 rounded flex items-center justify-center text-[#587D90] hover:text-[#2C2C2C] hover:bg-[#FFFAFA] transition-colors" id="btn-suite-settings" title="Suite Settings">
+<span class="material-symbols-outlined text-[20px]" data-icon="settings">settings</span>
+</button>
+<!-- Notification Bell with Badge -->
+<div class="relative">
+<button class="w-8 h-8 rounded flex items-center justify-center text-[#587D90] hover:text-[#2C2C2C] hover:bg-[#FFFAFA] transition-colors" title="Notifications">
+<span class="material-symbols-outlined text-[20px]" data-icon="notifications">notifications</span>
+<span class="absolute top-1 right-1 w-4 h-4 bg-[#BA1A1A] text-white font-label-sm text-[10px] rounded-full flex items-center justify-center font-semibold leading-none" id="notification-count">2</span>
+</button>
+</div>
+<div class="h-4 w-px bg-[#E1DFE2] mx-1"></div>
+<!-- Dr. Ross Profile Button -->
+<button class="flex items-center gap-2 pl-1 pr-2 py-1 rounded hover:bg-[#FFFAFA] transition-colors" title="Academic Identity Profile">
+<div class="w-7 h-7 rounded-full bg-[#0247AE] text-white flex items-center justify-center text-[12px] font-semibold tracking-wider">
+          DR
+        </div>
+<div class="text-left hidden md:block">
+<div class="font-label-md text-label-md font-semibold text-[#2C2C2C] leading-none">Dr. Ross</div>
+<div class="font-label-sm text-label-sm text-[#587D90] leading-none mt-0.5">Faculty Lead</div>
+</div>
+</button>
+</div>
+</header>
+<!-- MAIN WRAPPER: Workspace + Collapsible Sidebar -->
+<div class="flex flex-1 overflow-hidden relative">
+<!-- 2. WORKSPACE MAIN VIEWPORT (#ws-main, #view-workspace) -->
+<main class="flex-1 overflow-y-auto bg-[#FFFAFA] px-4 md:px-8 py-6 pb-24 space-y-6" id="ws-main">
+<!-- View Header / Breadcrumb navigation -->
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E1DFE2] pb-4">
+<div>
+<div class="flex items-center gap-2 text-label-sm font-label-sm text-[#587D90] mb-1">
+<span>Workspaces</span>
+<span>/</span>
+<span>Mathematics &amp; Computation</span>
+<span>/</span>
+<span class="text-[#0247AE] font-semibold">MATH-301 Working Group</span>
+</div>
+<h2 class="font-headline-sm text-headline-sm font-semibold text-[#2C2C2C] tracking-tight">
+            Suite Overview &amp; Document Repository
+          </h2>
+</div>
+<!-- Suite Quick Controls -->
+<div class="flex items-center gap-2">
+<button class="h-9 px-3.5 rounded bg-white border border-[#E1DFE2] hover:bg-[#FFFAFA] text-[#2C2C2C] font-label-lg text-label-lg flex items-center gap-1.5 transition-colors shadow-sm">
+<span class="material-symbols-outlined text-[18px]" data-icon="history">history</span>
+<span>Audit Log</span>
+</button>
+<button class="h-9 px-3.5 rounded bg-[#0247AE] hover:bg-[#023788] active:bg-[#012B6A] text-white font-label-lg text-label-lg flex items-center gap-1.5 transition-colors shadow-ambient">
+<span class="material-symbols-outlined text-[18px]" data-icon="add">add</span>
+<span>New Collaboration Node</span>
+</button>
+</div>
+</div>
+<!-- Welcome & Session Objectives Banner -->
+<div class="bg-white border-hairline rounded-[10px] p-5 shadow-ambient relative overflow-hidden">
+<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+<div class="space-y-1.5 max-w-2xl">
+<div class="flex items-center gap-2">
+<span class="px-2 py-0.5 rounded-full text-label-sm font-label-sm bg-[#F6E7D2] text-[#2C2C2C] border border-[#C8AA6E] font-medium flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px] text-[#C8AA6E]" data-icon="verified">verified</span>
+                Department of Pure &amp; Applied Mathematics
+              </span>
+<span class="text-label-sm font-label-sm text-[#587D90]">Term: Fall 2025 · Week 4</span>
+</div>
+<h3 class="font-title-lg text-title-lg font-semibold text-[#2C2C2C]">
+              Recitation Focus: Orthogonal Projections, Gram-Schmidt &amp; Spectral Decompositions
+            </h3>
+<p class="font-body-sm text-body-sm text-[#587D90]">
+              Working group sync scheduled with Cambridge Linear Algebra Institute. Live blackboard proofs and theorem validation active in shared scratchpad.
+            </p>
+</div>
+<!-- Recitation Countdown Card -->
+<div class="flex items-center gap-4 bg-[#FFFAFA] border border-[#E1DFE2] p-3 rounded-[8px] flex-shrink-0">
+<div class="w-10 h-10 rounded-full bg-[#EBF8FF] text-[#0247AE] flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-[22px]" data-icon="timer">timer</span>
+</div>
+<div>
+<div class="font-label-sm text-label-sm text-[#587D90] uppercase tracking-wider font-semibold">Next Peer Review</div>
+<div class="font-title-md text-title-md font-bold text-[#0247AE]">Today at 16:30 EST</div>
+<div class="font-body-sm text-body-sm text-[#2C2C2C]">Recitation Room 3B (Hybrid)</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Suite Invitation & PIN Access Box (#ws-state-invite) -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-4" id="ws-state-invite">
+<!-- Direct Invite Link Pill Card -->
+<div class="lg:col-span-8 bg-white border-hairline rounded-[10px] p-5 shadow-ambient flex flex-col justify-between">
+<div class="flex items-center justify-between mb-3">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[#0247AE]" data-icon="share">share</span>
+<h4 class="font-title-md text-title-md font-semibold text-[#2C2C2C]">Suite Secure Direct Invitation</h4>
+</div>
+<span class="text-label-sm font-label-sm text-[#587D90] bg-[#FFFAFA] border border-[#E1DFE2] px-2 py-0.5 rounded">Institutional SSO Required</span>
+</div>
+<p class="font-body-sm text-body-sm text-[#587D90] mb-3">
+            Authorized collaborators can join using this verified endpoint. Invitations enforce university domain credentials and cryptographic token matching.
+          </p>
+<div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 bg-[#FFFAFA] p-1.5 rounded-[8px] border border-[#E1DFE2]">
+<div class="flex-1 px-3 py-1.5 font-mono text-[13px] text-[#2D4358] truncate select-all">
+              https://colearn.edu/suite/math301-402-k9a
+            </div>
+<button class="h-9 px-4 rounded bg-[#0247AE] hover:bg-[#023788] active:bg-[#012B6A] text-white font-label-md text-label-md font-semibold flex items-center justify-center gap-1.5 transition-colors whitespace-nowrap shadow-sm">
+<span class="material-symbols-outlined text-[16px]" data-icon="content_copy">content_copy</span>
+<span>Copy Invite Link</span>
+</button>
+</div>
+</div>
+<!-- 5-digit Session PIN Card -->
+<div class="lg:col-span-4 bg-white border-hairline rounded-[10px] p-5 shadow-ambient flex flex-col justify-between">
+<div class="flex items-center justify-between mb-2">
+<span class="font-title-md text-title-md font-semibold text-[#2C2C2C]">Quick Access PIN</span>
+<span class="text-label-sm font-label-sm text-[#BA1A1A] flex items-center gap-1 font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-[#BA1A1A]"></span>
+              Expires in 42m
+            </span>
+</div>
+<div class="my-auto py-2">
+<div class="flex items-center justify-center gap-2 select-all tracking-[0.35em] font-mono text-[24px] font-bold text-[#003280] bg-[#FFFAFA] py-2.5 rounded-[6px] border border-[#E1DFE2] text-center shadow-inner">
+              4 9 2 8 3
+            </div>
+</div>
+<div class="text-center font-label-sm text-label-sm text-[#587D90] mt-1">
+            Display this PIN on lecture hall projectors for fast attendee check-in.
+          </div>
+</div>
+</div>
+<!-- Google Drive Synchronization Status Banner -->
+<div class="bg-white border-hairline rounded-[10px] px-5 py-3.5 shadow-ambient flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded bg-[#FFFAFA] border border-[#E1DFE2] flex items-center justify-center flex-shrink-0 text-[#0247AE]">
+<span class="material-symbols-outlined text-[20px]" data-icon="cloud_sync">cloud_sync</span>
+</div>
+<div>
+<div class="flex items-center gap-2">
+<span class="font-title-md text-title-md font-semibold text-[#2C2C2C]">Google Drive Connected</span>
+<span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+<span class="text-label-sm font-label-sm text-[#587D90]">Fall 2025 Course Shared Drive synchronized</span>
+</div>
+<div class="font-body-sm text-body-sm text-[#587D90]">
+              Automated two-way backup active. Version history preserved per Academic Integrity standard ISO-2709.
+            </div>
+</div>
+</div>
+<div class="flex items-center gap-4 flex-shrink-0 self-end md:self-auto">
+<!-- Drive Storage Indicator -->
+<div class="text-right">
+<div class="font-label-sm text-label-sm font-medium text-[#2C2C2C]">14.2 GB of 50 GB used</div>
+<div class="w-36 h-2 bg-[#E1DFE2] rounded-full overflow-hidden mt-1">
+<div class="bg-[#0247AE] h-full rounded-full" style="width: 28.4%;"></div>
+</div>
+</div>
+<button class="h-8 px-3 rounded bg-[#FFFAFA] border border-[#E1DFE2] hover:border-[#587D90] text-[#2C2C2C] font-label-sm text-label-sm flex items-center gap-1 transition-colors">
+<span class="material-symbols-outlined text-[16px]" data-icon="sync">sync</span>
+<span>Sync Settings</span>
+</button>
+</div>
+</div>
+<!-- Categorized Document Grid Card (#ws-file-category-grid) -->
+<div class="bg-white border-hairline rounded-[10px] p-6 shadow-ambient space-y-6" id="ws-file-category-grid">
+<!-- Section Header with Primary Actions -->
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E1DFE2] pb-4">
+<div class="flex items-center gap-2.5">
+<span class="w-8 h-8 rounded bg-[#EBF8FF] text-[#0247AE] flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]" data-icon="folder_shared">folder_shared</span>
+</span>
+<div>
+<h3 class="font-title-lg text-title-lg font-semibold text-[#2C2C2C]">Course Documents &amp; Shared Assets</h3>
+<p class="font-body-sm text-body-sm text-[#587D90]">Categorized file spaces with role-based write permissions and live citations.</p>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<button class="h-9 px-3.5 rounded bg-white border border-[#E1DFE2] hover:bg-[#FFFAFA] text-[#2C2C2C] font-label-lg text-label-lg flex items-center gap-1.5 transition-colors">
+<span class="material-symbols-outlined text-[18px]" data-icon="sync">sync</span>
+<span>Sync Now</span>
+</button>
+<button class="h-9 px-4 rounded bg-[#0247AE] hover:bg-[#023788] active:bg-[#012B6A] text-white font-label-lg text-label-lg font-semibold flex items-center gap-1.5 transition-colors shadow-sm">
+<span class="material-symbols-outlined text-[18px]" data-icon="upload_file">upload_file</span>
+<span>+ Upload File</span>
+</button>
+</div>
+</div>
+<!-- 5 Category Cards Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-4">
+<!-- 1. PDF Documents -->
+<div class="group border-hairline rounded-[8px] p-4 bg-[#FFFFFF] hover:border-[#587D90] hover:shadow-md transition-all duration-150 flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-3">
+<span class="w-9 h-9 rounded bg-[#FFDAD6] text-[#BA1A1A] flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]" data-icon="picture_as_pdf">picture_as_pdf</span>
+</span>
+<span class="font-label-sm text-label-sm text-[#587D90] font-medium bg-[#FFFAFA] border border-[#E1DFE2] px-2 py-0.5 rounded-full">
+                  18 files
+                </span>
+</div>
+<h4 class="font-title-md text-title-md font-semibold text-[#2C2C2C] group-hover:text-[#0247AE] transition-colors leading-snug">
+                Lecture Notes &amp; Problem Sets
+              </h4>
+<p class="font-body-sm text-body-sm text-[#587D90] mt-1 line-clamp-2">
+                Curated PDF syllabi, analytical exercises, and formal solutions.
+              </p>
+</div>
+<!-- Mini Preview Slot -->
+<div class="mt-4 pt-3 border-t border-[#E1DFE2] bg-[#FFFAFA] -mx-4 -mb-4 p-3 rounded-b-[8px]">
+<div class="flex items-start gap-2">
+<span class="material-symbols-outlined text-[#BA1A1A] text-[18px] flex-shrink-0 mt-0.5" data-icon="description">description</span>
+<div class="truncate text-left">
+<div class="font-label-md text-label-md font-medium text-[#2C2C2C] truncate">Problem_Set_04_Vector_Spaces.pdf</div>
+<div class="font-body-sm text-body-sm text-[#587D90] text-[11px]">1.4 MB · Updated 22 mins ago</div>
+</div>
+</div>
+</div>
+</div>
+<!-- 2. Word & DOCX -->
+<div class="group border-hairline rounded-[8px] p-4 bg-[#FFFFFF] hover:border-[#587D90] hover:shadow-md transition-all duration-150 flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-3">
+<span class="w-9 h-9 rounded bg-[#EBF8FF] text-[#0247AE] flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]" data-icon="article">article</span>
+</span>
+<span class="font-label-sm text-label-sm text-[#587D90] font-medium bg-[#FFFAFA] border border-[#E1DFE2] px-2 py-0.5 rounded-full">
+                  6 files
+                </span>
+</div>
+<h4 class="font-title-md text-title-md font-semibold text-[#2C2C2C] group-hover:text-[#0247AE] transition-colors leading-snug">
+                Drafts &amp; Lab Summaries
+              </h4>
+<p class="font-body-sm text-body-sm text-[#587D90] mt-1 line-clamp-2">
+                Manuscript co-drafts, essay notes, and collaborative write-ups.
+              </p>
+</div>
+<!-- Mini Preview Slot -->
+<div class="mt-4 pt-3 border-t border-[#E1DFE2] bg-[#FFFAFA] -mx-4 -mb-4 p-3 rounded-b-[8px]">
+<div class="flex items-start gap-2">
+<span class="material-symbols-outlined text-[#0247AE] text-[18px] flex-shrink-0 mt-0.5" data-icon="edit_note">edit_note</span>
+<div class="truncate text-left">
+<div class="font-label-md text-label-md font-medium text-[#2C2C2C] truncate">Recitation_03_Notes.docx</div>
+<div class="font-body-sm text-body-sm text-[#587D90] text-[11px]">840 KB · Updated 2 hrs ago</div>
+</div>
+</div>
+</div>
+</div>
+<!-- 3. Presentations PPTX -->
+<div class="group border-hairline rounded-[8px] p-4 bg-[#FFFFFF] hover:border-[#587D90] hover:shadow-md transition-all duration-150 flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-3">
+<span class="w-9 h-9 rounded bg-[#FEFCBF] text-[#B7791F] flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]" data-icon="slideshow">slideshow</span>
+</span>
+<span class="font-label-sm text-label-sm text-[#587D90] font-medium bg-[#FFFAFA] border border-[#E1DFE2] px-2 py-0.5 rounded-full">
+                  9 slide decks
+                </span>
+</div>
+<h4 class="font-title-md text-title-md font-semibold text-[#2C2C2C] group-hover:text-[#0247AE] transition-colors leading-snug">
+                Weekly Seminar Slides
+              </h4>
+<p class="font-body-sm text-body-sm text-[#587D90] mt-1 line-clamp-2">
+                Faculty lecture keynotes, colloquium decks, and recitation projections.
+              </p>
+</div>
+<!-- Mini Preview Slot -->
+<div class="mt-4 pt-3 border-t border-[#E1DFE2] bg-[#FFFAFA] -mx-4 -mb-4 p-3 rounded-b-[8px]">
+<div class="flex items-start gap-2">
+<span class="material-symbols-outlined text-[#B7791F] text-[18px] flex-shrink-0 mt-0.5" data-icon="co_present">co_present</span>
+<div class="truncate text-left">
+<div class="font-label-md text-label-md font-medium text-[#2C2C2C] truncate">Week_04_Eigenvalues_Orthogonal.pptx</div>
+<div class="font-body-sm text-body-sm text-[#587D90] text-[11px]">6.2 MB · Updated Yesterday</div>
+</div>
+</div>
+</div>
+</div>
+<!-- 4. Images & Diagrams -->
+<div class="group border-hairline rounded-[8px] p-4 bg-[#FFFFFF] hover:border-[#587D90] hover:shadow-md transition-all duration-150 flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-3">
+<span class="w-9 h-9 rounded bg-[#E4E2E1] text-[#2D4358] flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]" data-icon="image">image</span>
+</span>
+<span class="font-label-sm text-label-sm text-[#587D90] font-medium bg-[#FFFAFA] border border-[#E1DFE2] px-2 py-0.5 rounded-full">
+                  14 diagrams
+                </span>
+</div>
+<h4 class="font-title-md text-title-md font-semibold text-[#2C2C2C] group-hover:text-[#0247AE] transition-colors leading-snug">
+                Whiteboard Vector Exports &amp; Figures
+              </h4>
+<p class="font-body-sm text-body-sm text-[#587D90] mt-1 line-clamp-2">
+                Geometric sketches, matrix coordinate maps, and blackboard snaps.
+              </p>
+</div>
+<!-- Mini Preview Slot -->
+<div class="mt-4 pt-3 border-t border-[#E1DFE2] bg-[#FFFAFA] -mx-4 -mb-4 p-3 rounded-b-[8px]">
+<div class="flex items-start gap-2">
+<span class="material-symbols-outlined text-[#2D4358] text-[18px] flex-shrink-0 mt-0.5" data-icon="draw">draw</span>
+<div class="truncate text-left">
+<div class="font-label-md text-label-md font-medium text-[#2C2C2C] truncate">inner_product_projection_v2.png</div>
+<div class="font-body-sm text-body-sm text-[#587D90] text-[11px]">412 KB · Exported 4 hrs ago</div>
+</div>
+</div>
+</div>
+</div>
+<!-- 5. Other Data Files -->
+<div class="group border-hairline rounded-[8px] p-4 bg-[#FFFFFF] hover:border-[#587D90] hover:shadow-md transition-all duration-150 flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-3">
+<span class="w-9 h-9 rounded bg-[#F0EDED] text-[#483403] flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]" data-icon="terminal">terminal</span>
+</span>
+<span class="font-label-sm text-label-sm text-[#587D90] font-medium bg-[#FFFAFA] border border-[#E1DFE2] px-2 py-0.5 rounded-full">
+                  8 datasets
+                </span>
+</div>
+<h4 class="font-title-md text-title-md font-semibold text-[#2C2C2C] group-hover:text-[#0247AE] transition-colors leading-snug">
+                MATLAB &amp; Python Code (.m, .py, .csv)
+              </h4>
+<p class="font-body-sm text-body-sm text-[#587D90] mt-1 line-clamp-2">
+                Eigenvalue solvers, spectral radius scripts, and test datasets.
+              </p>
+</div>
+<!-- Mini Preview Slot -->
+<div class="mt-4 pt-3 border-t border-[#E1DFE2] bg-[#FFFAFA] -mx-4 -mb-4 p-3 rounded-b-[8px]">
+<div class="flex items-start gap-2">
+<span class="material-symbols-outlined text-[#003280] text-[18px] flex-shrink-0 mt-0.5" data-icon="code">code</span>
+<div class="truncate text-left">
+<div class="font-label-md text-label-md font-medium text-[#2C2C2C] truncate">gram_schmidt_test.py</div>
+<div class="font-body-sm text-body-sm text-[#587D90] text-[11px]">18.4 KB · Committed 1 hr ago</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Recent Activity Table / List -->
+<div class="pt-4">
+<div class="flex items-center justify-between mb-3">
+<h4 class="font-title-md text-title-md font-semibold text-[#2C2C2C]">Recently Accessed Documents &amp; Proofs</h4>
+<span class="text-body-sm font-body-sm text-[#587D90]">Showing 5 of 47 items in repository</span>
+</div>
+<div class="border-hairline rounded-[8px] overflow-hidden bg-white">
+<div class="overflow-x-auto">
+<table class="w-full text-left text-body-sm font-body-sm">
+<thead class="bg-[#FFFAFA] border-b border-[#E1DFE2] text-label-sm font-label-sm text-[#587D90]">
+<tr>
+<th class="py-3 px-4" scope="col">Filename</th>
+<th class="py-3 px-4" scope="col">Category</th>
+<th class="py-3 px-4" scope="col">Contributor</th>
+<th class="py-3 px-4" scope="col">Last Modified</th>
+<th class="py-3 px-4" scope="col">Size</th>
+<th class="py-3 px-4 text-right" scope="col">Quick Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-[#E1DFE2]">
+<!-- Row 1 -->
+<tr class="hover:bg-[#FFFAFA] transition-colors group">
+<td class="py-3 px-4 font-medium text-[#2C2C2C] flex items-center gap-2.5">
+<span class="material-symbols-outlined text-[#BA1A1A] text-[20px]" data-icon="picture_as_pdf">picture_as_pdf</span>
+<span class="truncate max-w-xs group-hover:text-[#0247AE] transition-colors">Problem_Set_04_Vector_Spaces.pdf</span>
+</td>
+<td class="py-3 px-4 text-[#587D90]">Problem Sets</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-label-sm font-label-sm bg-[#EBF8FF] text-[#0247AE]">
+                        Dr. Ross
+                      </span>
+</td>
+<td class="py-3 px-4 text-[#587D90]">22 mins ago</td>
+<td class="py-3 px-4 text-[#587D90]">1.4 MB</td>
+<td class="py-3 px-4 text-right space-x-1">
+<button class="p-1 rounded text-[#587D90] hover:text-[#0247AE] hover:bg-white transition-colors" title="Preview document">
+<span class="material-symbols-outlined text-[18px]" data-icon="visibility">visibility</span>
+</button>
+<button class="p-1 rounded text-[#587D90] hover:text-[#0247AE] hover:bg-white transition-colors" title="Download">
+<span class="material-symbols-outlined text-[18px]" data-icon="download">download</span>
+</button>
+<button class="p-1 rounded text-[#587D90] hover:text-[#2C2C2C] hover:bg-white transition-colors" title="More options">
+<span class="material-symbols-outlined text-[18px]" data-icon="more_vert">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-[#FFFAFA] transition-colors group">
+<td class="py-3 px-4 font-medium text-[#2C2C2C] flex items-center gap-2.5">
+<span class="material-symbols-outlined text-[#003280] text-[20px]" data-icon="terminal">terminal</span>
+<span class="truncate max-w-xs group-hover:text-[#0247AE] transition-colors">gram_schmidt_test.py</span>
+</td>
+<td class="py-3 px-4 text-[#587D90]">Python Scripts</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-label-sm font-label-sm bg-[#F0EDED] text-[#2C2C2C]">
+                        Julian Roy
+                      </span>
+</td>
+<td class="py-3 px-4 text-[#587D90]">1 hr ago</td>
+<td class="py-3 px-4 text-[#587D90]">18.4 KB</td>
+<td class="py-3 px-4 text-right space-x-1">
+<button class="p-1 rounded text-[#587D90] hover:text-[#0247AE] hover:bg-white transition-colors" title="Preview code">
+<span class="material-symbols-outlined text-[18px]" data-icon="visibility">visibility</span>
+</button>
+<button class="p-1 rounded text-[#587D90] hover:text-[#0247AE] hover:bg-white transition-colors" title="Download">
+<span class="material-symbols-outlined text-[18px]" data-icon="download">download</span>
+</button>
+<button class="p-1 rounded text-[#587D90] hover:text-[#2C2C2C] hover:bg-white transition-colors" title="More options">
+<span class="material-symbols-outlined text-[18px]" data-icon="more_vert">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-[#FFFAFA] transition-colors group">
+<td class="py-3 px-4 font-medium text-[#2C2C2C] flex items-center gap-2.5">
+<span class="material-symbols-outlined text-[#0247AE] text-[20px]" data-icon="article">article</span>
+<span class="truncate max-w-xs group-hover:text-[#0247AE] transition-colors">Recitation_03_Notes.docx</span>
+</td>
+<td class="py-3 px-4 text-[#587D90]">Drafts &amp; Notes</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-label-sm font-label-sm bg-[#EBF8FF] text-[#0247AE]">
+                        Prof. Lindqvist
+                      </span>
+</td>
+<td class="py-3 px-4 text-[#587D90]">2 hrs ago</td>
+<td class="py-3 px-4 text-[#587D90]">840 KB</td>
+<td class="py-3 px-4 text-right space-x-1">
+<button class="p-1 rounded text-[#587D90] hover:text-[#0247AE] hover:bg-white transition-colors" title="Preview document">
+<span class="material-symbols-outlined text-[18px]" data-icon="visibility">visibility</span>
+</button>
+<button class="p-1 rounded text-[#587D90] hover:text-[#0247AE] hover:bg-white transition-colors" title="Download">
+<span class="material-symbols-outlined text-[18px]" data-icon="download">download</span>
+</button>
+<button class="p-1 rounded text-[#587D90] hover:text-[#2C2C2C] hover:bg-white transition-colors" title="More options">
+<span class="material-symbols-outlined text-[18px]" data-icon="more_vert">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-[#FFFAFA] transition-colors group">
+<td class="py-3 px-4 font-medium text-[#2C2C2C] flex items-center gap-2.5">
+<span class="material-symbols-outlined text-[#2D4358] text-[20px]" data-icon="image">image</span>
+<span class="truncate max-w-xs group-hover:text-[#0247AE] transition-colors">inner_product_projection_v2.png</span>
+</td>
+<td class="py-3 px-4 text-[#587D90]">Diagrams</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-label-sm font-label-sm bg-[#F0EDED] text-[#2C2C2C]">
+                        Marcus Vance
+                      </span>
+</td>
+<td class="py-3 px-4 text-[#587D90]">4 hrs ago</td>
+<td class="py-3 px-4 text-[#587D90]">412 KB</td>
+<td class="py-3 px-4 text-right space-x-1">
+<button class="p-1 rounded text-[#587D90] hover:text-[#0247AE] hover:bg-white transition-colors" title="Preview image">
+<span class="material-symbols-outlined text-[18px]" data-icon="visibility">visibility</span>
+</button>
+<button class="p-1 rounded text-[#587D90] hover:text-[#0247AE] hover:bg-white transition-colors" title="Download">
+<span class="material-symbols-outlined text-[18px]" data-icon="download">download</span>
+</button>
+<button class="p-1 rounded text-[#587D90] hover:text-[#2C2C2C] hover:bg-white transition-colors" title="More options">
+<span class="material-symbols-outlined text-[18px]" data-icon="more_vert">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 5 -->
+<tr class="hover:bg-[#FFFAFA] transition-colors group">
+<td class="py-3 px-4 font-medium text-[#2C2C2C] flex items-center gap-2.5">
+<span class="material-symbols-outlined text-[#B7791F] text-[20px]" data-icon="slideshow">slideshow</span>
+<span class="truncate max-w-xs group-hover:text-[#0247AE] transition-colors">Week_04_Eigenvalues_Orthogonal.pptx</span>
+</td>
+<td class="py-3 px-4 text-[#587D90]">Slide Decks</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-label-sm font-label-sm bg-[#EBF8FF] text-[#0247AE]">
+                        Dr. Ross
+                      </span>
+</td>
+<td class="py-3 px-4 text-[#587D90]">Yesterday</td>
+<td class="py-3 px-4 text-[#587D90]">6.2 MB</td>
+<td class="py-3 px-4 text-right space-x-1">
+<button class="p-1 rounded text-[#587D90] hover:text-[#0247AE] hover:bg-white transition-colors" title="Preview deck">
+<span class="material-symbols-outlined text-[18px]" data-icon="visibility">visibility</span>
+</button>
+<button class="p-1 rounded text-[#587D90] hover:text-[#0247AE] hover:bg-white transition-colors" title="Download">
+<span class="material-symbols-outlined text-[18px]" data-icon="download">download</span>
+</button>
+<button class="p-1 rounded text-[#587D90] hover:text-[#2C2C2C] hover:bg-white transition-colors" title="More options">
+<span class="material-symbols-outlined text-[18px]" data-icon="more_vert">more_vert</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- 3. COLLAPSIBLE RIGHT SIDEBAR (#ws-sidebar) -->
+<aside class="w-[280px] bg-[#FFFFFF] border-l border-[#E1DFE2] flex-shrink-0 flex flex-col justify-between hidden md:flex transition-all duration-200 z-30" id="ws-sidebar">
+<!-- Sidebar Top Section -->
+<div class="flex flex-col flex-1 overflow-y-auto">
+<!-- Active Voice Call Bar (#active-voice-call-bar) -->
+<div class="p-3 bg-[#EBF8FF] border-b border-[#CEE5FF]" id="active-voice-call-bar">
+<div class="flex items-center justify-between mb-2">
+<div class="flex items-center gap-1.5 text-label-sm font-label-sm font-semibold text-[#0247AE]">
+<span class="material-symbols-outlined text-[16px]" data-icon="call">call</span>
+<span>Audio Channel Active</span>
+</div>
+<button class="px-2 py-0.5 rounded text-label-sm font-label-sm bg-[#C53030] hover:bg-red-700 text-white font-medium transition-colors">
+              End Call
+            </button>
+</div>
+<div class="flex items-center justify-between text-[11px] text-[#587D90]">
+<span class="flex items-center gap-1 text-[#BA1A1A]">
+<span class="material-symbols-outlined text-[14px]" data-icon="mic_off">mic_off</span>
+              Mic OFF
+            </span>
+<span class="font-mono text-[10px] bg-white/70 px-1 py-0.5 rounded border border-[#CEE5FF]">Space = Push-to-Talk</span>
+</div>
+</div>
+<!-- Sidebar Header with Members Count and +Invite -->
+<div class="p-4 border-b border-[#E1DFE2] flex items-center justify-between">
+<div class="flex items-center gap-2">
+<h3 class="font-title-md text-title-md font-semibold text-[#2C2C2C]">Suite Members</h3>
+<span class="px-2 py-0.5 rounded-full text-label-sm font-label-sm bg-[#EBF8FF] text-[#0247AE] font-semibold">8 Online</span>
+</div>
+<div class="flex items-center gap-1">
+<button class="p-1 rounded hover:bg-[#FFFAFA] text-[#587D90] transition-colors" title="Refresh presence">
+<span class="material-symbols-outlined text-[18px]" data-icon="refresh">refresh</span>
+</button>
+<button class="px-2 py-1 rounded bg-[#0247AE] hover:bg-[#023788] text-white font-label-sm text-label-sm font-medium flex items-center gap-0.5 transition-colors" title="Invite user">
+<span class="material-symbols-outlined text-[14px]" data-icon="person_add">person_add</span>
+<span>+ Invite</span>
+</button>
+</div>
+</div>
+<!-- Member List (#sidebar-members-list) -->
+<div class="divide-y divide-[#E1DFE2]/60 px-3 py-1 text-body-sm font-body-sm" id="sidebar-members-list">
+<!-- 1. Dr. David Ross (Host) -->
+<div class="py-2.5 px-2 flex items-center justify-between rounded hover:bg-[#FFFAFA] transition-colors">
+<div class="flex items-center gap-2.5 min-w-0">
+<div class="relative flex-shrink-0">
+<div class="w-8 h-8 rounded-full bg-[#0247AE] text-white font-label-sm font-bold flex items-center justify-center">DR</div>
+<span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-white rounded-full"></span>
+</div>
+<div class="truncate text-left">
+<div class="font-label-md text-label-md font-semibold text-[#2C2C2C] truncate">Dr. David Ross <span class="text-[11px] font-normal text-[#587D90]">(You)</span></div>
+<div class="text-[11px] text-[#587D90] truncate">MIT Math Dept.</div>
+</div>
+</div>
+<span class="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-[#FEFCBF] text-[#B7791F] border border-[#F6E7D2] flex-shrink-0">
+              Host
+            </span>
+</div>
+<!-- 2. Prof. Elena Lindqvist (Admin) -->
+<div class="py-2.5 px-2 flex items-center justify-between rounded hover:bg-[#FFFAFA] transition-colors">
+<div class="flex items-center gap-2.5 min-w-0">
+<div class="relative flex-shrink-0">
+<div class="w-8 h-8 rounded-full bg-[#587D90] text-white font-label-sm font-bold flex items-center justify-center">EL</div>
+<span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-white rounded-full"></span>
+</div>
+<div class="truncate text-left">
+<div class="font-label-md text-label-md font-semibold text-[#2C2C2C] truncate">Prof. Elena Lindqvist</div>
+<div class="text-[11px] text-[#587D90] truncate">Uppsala University</div>
+</div>
+</div>
+<span class="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-[#EBF8FF] text-[#0247AE] border border-[#CEE5FF] flex-shrink-0">
+              Admin
+            </span>
+</div>
+<!-- 3. Julian Roy (Member, Screen Sharing) -->
+<div class="py-2.5 px-2 flex items-center justify-between rounded hover:bg-[#FFFAFA] transition-colors">
+<div class="flex items-center gap-2.5 min-w-0">
+<div class="relative flex-shrink-0">
+<div class="w-8 h-8 rounded-full bg-[#33495E] text-white font-label-sm font-bold flex items-center justify-center">JR</div>
+<span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-white rounded-full"></span>
+</div>
+<div class="truncate text-left">
+<div class="font-label-md text-label-md font-semibold text-[#2C2C2C] flex items-center gap-1 truncate">
+<span>Julian Roy</span>
+<span class="material-symbols-outlined text-[13px] text-emerald-600" data-icon="screen_share" title="Sharing screen">screen_share</span>
+</div>
+<div class="text-[11px] text-emerald-600 truncate font-medium">Sharing Canvas</div>
+</div>
+</div>
+<span class="px-1.5 py-0.5 rounded text-[10px] font-medium bg-[#E7E3D8] text-[#587D90] flex-shrink-0">
+              Member
+            </span>
+</div>
+<!-- 4. Marcus Vance (Member) -->
+<div class="py-2.5 px-2 flex items-center justify-between rounded hover:bg-[#FFFAFA] transition-colors">
+<div class="flex items-center gap-2.5 min-w-0">
+<div class="relative flex-shrink-0">
+<div class="w-8 h-8 rounded-full bg-[#483403] text-white font-label-sm font-bold flex items-center justify-center">MV</div>
+<span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-white rounded-full"></span>
+</div>
+<div class="truncate text-left">
+<div class="font-label-md text-label-md font-semibold text-[#2C2C2C] truncate">Marcus Vance</div>
+<div class="text-[11px] text-[#587D90] truncate">Graduate Fellow</div>
+</div>
+</div>
+<span class="px-1.5 py-0.5 rounded text-[10px] font-medium bg-[#E7E3D8] text-[#587D90] flex-shrink-0">
+              Member
+            </span>
+</div>
+<!-- 5. Sarah Chen (Member, Away) -->
+<div class="py-2.5 px-2 flex items-center justify-between rounded hover:bg-[#FFFAFA] transition-colors opacity-85">
+<div class="flex items-center gap-2.5 min-w-0">
+<div class="relative flex-shrink-0">
+<div class="w-8 h-8 rounded-full bg-[#737784] text-white font-label-sm font-bold flex items-center justify-center">SC</div>
+<span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-amber-400 border-2 border-white rounded-full"></span>
+</div>
+<div class="truncate text-left">
+<div class="font-label-md text-label-md font-medium text-[#2C2C2C] truncate">Sarah Chen</div>
+<div class="text-[11px] text-amber-600 truncate font-medium">Away (in library)</div>
+</div>
+</div>
+<span class="px-1.5 py-0.5 rounded text-[10px] font-medium bg-[#E7E3D8] text-[#587D90] flex-shrink-0">
+              Member
+            </span>
+</div>
+<!-- 6. Dr. Aris Thorne (Member, Offline) -->
+<div class="py-2.5 px-2 flex items-center justify-between rounded hover:bg-[#FFFAFA] transition-colors opacity-60">
+<div class="flex items-center gap-2.5 min-w-0">
+<div class="relative flex-shrink-0">
+<div class="w-8 h-8 rounded-full bg-gray-300 text-gray-700 font-label-sm font-bold flex items-center justify-center">AT</div>
+<span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-gray-400 border-2 border-white rounded-full"></span>
+</div>
+<div class="truncate text-left">
+<div class="font-label-md text-label-md font-medium text-[#2C2C2C] truncate">Dr. Aris Thorne</div>
+<div class="text-[11px] text-[#587D90] truncate">Offline · Last seen 3h ago</div>
+</div>
+</div>
+<span class="px-1.5 py-0.5 rounded text-[10px] font-medium bg-gray-100 text-gray-500 flex-shrink-0">
+              Member
+            </span>
+</div>
+</div>
+</div>
+<!-- Sidebar Bottom Action Buttons -->
+<div class="p-4 border-t border-[#E1DFE2] space-y-2 bg-[#FFFAFA]">
+<button class="w-full h-10 rounded bg-[#0247AE] hover:bg-[#023788] active:bg-[#012B6A] text-white font-label-md text-label-md font-semibold flex items-center justify-center gap-2 transition-colors shadow-sm">
+<span class="material-symbols-outlined text-[18px]" data-icon="meeting_room">meeting_room</span>
+<span>Enter Room Hub</span>
+</button>
+<button class="w-full h-9 rounded bg-white hover:bg-[#FFFAFA] border border-[#E1DFE2] text-[#2C2C2C] font-label-md text-label-md font-medium flex items-center justify-center gap-2 transition-colors">
+<span class="material-symbols-outlined text-[16px] text-[#587D90]" data-icon="logout">logout</span>
+<span>Leave Suite</span>
+</button>
+</div>
+</aside>
+</div>
+<!-- 4. FIXED FLOATING BOTTOM TASKBAR (.bottom-toolbar) -->
+<div class="fixed bottom-5 left-1/2 -translate-x-1/2 z-50">
+<nav class="bottom-toolbar h-[54px] bg-[#FFFFFF] border-hairline rounded-[12px] px-3 shadow-dock flex items-center gap-1.5 select-none">
+<!-- 1. Home (Suite Hub) -->
+<button class="w-9 h-9 rounded-[8px] flex items-center justify-center text-[#587D90] hover:text-[#0247AE] hover:bg-[#FFFAFA] transition-colors relative group" title="Suite Hub">
+<span class="material-symbols-outlined text-[20px]" data-icon="home">home</span>
+</button>
+<!-- 2. Chat with Badge (#chat-panel trigger) -->
+<button class="w-9 h-9 rounded-[8px] flex items-center justify-center text-[#587D90] hover:text-[#0247AE] hover:bg-[#FFFAFA] transition-colors relative group" id="chat-panel" title="Chat Stream">
+<span class="material-symbols-outlined text-[20px]" data-icon="chat">chat</span>
+<span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#0247AE]"></span>
+</button>
+<!-- 3. Members (#sidebar trigger) -->
+<button class="w-9 h-9 rounded-[8px] flex items-center justify-center text-[#587D90] hover:text-[#0247AE] hover:bg-[#FFFAFA] transition-colors" title="Toggle Members">
+<span class="material-symbols-outlined text-[20px]" data-icon="group">group</span>
+</button>
+<!-- 4. Documents (Active State Indicator) -->
+<button class="w-9 h-9 rounded-[8px] flex items-center justify-center bg-[#EBF8FF] text-[#0247AE] border border-[#CEE5FF]" title="Documents &amp; Assets (Active)">
+<span class="material-symbols-outlined text-[20px]" data-icon="folder_open">folder_open</span>
+</button>
+<!-- 5. Whiteboard -->
+<button class="w-9 h-9 rounded-[8px] flex items-center justify-center text-[#587D90] hover:text-[#0247AE] hover:bg-[#FFFAFA] transition-colors" title="Collaborative Whiteboard">
+<span class="material-symbols-outlined text-[20px]" data-icon="gesture">gesture</span>
+</button>
+<!-- 6. Notes (Floating Notepad Toggle) -->
+<button class="w-9 h-9 rounded-[8px] flex items-center justify-center text-[#587D90] hover:text-[#0247AE] hover:bg-[#FFFAFA] transition-colors" title="Personal Scratchpad">
+<span class="material-symbols-outlined text-[20px]" data-icon="edit_document">edit_document</span>
+</button>
+<div class="h-6 w-px bg-[#E1DFE2] mx-1"></div>
+<!-- 7. Microphone (Muted State with Red Outline) -->
+<button class="w-9 h-9 rounded-[8px] flex items-center justify-center bg-red-50 text-[#BA1A1A] border border-[#BA1A1A]/40 hover:bg-red-100 transition-colors" title="Microphone (Muted - Space to unmute)">
+<span class="material-symbols-outlined text-[20px]" data-icon="mic_off">mic_off</span>
+</button>
+<!-- 8. Video Camera (Toggle Video Overlay) -->
+<button class="w-9 h-9 rounded-[8px] flex items-center justify-center text-[#587D90] hover:text-[#0247AE] hover:bg-[#FFFAFA] transition-colors" title="Toggle Video">
+<span class="material-symbols-outlined text-[20px]" data-icon="videocam">videocam</span>
+</button>
+<!-- 9. Screen Share (Active State) -->
+<button class="w-9 h-9 rounded-[8px] flex items-center justify-center text-emerald-600 bg-emerald-50 border border-emerald-200" title="Screen Share Active">
+<span class="material-symbols-outlined text-[20px]" data-icon="screen_share">screen_share</span>
+</button>
+<!-- 10. Leave / Disconnect (Red circle background #C53030) -->
+<button class="w-9 h-9 rounded-full flex items-center justify-center bg-[#C53030] hover:bg-red-700 text-white transition-transform active:scale-95 shadow-sm ml-1" title="Leave Suite Room">
+<span class="material-symbols-outlined text-[18px]" data-icon="call_end">call_end</span>
+</button>
+</nav>
+</div>
+<!-- Shared Component: Footnote/Institutional Subtext matching Shared Components JSON -->
+<footer class="bg-surface-container-lowest border-t border-outline-variant/60 py-3 px-6 text-center text-secondary text-body-sm font-body-sm select-none">
+<div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-2">
+<span>© 2025 CoLearn Academic Collaborative. Institutional Research Network. All rights reserved.</span>
+<div class="flex items-center gap-4 text-[12px]">
+<a class="hover:text-primary transition-colors" href="#">Data Governance</a>
+<a class="hover:text-primary transition-colors" href="#">Research Ethics</a>
+<a class="hover:text-primary transition-colors" href="#">Peer Review Standards</a>
+</div>
+</div>
+</footer>
+<!-- Light micro-interaction logic for desktop tooltips and state simulation -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Push to talk visual simulation
+      window.addEventListener('keydown', (e) => {
+        if (e.code === 'Space' && e.target === document.body) {
+          e.preventDefault();
+          const callBar = document.getElementById('active-voice-call-bar');
+          if (callBar) {
+            callBar.classList.add('bg-emerald-50', 'border-emerald-200');
+          }
+        }
+      });
+
+      window.addEventListener('keyup', (e) => {
+        if (e.code === 'Space' && e.target === document.body) {
+          const callBar = document.getElementById('active-voice-call-bar');
+          if (callBar) {
+            callBar.classList.remove('bg-emerald-50', 'border-emerald-200');
+          }
+        }
+      });
+    });
+  </script>
+</body></html>

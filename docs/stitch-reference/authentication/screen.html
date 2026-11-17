@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CoLearn — Authentication &amp; Account Recovery Suite</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "surface-dim": "#dcd9d9",
+            "tertiary": "#483403",
+            "on-tertiary-fixed-variant": "#594311",
+            "error-container": "#ffdad6",
+            "on-primary-fixed": "#001847",
+            "on-secondary-container": "#4f657b",
+            "on-error": "#ffffff",
+            "surface-variant": "#e4e2e1",
+            "secondary-fixed-dim": "#b2c9e3",
+            "outline-variant": "#c3c6d5",
+            "surface-container-lowest": "#ffffff",
+            "surface-bright": "#fcf9f8",
+            "surface-container": "#f0eded",
+            "secondary": "#4b6077",
+            "surface-container-high": "#eae7e7",
+            "surface-tint": "#2559bf",
+            "inverse-on-surface": "#f3f0f0",
+            "primary-fixed-dim": "#b2c5ff",
+            "on-secondary": "#ffffff",
+            "tertiary-container": "#614b18",
+            "primary": "#003280",
+            "secondary-fixed": "#cee5ff",
+            "tertiary-fixed": "#ffdfa0",
+            "tertiary-fixed-dim": "#e2c384",
+            "on-background": "#1b1c1c",
+            "on-secondary-fixed": "#041d30",
+            "on-primary-fixed-variant": "#0040a0",
+            "primary-fixed": "#dae2ff",
+            "on-tertiary-fixed": "#261a00",
+            "on-primary-container": "#a7beff",
+            "on-secondary-fixed-variant": "#33495e",
+            "outline": "#737784",
+            "surface-container-highest": "#e4e2e1",
+            "primary-container": "#0247ae",
+            "on-surface-variant": "#434653",
+            "on-tertiary": "#ffffff",
+            "surface": "#fcf9f8",
+            "inverse-surface": "#303030",
+            "on-error-container": "#93000a",
+            "secondary-container": "#cbe2fc",
+            "error": "#ba1a1a",
+            "on-primary": "#ffffff",
+            "surface-container-low": "#f6f3f2",
+            "inverse-primary": "#b2c5ff",
+            "on-tertiary-container": "#dbbc7e",
+            "background": "#fcf9f8",
+            "on-surface": "#1b1c1c"
+          },
+          borderRadius: {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          spacing: {
+            "space-md": "1rem",
+            "gutter": "1.5rem",
+            "margin-mobile": "1rem",
+            "gutter-mobile": "1rem",
+            "space-xl": "2rem",
+            "space-xs": "0.25rem",
+            "space-lg": "1.5rem",
+            "margin": "2rem",
+            "space-sm": "0.5rem"
+          },
+          fontFamily: {
+            "label-sm": ["Inter"],
+            "body-lg": ["Inter"],
+            "body-md": ["Inter"],
+            "headline-lg": ["Inter"],
+            "title-lg": ["Inter"],
+            "headline-sm": ["Inter"],
+            "label-md": ["Inter"],
+            "display-lg-mobile": ["Inter"],
+            "headline-lg-mobile": ["Inter"],
+            "body-sm": ["Inter"],
+            "headline-md": ["Inter"],
+            "title-md": ["Inter"],
+            "display-lg": ["Inter"],
+            "label-lg": ["Inter"]
+          },
+          fontSize: {
+            "label-sm": ["11px", { lineHeight: "14px", letterSpacing: "0.04em", fontWeight: "600" }],
+            "body-lg": ["16px", { lineHeight: "26px", letterSpacing: "0em", fontWeight: "400" }],
+            "body-md": ["14px", { lineHeight: "22px", letterSpacing: "0em", fontWeight: "400" }],
+            "headline-lg": ["32px", { lineHeight: "40px", letterSpacing: "-0.015em", fontWeight: "600" }],
+            "title-lg": ["18px", { lineHeight: "26px", letterSpacing: "0em", fontWeight: "600" }],
+            "headline-sm": ["20px", { lineHeight: "28px", letterSpacing: "-0.005em", fontWeight: "600" }],
+            "label-md": ["12px", { lineHeight: "16px", letterSpacing: "0.02em", fontWeight: "500" }],
+            "display-lg-mobile": ["30px", { lineHeight: "38px", letterSpacing: "-0.02em", fontWeight: "600" }],
+            "headline-lg-mobile": ["24px", { lineHeight: "32px", letterSpacing: "-0.01em", fontWeight: "600" }],
+            "body-sm": ["12px", { lineHeight: "18px", letterSpacing: "0.01em", fontWeight: "400" }],
+            "headline-md": ["24px", { lineHeight: "32px", letterSpacing: "-0.01em", fontWeight: "600" }],
+            "title-md": ["16px", { lineHeight: "24px", letterSpacing: "0em", fontWeight: "500" }],
+            "display-lg": ["40px", { lineHeight: "48px", letterSpacing: "-0.02em", fontWeight: "600" }],
+            "label-lg": ["14px", { lineHeight: "20px", letterSpacing: "0.01em", fontWeight: "500" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    input:focus, select:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(2, 71, 174, 0.15);
+    }
+  </style>
+</head>
+<body class="bg-surface text-on-surface min-h-screen flex flex-col font-body-md antialiased selection:bg-secondary-container selection:text-on-secondary-fixed">
+<!-- Top Minimal Academic Brand Masthead -->
+<header class="sticky top-0 w-full z-50 bg-surface/90 backdrop-blur-md border-b border-outline-variant/50 shadow-[0_2px_8px_rgba(45,67,88,0.06)]">
+<div class="max-w-7xl mx-auto px-margin flex items-center justify-between h-16">
+<div class="flex items-center gap-space-md">
+<a class="flex items-center gap-2 group text-decoration-none" href="#">
+<div class="w-8 h-8 rounded bg-primary-container flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined text-lg" data-icon="school">school</span>
+</div>
+<span class="text-title-lg font-title-lg font-semibold tracking-tight text-primary">CoLearn</span>
+</a>
+<div class="h-4 w-px bg-outline-variant/60"></div>
+<span class="text-label-md font-label-md text-secondary tracking-normal">Academic Collaboration Platform</span>
+</div>
+<div class="flex items-center gap-space-lg">
+<div class="hidden md:flex items-center gap-2 px-2.5 py-1 rounded bg-surface-container border border-outline-variant/40 text-secondary text-label-sm font-label-sm">
+<span class="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
+<span>ORCID &amp; Shibboleth v4.2 Enabled</span>
+</div>
+<a class="text-secondary font-label-lg text-label-lg hover:text-primary transition-colors duration-150 flex items-center gap-1.5 active:scale-[0.99]" href="#public-portal">
+<span class="material-symbols-outlined text-base" data-icon="arrow_back">arrow_back</span>
+<span>Back to Public Portal</span>
+</a>
+</div>
+</div>
+</header>
+<!-- Main Suite Canvas -->
+<main class="flex-1 flex flex-col items-center justify-start py-space-xl px-margin">
+<!-- Academic Mode Selector Tabs -->
+<section class="w-full max-w-2xl mb-8">
+<div class="text-center mb-4">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-tertiary-fixed text-on-tertiary-fixed border border-tertiary-fixed-dim/60 text-label-sm font-label-sm">
+<span class="material-symbols-outlined text-xs" data-icon="lock">lock</span>
+<span>Institutional Research Network Authentication</span>
+</span>
+<h1 class="text-headline-md font-headline-md text-on-surface mt-2 tracking-tight">Identity &amp; Credential Suite</h1>
+<p class="text-secondary font-body-sm text-body-sm mt-1">Select an identity flow to review cryptographic sign-in, onboarding OTP, or recovery workflows.</p>
+</div>
+<!-- Segmented View Controller -->
+<div class="bg-surface-container-high p-1 rounded-xl border border-outline-variant/50 flex items-center justify-between gap-1 shadow-inner">
+<button class="flex-1 py-2 px-3 rounded-lg text-label-md font-label-md transition-all duration-150 flex items-center justify-center gap-1.5 bg-surface-container-lowest text-primary shadow-[0_2px_8px_rgba(45,67,88,0.06)] font-semibold" id="tab-login" onclick="switchView('login')">
+<span class="material-symbols-outlined text-base" data-icon="login">login</span>
+<span>1. User Login</span>
+</button>
+<button class="flex-1 py-2 px-3 rounded-lg text-label-md font-label-md transition-all duration-150 flex items-center justify-center gap-1.5 text-secondary hover:text-primary" id="tab-signup" onclick="switchView('signup')">
+<span class="material-symbols-outlined text-base" data-icon="person_add">person_add</span>
+<span>2. Registration &amp; OTP</span>
+</button>
+<button class="flex-1 py-2 px-3 rounded-lg text-label-md font-label-md transition-all duration-150 flex items-center justify-center gap-1.5 text-secondary hover:text-primary" id="tab-forgot" onclick="switchView('forgot')">
+<span class="material-symbols-outlined text-base" data-icon="key">key</span>
+<span>3. Password Recovery</span>
+</button>
+</div>
+</section>
+<!-- ========================================================================= -->
+<!-- VIEW 1: USER LOGIN (#view-login)                                          -->
+<!-- ========================================================================= -->
+<div class="w-full flex justify-center transition-opacity duration-200" id="view-login">
+<div class="w-full max-w-[420px] bg-surface-container-lowest rounded-[14px] border border-outline-variant/60 p-8 shadow-[0_2px_8px_rgba(45,67,88,0.06)] relative">
+<div class="mb-6">
+<div class="flex items-center justify-between mb-1.5">
+<h2 class="text-headline-sm font-headline-sm text-on-surface">Log In</h2>
+<span class="px-2 py-0.5 rounded text-label-sm font-label-sm bg-surface-container border border-outline-variant/50 text-secondary">v2.8.4</span>
+</div>
+<p class="text-secondary text-body-md font-body-md">Access your academic study suites and research groups.</p>
+</div>
+<!-- Demo Alert Banner -->
+<div class="mb-5 p-3 rounded-lg bg-[#FFF5F5] border border-[#C53030]/30 flex items-start gap-2.5">
+<span class="material-symbols-outlined text-[#C53030] text-lg mt-0.5 shrink-0" data-icon="error">error</span>
+<div class="flex-1">
+<p class="text-label-md font-label-md text-[#C53030] font-semibold">Institutional credentials alert</p>
+<p class="text-body-sm font-body-sm text-[#C53030]/90 mt-0.5">Invalid institutional credentials or expired session.</p>
+</div>
+</div>
+<form class="space-y-4" onsubmit="event.preventDefault();">
+<!-- Institutional Email Input -->
+<div>
+<label class="block text-label-md font-label-md text-on-surface mb-1.5" for="login-email">
+              Institutional Email Address
+            </label>
+<div class="relative">
+<input class="w-full h-10 px-3.5 bg-surface-container-lowest border border-outline-variant/60 rounded text-body-md font-body-md text-on-surface placeholder:text-secondary focus:border-primary-container transition-all" id="login-email" placeholder="name@university.edu" type="email" value="name@university.edu"/>
+<span class="material-symbols-outlined absolute right-3 top-2.5 text-secondary pointer-events-none text-lg" data-icon="alternate_email">alternate_email</span>
+</div>
+</div>
+<!-- Password Field with Toggle -->
+<div>
+<div class="flex items-center justify-between mb-1.5">
+<label class="block text-label-md font-label-md text-on-surface" for="login-password">Password</label>
+<button class="text-primary hover:underline text-label-sm font-label-sm font-medium" onclick="switchView('forgot')" type="button">Forgot password?</button>
+</div>
+<div class="relative">
+<input class="w-full h-10 px-3.5 pr-10 bg-surface-container-lowest border border-outline-variant/60 rounded text-body-md font-body-md text-on-surface placeholder:text-secondary focus:border-primary-container transition-all" id="login-password" type="password" value="InstitutionalResearch99*"/>
+<button class="absolute right-2.5 top-2 text-secondary hover:text-primary transition-colors p-0.5 rounded focus:outline-none" onclick="togglePasswordVisibility('login-password', 'eye-icon-login')" title="Toggle password visibility" type="button">
+<span class="material-symbols-outlined text-lg" data-icon="visibility" id="eye-icon-login">visibility</span>
+</button>
+</div>
+</div>
+<!-- Remember Me Checkbox -->
+<div class="flex items-center justify-between pt-1">
+<label class="flex items-center gap-2 cursor-pointer select-none">
+<input checked="" class="w-[18px] h-[18px] rounded text-primary-container border-secondary/50 focus:ring-0 focus:ring-offset-0 cursor-pointer" type="checkbox"/>
+<span class="text-body-sm font-body-sm text-secondary">Remember institution on this workstation</span>
+</label>
+</div>
+<!-- Primary CTA Button -->
+<div class="pt-2">
+<button class="w-full h-[42px] bg-primary-container hover:bg-primary active:bg-on-primary-fixed text-on-primary rounded font-label-lg text-label-lg font-semibold flex items-center justify-center gap-2 shadow-[0_2px_8px_rgba(45,67,88,0.06)] transition-all" type="submit">
+<span>Log In</span>
+<span class="material-symbols-outlined text-base" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</form>
+<!-- Institutional Single Sign-On Divider -->
+<div class="my-6 relative flex items-center justify-center">
+<div class="w-full border-t border-outline-variant/50"></div>
+<span class="bg-surface-container-lowest px-3 text-label-sm font-label-sm text-secondary uppercase tracking-wider absolute">Institutional Federation</span>
+</div>
+<div class="grid grid-cols-2 gap-2.5">
+<button class="h-9 px-3 rounded border border-outline-variant/60 bg-surface hover:bg-surface-container-low transition-colors text-label-sm font-label-sm text-on-surface flex items-center justify-center gap-1.5" type="button">
+<span class="material-symbols-outlined text-secondary text-base" data-icon="badge">badge</span>
+<span>EduGAIN / SSO</span>
+</button>
+<button class="h-9 px-3 rounded border border-outline-variant/60 bg-surface hover:bg-surface-container-low transition-colors text-label-sm font-label-sm text-on-surface flex items-center justify-center gap-1.5" type="button">
+<span class="material-symbols-outlined text-[#A6CE39] text-base" data-icon="verified_user">verified_user</span>
+<span>ORCID iD</span>
+</button>
+</div>
+<!-- Secondary Link Row -->
+<div class="mt-6 pt-4 border-t border-outline-variant/40 text-center">
+<p class="text-body-sm font-body-sm text-secondary">
+            New to CoLearn?
+            <button class="ml-1.5 inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-secondary-container/60 text-primary font-semibold hover:bg-secondary-container transition-colors text-label-sm font-label-sm" onclick="switchView('signup')" type="button">
+<span>Create account</span>
+<span class="material-symbols-outlined text-xs" data-icon="chevron_right">chevron_right</span>
+</button>
+</p>
+</div>
+</div>
+</div>
+<!-- ========================================================================= -->
+<!-- VIEW 2: REGISTRATION & OTP VERIFICATION (#view-signup)                   -->
+<!-- ========================================================================= -->
+<div class="w-full hidden justify-center transition-opacity duration-200" id="view-signup">
+<div class="w-full max-w-[480px] bg-surface-container-lowest rounded-[14px] border border-outline-variant/60 p-8 shadow-[0_2px_8px_rgba(45,67,88,0.06)]">
+<!-- Progress Stepper Header -->
+<div class="mb-6">
+<div class="flex items-center justify-between mb-2">
+<span class="text-label-sm font-label-sm text-primary font-semibold uppercase tracking-wider">Onboarding Verification</span>
+<span class="text-label-sm font-label-sm text-secondary" id="signup-step-indicator">Stage 1 of 2</span>
+</div>
+<h2 class="text-headline-sm font-headline-sm text-on-surface">Create Academic Account</h2>
+<p class="text-secondary text-body-md font-body-md mt-1" id="signup-step-subtext">Step 1 of 2: Researcher Profile &amp; Credentials</p>
+<!-- Segmented Stepper Bar -->
+<div class="grid grid-cols-2 gap-2 mt-3">
+<div class="h-1 rounded bg-primary-container" id="step-bar-1"></div>
+<div class="h-1 rounded bg-outline-variant/40" id="step-bar-2"></div>
+</div>
+</div>
+<!-- STEP 1 CONTAINER: PROFILE & CREDENTIALS -->
+<div class="space-y-4" id="signup-stage-1">
+<!-- 2-column Grid: Full Name and Username -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+<div>
+<label class="block text-label-md font-label-md text-on-surface mb-1" for="full-name">Full Name</label>
+<input class="w-full h-10 px-3 bg-surface-container-lowest border border-outline-variant/60 rounded text-body-md font-body-md text-on-surface focus:border-primary-container" id="full-name" type="text" value="Dr. Eleanor Vance"/>
+</div>
+<div>
+<label class="block text-label-md font-label-md text-on-surface mb-1" for="username">Username</label>
+<div class="relative">
+<input class="w-full h-10 px-3 bg-surface-container-lowest border border-outline-variant/60 rounded text-body-md font-body-md text-on-surface focus:border-primary-container font-mono text-[13px]" id="username" type="text" value="@evance"/>
+<span class="material-symbols-outlined absolute right-2.5 top-2.5 text-emerald-600 text-base" data-icon="check_circle">check_circle</span>
+</div>
+</div>
+</div>
+<!-- Single Column: Institutional Email -->
+<div>
+<label class="block text-label-md font-label-md text-on-surface mb-1" for="reg-email">Institutional Email</label>
+<input class="w-full h-10 px-3 bg-surface-container-lowest border border-outline-variant/60 rounded text-body-md font-body-md text-on-surface focus:border-primary-container" id="reg-email" type="email" value="e.vance@cam.ac.uk"/>
+</div>
+<!-- Single Column: Mobile Number -->
+<div>
+<label class="block text-label-md font-label-md text-on-surface mb-1" for="reg-phone">Mobile Number (2FA Backup)</label>
+<input class="w-full h-10 px-3 bg-surface-container-lowest border border-outline-variant/60 rounded text-body-md font-body-md text-on-surface focus:border-primary-container font-mono text-[13px]" id="reg-phone" type="tel" value="+44 7700 900077"/>
+</div>
+<!-- Dropdown Selector: Academic Role / Gender -->
+<div>
+<label class="block text-label-md font-label-md text-on-surface mb-1" for="academic-role">Academic Role / Designation</label>
+<div class="relative">
+<select class="w-full h-10 px-3 pr-8 bg-surface-container-lowest border border-outline-variant/60 rounded text-body-md font-body-md text-on-surface focus:border-primary-container appearance-none" id="academic-role">
+<option selected="">Postdoctoral Researcher / Faculty</option>
+<option>Principal Investigator / Lab Director</option>
+<option>Doctoral Candidate (PhD)</option>
+<option>Visiting Academic Fellow</option>
+<option>Peer Review Board Member</option>
+</select>
+<span class="material-symbols-outlined absolute right-2.5 top-2.5 text-secondary pointer-events-none text-lg" data-icon="unfold_more">unfold_more</span>
+</div>
+</div>
+<!-- Password Field with Live Strength Bar -->
+<div>
+<label class="block text-label-md font-label-md text-on-surface mb-1" for="signup-password">Master Account Password</label>
+<input class="w-full h-10 px-3 bg-surface-container-lowest border border-outline-variant/60 rounded text-body-md font-body-md text-on-surface focus:border-primary-container" id="signup-password" type="password" value="Oxbridge2025#Alpha!"/>
+<!-- Strength Segmented Progress Bar -->
+<div class="mt-2" id="pw-strength-bar">
+<div class="flex items-center justify-between mb-1">
+<span class="text-label-sm font-label-sm text-emerald-700 flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
+<span>Strong · Meets academic security policy</span>
+</span>
+<span class="text-label-sm font-label-sm text-secondary font-mono">Entropy: 88b</span>
+</div>
+<div class="grid grid-cols-4 gap-1.5">
+<div class="h-1.5 rounded-full bg-emerald-600"></div>
+<div class="h-1.5 rounded-full bg-emerald-600"></div>
+<div class="h-1.5 rounded-full bg-emerald-600"></div>
+<div class="h-1.5 rounded-full bg-emerald-600"></div>
+</div>
+</div>
+</div>
+<!-- Confirm Password Field -->
+<div>
+<label class="block text-label-md font-label-md text-on-surface mb-1" for="confirm-password">Confirm Password</label>
+<input class="w-full h-10 px-3 bg-surface-container-lowest border border-outline-variant/60 rounded text-body-md font-body-md text-on-surface focus:border-primary-container" id="confirm-password" type="password" value="Oxbridge2025#Alpha!"/>
+</div>
+<!-- Continue Action -->
+<div class="pt-3">
+<button class="w-full h-[42px] bg-primary-container hover:bg-primary active:bg-on-primary-fixed text-on-primary rounded font-label-lg text-label-lg font-semibold flex items-center justify-center gap-2 shadow-[0_2px_8px_rgba(45,67,88,0.06)] transition-all" onclick="showSignupStep2()" type="button">
+<span>Continue to Verification →</span>
+</button>
+</div>
+</div>
+<!-- STEP 2 CONTAINER: EMAIL OTP CRYPTOGRAPHIC VERIFICATION -->
+<div class="hidden space-y-5" id="signup-stage-2">
+<div class="p-4 rounded-lg bg-surface border border-outline-variant/50">
+<div class="flex items-center gap-2 mb-1.5">
+<span class="material-symbols-outlined text-primary text-xl" data-icon="mark_email_read">mark_email_read</span>
+<h3 class="text-title-md font-title-md text-on-surface">Verify Institutional Email</h3>
+</div>
+<p class="text-secondary text-body-sm font-body-sm leading-relaxed">
+              Enter the 6-digit cryptographic verification code sent to <strong class="text-on-surface font-semibold">e.vance@cam.ac.uk</strong>
+</p>
+</div>
+<!-- 6-digit numeric input cluster -->
+<div>
+<label class="block text-label-md font-label-md text-on-surface mb-2.5 text-center">Institutional Authorization Code</label>
+<div class="flex justify-between items-center gap-2 max-w-[340px] mx-auto">
+<input class="w-11 h-12 text-center text-title-lg font-title-lg font-semibold border-2 border-primary-container rounded bg-surface-container-lowest text-primary shadow-sm" maxlength="1" type="text" value="8"/>
+<input class="w-11 h-12 text-center text-title-lg font-title-lg font-semibold border-2 border-primary-container rounded bg-surface-container-lowest text-primary shadow-sm" maxlength="1" type="text" value="4"/>
+<input class="w-11 h-12 text-center text-title-lg font-title-lg font-semibold border-2 border-primary-container rounded bg-surface-container-lowest text-primary shadow-sm" maxlength="1" type="text" value="9"/>
+<input class="w-11 h-12 text-center text-title-lg font-title-lg font-semibold border-2 border-primary-container rounded bg-surface-container-lowest text-primary shadow-sm" maxlength="1" type="text" value="2"/>
+<input class="w-11 h-12 text-center text-title-lg font-title-lg font-semibold border-2 border-primary-container rounded bg-surface-container-lowest text-primary shadow-sm" maxlength="1" type="text" value="0"/>
+<input class="w-11 h-12 text-center text-title-lg font-title-lg font-semibold border-2 border-primary-container rounded bg-surface-container-lowest text-primary shadow-sm" maxlength="1" type="text" value="1"/>
+</div>
+</div>
+<!-- Countdown Timer and Status Indicator -->
+<div class="space-y-1.5">
+<div class="flex items-center justify-between text-label-sm font-label-sm">
+<span class="text-secondary flex items-center gap-1">
+<span class="material-symbols-outlined text-sm text-secondary" data-icon="schedule">schedule</span>
+<span id="otp-timer-text">⏱ OTP valid for 284s</span>
+</span>
+<span class="text-emerald-700 font-medium">Session Live</span>
+</div>
+<div class="w-full h-1.5 bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-primary-container transition-all duration-1000 ease-linear" style="width: 78%;"></div>
+</div>
+</div>
+<!-- Dual action options -->
+<div class="flex items-center justify-between pt-1">
+<button class="text-label-sm font-label-sm text-primary hover:underline flex items-center gap-1 font-medium" id="btn-send-otp" onclick="resendOtpNotification()" type="button">
+<span class="material-symbols-outlined text-sm" data-icon="refresh">refresh</span>
+<span>Resend Code</span>
+</button>
+<button class="text-label-sm font-label-sm text-secondary hover:text-on-surface underline" onclick="showSignupStep1()" type="button">
+              Change email
+            </button>
+</div>
+<!-- Step 2 Completion CTA -->
+<div class="pt-2 space-y-2">
+<button class="w-full h-[42px] bg-primary-container hover:bg-primary active:bg-on-primary-fixed text-on-primary rounded font-label-lg text-label-lg font-semibold flex items-center justify-center gap-2 shadow-[0_2px_8px_rgba(45,67,88,0.06)] transition-all" onclick="alert('Account successfully verified! Routing to Cambridge Research Lab workspace...')" type="button">
+<span class="material-symbols-outlined text-base" data-icon="verified">verified</span>
+<span>Complete Registration &amp; Enter Workspace</span>
+</button>
+<button class="w-full h-9 bg-transparent hover:bg-surface text-secondary text-label-md font-label-md rounded flex items-center justify-center gap-1 transition-colors" onclick="showSignupStep1()" type="button">
+<span>← Return to Step 1 Edit</span>
+</button>
+</div>
+</div>
+<!-- Footer Link back to login -->
+<div class="mt-6 pt-4 border-t border-outline-variant/40 text-center">
+<p class="text-body-sm font-body-sm text-secondary">
+            Already registered with an academic cohort?
+            <button class="text-primary hover:underline font-semibold ml-1" onclick="switchView('login')" type="button">Sign In</button>
+</p>
+</div>
+</div>
+</div>
+<!-- ========================================================================= -->
+<!-- VIEW 3: FORGOT PASSWORD & RECOVERY STATE MACHINE (#view-forgot)          -->
+<!-- ========================================================================= -->
+<div class="w-full hidden justify-center transition-opacity duration-200" id="view-forgot">
+<div class="w-full max-w-[440px] bg-surface-container-lowest rounded-[14px] border border-outline-variant/60 p-8 shadow-[0_2px_8px_rgba(45,67,88,0.06)]">
+<div class="mb-6">
+<div class="flex items-center justify-between mb-1.5">
+<h2 class="text-headline-sm font-headline-sm text-on-surface">Password Recovery</h2>
+<span class="px-2 py-0.5 rounded text-label-sm font-label-sm bg-tertiary-fixed text-on-tertiary-fixed border border-tertiary-fixed-dim/50">Cryptographic State</span>
+</div>
+<p class="text-secondary text-body-md font-body-md">Recover research credentials via institutional federation token.</p>
+</div>
+<!-- Recovery Flow Visual Breadcrumb Tracker -->
+<div class="mb-6 p-2 rounded-lg bg-surface border border-outline-variant/50 flex items-center justify-between">
+<button class="flex-1 text-center py-1 text-label-sm font-label-sm rounded font-semibold text-primary bg-surface-container-lowest shadow-sm border border-outline-variant/40" id="f-tab-1" onclick="setForgotStage(1)" type="button">
+            1. Email
+          </button>
+<span class="material-symbols-outlined text-outline-variant text-xs" data-icon="chevron_right">chevron_right</span>
+<button class="flex-1 text-center py-1 text-label-sm font-label-sm rounded text-secondary hover:text-on-surface" id="f-tab-2" onclick="setForgotStage(2)" type="button">
+            2. Token
+          </button>
+<span class="material-symbols-outlined text-outline-variant text-xs" data-icon="chevron_right">chevron_right</span>
+<button class="flex-1 text-center py-1 text-label-sm font-label-sm rounded text-secondary hover:text-on-surface" id="f-tab-3" onclick="setForgotStage(3)" type="button">
+            3. Reset
+          </button>
+</div>
+<!-- STAGE 1: EMAIL REQUEST -->
+<div class="space-y-4" id="forgot-stage-1">
+<div class="p-3.5 rounded bg-surface border border-outline-variant/50">
+<p class="text-label-md font-label-md text-on-surface font-semibold">Institutional Lookup</p>
+<p class="text-body-sm font-body-sm text-secondary mt-0.5">
+              Enter your verified academic email. A 5-minute single-use recovery token will be dispatched to your inbox.
+            </p>
+</div>
+<div>
+<label class="block text-label-md font-label-md text-on-surface mb-1.5" for="recovery-email">Registered Email</label>
+<div class="relative">
+<input class="w-full h-10 px-3 bg-surface-container-lowest border border-outline-variant/60 rounded text-body-md font-body-md text-on-surface focus:border-primary-container" id="recovery-email" type="email" value="fellow.curie@sorbonne-universite.fr"/>
+<span class="material-symbols-outlined absolute right-3 top-2.5 text-secondary text-lg" data-icon="mail">mail</span>
+</div>
+</div>
+<button class="w-full h-[42px] bg-primary-container hover:bg-primary active:bg-on-primary-fixed text-on-primary rounded font-label-lg text-label-lg font-semibold flex items-center justify-center gap-2 shadow-[0_2px_8px_rgba(45,67,88,0.06)] transition-all" onclick="setForgotStage(2)" type="button">
+<span>Send Reset Token</span>
+<span class="material-symbols-outlined text-base" data-icon="send">send</span>
+</button>
+</div>
+<!-- STAGE 2: OTP VERIFICATION -->
+<div class="hidden space-y-4" id="forgot-stage-2">
+<div class="p-3 rounded-lg bg-surface-container border border-outline-variant/60 flex items-start gap-2.5">
+<span class="material-symbols-outlined text-primary text-lg mt-0.5 shrink-0" data-icon="timer">timer</span>
+<div class="flex-1">
+<p class="text-label-md font-label-md text-on-surface font-semibold">5-Minute Expiry Notice</p>
+<p class="text-body-sm font-body-sm text-secondary">Token delivered to fellow.curie@... Check spam filters if not received within 30 seconds.</p>
+</div>
+</div>
+<div>
+<label class="block text-label-md font-label-md text-on-surface mb-1.5">6-Digit Token Input</label>
+<div class="relative">
+<input class="w-full h-11 text-center font-mono tracking-[0.6em] text-title-lg font-title-lg font-semibold border border-outline-variant/60 rounded bg-surface-container-lowest text-on-surface focus:border-primary-container" maxlength="6" type="text" value="739401"/>
+<span class="material-symbols-outlined absolute right-3 top-3 text-emerald-600 text-lg" data-icon="lock_clock">lock_clock</span>
+</div>
+</div>
+<div class="flex items-center justify-between text-body-sm font-body-sm">
+<span class="text-secondary">Token valid for 04:32</span>
+<button class="text-primary hover:underline text-label-sm font-label-sm font-medium" onclick="alert('A fresh cryptographic recovery token has been transmitted to your email address.')" type="button">Resend token</button>
+</div>
+<button class="w-full h-[42px] bg-primary-container hover:bg-primary active:bg-on-primary-fixed text-on-primary rounded font-label-lg text-label-lg font-semibold flex items-center justify-center gap-2 shadow-[0_2px_8px_rgba(45,67,88,0.06)] transition-all" onclick="setForgotStage(3)" type="button">
+<span>Verify Token &amp; Continue</span>
+<span class="material-symbols-outlined text-base" data-icon="check">check</span>
+</button>
+</div>
+<!-- STAGE 3: CREDENTIAL RESET -->
+<div class="hidden space-y-4" id="forgot-stage-3">
+<div>
+<label class="block text-label-md font-label-md text-on-surface mb-1" for="new-pw">New Institutional Password</label>
+<input class="w-full h-10 px-3 bg-surface-container-lowest border border-outline-variant/60 rounded text-body-md font-body-md text-on-surface focus:border-primary-container" id="new-pw" type="password" value="Sorbonne#2025∑Math"/>
+</div>
+<div>
+<label class="block text-label-md font-label-md text-on-surface mb-1" for="confirm-new-pw">Confirm New Password</label>
+<input class="w-full h-10 px-3 bg-surface-container-lowest border border-outline-variant/60 rounded text-body-md font-body-md text-on-surface focus:border-primary-container" id="confirm-new-pw" type="password" value="Sorbonne#2025∑Math"/>
+</div>
+<!-- Academic Password Requirement Checklist -->
+<div class="p-3 rounded bg-surface border border-outline-variant/50 space-y-1.5">
+<span class="text-label-sm font-label-sm text-secondary font-semibold uppercase tracking-wider block mb-1">Security Standard Requirements:</span>
+<div class="flex items-center gap-2 text-body-sm font-body-sm text-emerald-700">
+<span class="material-symbols-outlined text-sm font-bold" data-icon="check">check</span>
+<span>Minimum 10 characters length</span>
+</div>
+<div class="flex items-center gap-2 text-body-sm font-body-sm text-emerald-700">
+<span class="material-symbols-outlined text-sm font-bold" data-icon="check">check</span>
+<span>Mixed case alphanumeric pairing</span>
+</div>
+<div class="flex items-center gap-2 text-body-sm font-body-sm text-emerald-700">
+<span class="material-symbols-outlined text-sm font-bold" data-icon="check">check</span>
+<span>Mathematical symbol or special glyph (e.g. ∑, #, *, ^)</span>
+</div>
+</div>
+<div class="pt-2">
+<button class="w-full h-[42px] bg-primary-container hover:bg-primary active:bg-on-primary-fixed text-on-primary rounded font-label-lg text-label-lg font-semibold flex items-center justify-center gap-2 shadow-[0_2px_8px_rgba(45,67,88,0.06)] transition-all" onclick="finalizePasswordReset()" type="button">
+<span>Update Password &amp; Return to Login</span>
+<span class="material-symbols-outlined text-base" data-icon="task_alt">task_alt</span>
+</button>
+</div>
+</div>
+<!-- Back to login footer link -->
+<div class="mt-6 pt-4 border-t border-outline-variant/40 text-center">
+<button class="text-secondary hover:text-primary transition-colors text-label-md font-label-md inline-flex items-center gap-1" onclick="switchView('login')" type="button">
+<span class="material-symbols-outlined text-sm" data-icon="arrow_back">arrow_back</span>
+<span>Return to Log In</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Security & Institutional Compliance Note -->
+<div class="mt-12 text-center max-w-xl">
+<div class="flex items-center justify-center gap-4 text-secondary text-label-sm font-label-sm">
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm" data-icon="gavel">gavel</span>
+<span>GDPR / FERPA Compliant</span>
+</span>
+<span>•</span>
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm" data-icon="shield">shield</span>
+<span>Zero-Knowledge Vault</span>
+</span>
+<span>•</span>
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm" data-icon="domain">domain</span>
+<span>Research Data Mesh v4</span>
+</span>
+</div>
+<p class="text-secondary/80 font-body-sm text-body-sm mt-2">
+        CoLearn authenticates researchers through member institution key servers under ISO/IEC 27001 standard.
+      </p>
+</div>
+</main>
+<!-- Web Footer (Preserving exact JSON Content and Styles) -->
+<footer class="w-full bg-surface-container-lowest border-t border-outline-variant/60">
+<div class="max-w-7xl mx-auto px-margin py-space-xl flex flex-col md:flex-row justify-between items-center gap-space-md">
+<div>
+<p class="text-primary font-semibold text-title-md font-title-md">CoLearn</p>
+<p class="text-secondary font-body-sm text-body-sm mt-1">© 2025 CoLearn Academic Collaborative. Institutional Research Network. All rights reserved.</p>
+</div>
+<nav class="flex flex-wrap items-center gap-x-6 gap-y-2">
+<a class="text-secondary font-body-sm text-body-sm hover:text-primary hover:underline transition-all duration-150" href="#institutional-access">Institutional Access</a>
+<a class="text-secondary font-body-sm text-body-sm hover:text-primary hover:underline transition-all duration-150" href="#research-ethics">Research Ethics</a>
+<a class="text-secondary font-body-sm text-body-sm hover:text-primary hover:underline transition-all duration-150" href="#data-governance">Data Governance</a>
+<a class="text-secondary font-body-sm text-body-sm hover:text-primary hover:underline transition-all duration-150" href="#peer-review-standards">Peer Review Standards</a>
+<a class="text-secondary font-body-sm text-body-sm hover:text-primary hover:underline transition-all duration-150" href="#documentation">Documentation</a>
+<a class="text-secondary font-body-sm text-body-sm hover:text-primary hover:underline transition-all duration-150" href="#contact-working-group">Contact Working Group</a>
+</nav>
+</div>
+</footer>
+<!-- Interactive State Controller Script -->
+<script>
+    function switchView(viewName) {
+      // Elements
+      const loginView = document.getElementById('view-login');
+      const signupView = document.getElementById('view-signup');
+      const forgotView = document.getElementById('view-forgot');
+
+      const tabLogin = document.getElementById('tab-login');
+      const tabSignup = document.getElementById('tab-signup');
+      const tabForgot = document.getElementById('tab-forgot');
+
+      // Hide all views
+      loginView.classList.add('hidden');
+      loginView.classList.remove('flex');
+      signupView.classList.add('hidden');
+      signupView.classList.remove('flex');
+      forgotView.classList.add('hidden');
+      forgotView.classList.remove('flex');
+
+      // Reset tab styling to inactive state
+      const inactiveTabStyle = "flex-1 py-2 px-3 rounded-lg text-label-md font-label-md transition-all duration-150 flex items-center justify-center gap-1.5 text-secondary hover:text-primary";
+      const activeTabStyle = "flex-1 py-2 px-3 rounded-lg text-label-md font-label-md transition-all duration-150 flex items-center justify-center gap-1.5 bg-surface-container-lowest text-primary shadow-[0_2px_8px_rgba(45,67,88,0.06)] font-semibold";
+
+      tabLogin.className = inactiveTabStyle;
+      tabSignup.className = inactiveTabStyle;
+      tabForgot.className = inactiveTabStyle;
+
+      if (viewName === 'login') {
+        loginView.classList.remove('hidden');
+        loginView.classList.add('flex');
+        tabLogin.className = activeTabStyle;
+      } else if (viewName === 'signup') {
+        signupView.classList.remove('hidden');
+        signupView.classList.add('flex');
+        tabSignup.className = activeTabStyle;
+      } else if (viewName === 'forgot') {
+        forgotView.classList.remove('hidden');
+        forgotView.classList.add('flex');
+        tabForgot.className = activeTabStyle;
+      }
+    }
+
+    function togglePasswordVisibility(inputId, iconId) {
+      const input = document.getElementById(inputId);
+      const icon = document.getElementById(iconId);
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.textContent = 'visibility_off';
+      } else {
+        input.type = 'password';
+        icon.textContent = 'visibility';
+      }
+    }
+
+    // Step transitions for Registration
+    function showSignupStep2() {
+      document.getElementById('signup-stage-1').classList.add('hidden');
+      document.getElementById('signup-stage-2').classList.remove('hidden');
+      document.getElementById('step-bar-2').classList.remove('bg-outline-variant/40');
+      document.getElementById('step-bar-2').classList.add('bg-primary-container');
+      document.getElementById('signup-step-indicator').textContent = 'Stage 2 of 2';
+      document.getElementById('signup-step-subtext').textContent = 'Step 2 of 2: Cryptographic Institutional Email OTP';
+    }
+
+    function showSignupStep1() {
+      document.getElementById('signup-stage-2').classList.add('hidden');
+      document.getElementById('signup-stage-1').classList.remove('hidden');
+      document.getElementById('step-bar-2').classList.remove('bg-primary-container');
+      document.getElementById('step-bar-2').classList.add('bg-outline-variant/40');
+      document.getElementById('signup-step-indicator').textContent = 'Stage 1 of 2';
+      document.getElementById('signup-step-subtext').textContent = 'Step 1 of 2: Researcher Profile & Credentials';
+    }
+
+    function resendOtpNotification() {
+      const btn = document.getElementById('btn-send-otp');
+      btn.innerHTML = '<span class="material-symbols-outlined text-sm animate-spin" data-icon="progress_activity">progress_activity</span><span>Transmitting...</span>';
+      setTimeout(() => {
+        btn.innerHTML = '<span class="material-symbols-outlined text-sm" data-icon="check">check</span><span>Transmitted! (284s)</span>';
+        setTimeout(() => {
+          btn.innerHTML = '<span class="material-symbols-outlined text-sm" data-icon="refresh">refresh</span><span>Resend Code</span>';
+        }, 3000);
+      }, 700);
+    }
+
+    // Forgot Password State Machine Stages
+    function setForgotStage(stageNumber) {
+      const s1 = document.getElementById('forgot-stage-1');
+      const s2 = document.getElementById('forgot-stage-2');
+      const s3 = document.getElementById('forgot-stage-3');
+
+      const t1 = document.getElementById('f-tab-1');
+      const t2 = document.getElementById('f-tab-2');
+      const t3 = document.getElementById('f-tab-3');
+
+      s1.classList.add('hidden');
+      s2.classList.add('hidden');
+      s3.classList.add('hidden');
+
+      const inactivePill = "flex-1 text-center py-1 text-label-sm font-label-sm rounded text-secondary hover:text-on-surface";
+      const activePill = "flex-1 text-center py-1 text-label-sm font-label-sm rounded font-semibold text-primary bg-surface-container-lowest shadow-sm border border-outline-variant/40";
+
+      t1.className = inactivePill;
+      t2.className = inactivePill;
+      t3.className = inactivePill;
+
+      if (stageNumber === 1) {
+        s1.classList.remove('hidden');
+        t1.className = activePill;
+      } else if (stageNumber === 2) {
+        s2.classList.remove('hidden');
+        t2.className = activePill;
+      } else if (stageNumber === 3) {
+        s3.classList.remove('hidden');
+        t3.className = activePill;
+      }
+    }
+
+    function finalizePasswordReset() {
+      alert('Password updated in institutional ledger. Redirecting to sign in...');
+      switchView('login');
+      setForgotStage(1);
+    }
+  </script>
+</body></html>

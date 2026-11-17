@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CoLearn | Student Dashboard &amp; Suite Creation Flow</title>
+<!-- Google Fonts: Inter -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Theme Configuration -->
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-secondary-fixed-variant": "#33495e",
+            "on-error": "#ffffff",
+            "on-secondary": "#ffffff",
+            "error": "#ba1a1a",
+            "surface-container-lowest": "#ffffff",
+            "secondary-fixed": "#cee5ff",
+            "on-tertiary-container": "#dbbc7e",
+            "surface-bright": "#fcf9f8",
+            "tertiary-container": "#614b18",
+            "outline": "#737784",
+            "secondary": "#4b6077",
+            "primary": "#003280",
+            "primary-fixed": "#dae2ff",
+            "on-secondary-container": "#4f657b",
+            "on-secondary-fixed": "#041d30",
+            "surface": "#fcf9f8",
+            "inverse-surface": "#303030",
+            "surface-dim": "#dcd9d9",
+            "outline-variant": "#c3c6d5",
+            "inverse-on-surface": "#f3f0f0",
+            "on-tertiary-fixed": "#261a00",
+            "surface-variant": "#e4e2e1",
+            "on-background": "#1b1c1c",
+            "tertiary-fixed-dim": "#e2c384",
+            "primary-container": "#0247ae",
+            "on-primary": "#ffffff",
+            "on-primary-fixed-variant": "#0040a0",
+            "on-surface": "#1b1c1c",
+            "surface-tint": "#2559bf",
+            "on-primary-fixed": "#001847",
+            "tertiary-fixed": "#ffdfa0",
+            "surface-container-high": "#eae7e7",
+            "on-tertiary-fixed-variant": "#594311",
+            "on-surface-variant": "#434653",
+            "primary-fixed-dim": "#b2c5ff",
+            "secondary-fixed-dim": "#b2c9e3",
+            "tertiary": "#483403",
+            "on-primary-container": "#a7beff",
+            "on-error-container": "#93000a",
+            "inverse-primary": "#b2c5ff",
+            "surface-container": "#f0eded",
+            "surface-container-highest": "#e4e2e1",
+            "background": "#FFFAFA",
+            "secondary-container": "#cbe2fc",
+            "on-tertiary": "#ffffff",
+            "error-container": "#ffdad6",
+            "surface-container-low": "#f6f3f2",
+            /* Academic Custom Palette Overrides & Semantic Extensions */
+            "academic-blue": "#0247AE",
+            "academic-blue-dark": "#012B6A",
+            "academic-slate": "#2D4358",
+            "academic-subtle": "#587D90",
+            "academic-charcoal": "#2C2C2C",
+            "academic-warm": "#F6E7D2",
+            "academic-gold": "#C8AA6E",
+            "academic-gold-soft": "#D2BC8A",
+            "academic-border": "#E1DFE2"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem",
+            "input": "6px",
+            "card": "10px",
+            "modal": "14px"
+          },
+          "spacing": {
+            "space-lg": "1.5rem",
+            "gutter": "1.5rem",
+            "space-xl": "2rem",
+            "gutter-mobile": "1rem",
+            "margin": "2rem",
+            "space-md": "1rem",
+            "space-sm": "0.5rem",
+            "space-xs": "0.25rem",
+            "margin-mobile": "1rem"
+          },
+          "fontFamily": {
+            "display-lg-mobile": ["Inter"],
+            "body-md": ["Inter"],
+            "display-lg": ["Inter"],
+            "headline-sm": ["Inter"],
+            "body-lg": ["Inter"],
+            "title-md": ["Inter"],
+            "body-sm": ["Inter"],
+            "label-sm": ["Inter"],
+            "label-lg": ["Inter"],
+            "headline-lg": ["Inter"],
+            "headline-lg-mobile": ["Inter"],
+            "label-md": ["Inter"],
+            "title-lg": ["Inter"],
+            "headline-md": ["Inter"]
+          },
+          "fontSize": {
+            "display-lg-mobile": ["30px", { "lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "body-md": ["14px", { "lineHeight": "22px", "letterSpacing": "0em", "fontWeight": "400" }],
+            "display-lg": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "headline-sm": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.005em", "fontWeight": "600" }],
+            "body-lg": ["16px", { "lineHeight": "26px", "letterSpacing": "0em", "fontWeight": "400" }],
+            "title-md": ["16px", { "lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "500" }],
+            "body-sm": ["12px", { "lineHeight": "18px", "letterSpacing": "0.01em", "fontWeight": "400" }],
+            "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "600" }],
+            "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500" }],
+            "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.015em", "fontWeight": "600" }],
+            "headline-lg-mobile": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500" }],
+            "title-lg": ["18px", { "lineHeight": "26px", "letterSpacing": "0em", "fontWeight": "600" }],
+            "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }]
+          }
+        }
+      }
+    };
+  </script>
+<style>
+    body {
+      background-color: #FFFAFA;
+      color: #2C2C2C;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    .academic-card {
+      background-color: #FFFFFF;
+      border: 1px solid #E1DFE2;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(45, 67, 88, 0.06);
+    }
+    .academic-modal {
+      background-color: #FFFFFF;
+      border: 1px solid #E1DFE2;
+      border-radius: 14px;
+      box-shadow: 0 16px 40px rgba(45, 67, 88, 0.12);
+    }
+  </style>
+</head>
+<body class="bg-[#FFFAFA] min-h-screen text-[#2C2C2C] flex flex-col antialiased">
+<!-- ========================================================================= -->
+<!-- 1. GLOBAL NAVIGATION BAR (TopNavBar Shared Component) -->
+<!-- ========================================================================= -->
+<header class="sticky top-0 w-full z-50 bg-[#FFFFFF]/95 backdrop-blur-md border-b border-[#E1DFE2] shadow-[0_2px_8px_rgba(45,67,88,0.06)]">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
+<!-- Brand & Subtitle -->
+<div class="flex items-center gap-6">
+<a class="flex items-center gap-3 group" href="#view-dashboard">
+<div class="w-9 h-9 rounded-md bg-[#0247AE] flex items-center justify-center text-white shadow-sm font-bold text-lg tracking-tight">
+            CL
+          </div>
+<div>
+<div class="text-[#0247AE] font-title-lg text-title-lg tracking-tight font-semibold flex items-center gap-1.5 leading-none">
+              CoLearn
+            </div>
+<p class="text-[#587D90] font-label-sm text-label-sm tracking-wide mt-0.5">
+              Academic Collaboration Platform
+            </p>
+</div>
+</a>
+<!-- Academic Nav Links (Desktop) -->
+<nav aria-label="Main Navigation" class="hidden md:flex items-center gap-6 ml-4">
+<a class="text-secondary font-label-lg text-label-lg hover:text-[#0247AE] transition-colors duration-150" href="#workspace">
+            Workspace
+          </a>
+<a class="text-secondary font-label-lg text-label-lg hover:text-[#0247AE] transition-colors duration-150" href="#research-labs">
+            Research Labs
+          </a>
+<!-- Active Target for this dashboard view: My Study Suites -->
+<a class="text-[#0247AE] border-b-2 border-[#0247AE] pb-1 font-label-lg text-label-lg font-semibold" href="#view-dashboard">
+            My Study Suites
+          </a>
+<a class="text-secondary font-label-lg text-label-lg hover:text-[#0247AE] transition-colors duration-150" href="#about">
+            About Us
+          </a>
+</nav>
+</div>
+<!-- Right Section: Institutional Status, Notification, Profile Trigger -->
+<div class="flex items-center gap-3 sm:gap-4">
+<!-- Institution Indicator -->
+<div class="hidden lg:flex items-center gap-2 px-3 py-1 bg-[#F6F3F2] border border-[#E1DFE2] rounded-full text-secondary">
+<span class="w-2 h-2 rounded-full bg-[#2E7D32] animate-pulse"></span>
+<span class="font-label-sm text-label-sm text-[#2D4358] font-medium tracking-tight">University Library Mesh · Connected</span>
+</div>
+<!-- Search Icon Action -->
+<button aria-label="Search Academic Resources" class="w-9 h-9 flex items-center justify-center rounded-md border border-[#E1DFE2] text-secondary hover:text-[#0247AE] hover:bg-[#FFFAFA] transition-colors" type="button">
+<span class="material-symbols-outlined text-[20px]" data-icon="search">search</span>
+</button>
+<!-- Notification Bell with Unread Badge -->
+<button aria-label="Notifications" class="relative w-9 h-9 flex items-center justify-center rounded-md border border-[#E1DFE2] text-secondary hover:text-[#0247AE] hover:bg-[#FFFAFA] transition-colors" type="button">
+<span class="material-symbols-outlined text-[20px]" data-icon="notifications">notifications</span>
+<span class="absolute top-1.5 right-1.5 w-2 h-2 bg-[#C53030] rounded-full ring-2 ring-white"></span>
+</button>
+<!-- User Profile Avatar Button -->
+<button class="flex items-center gap-2 p-1 pl-2 pr-2.5 rounded-full border border-[#E1DFE2] hover:border-[#0247AE] transition-all bg-[#FFFFFF]" onclick="toggleModal('modal-profile')" title="Open Researcher Profile" type="button">
+<div class="w-7 h-7 rounded-full bg-[#F6E7D2] border border-[#C8AA6E] flex items-center justify-center text-[#2C2C2C] font-semibold text-xs tracking-wider">
+            DR
+          </div>
+<span class="hidden sm:inline font-label-md text-label-md text-[#2C2C2C] font-medium">Dr. Ross</span>
+<span class="material-symbols-outlined text-secondary text-[18px]" data-icon="expand_more">expand_more</span>
+</button>
+</div>
+</div>
+</header>
+<!-- ========================================================================= -->
+<!-- 2. STUDENT DASHBOARD CONTAINER (#view-dashboard) -->
+<!-- ========================================================================= -->
+<main class="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 space-y-8" id="view-dashboard">
+<!-- Greeting & Status Banner -->
+<section class="border-b border-[#E1DFE2] pb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div>
+<h1 class="text-[28px] leading-[34px] font-bold text-[#2C2C2C] tracking-tight flex items-center gap-2">
+          Welcome back, David! <span class="select-none">👋</span>
+</h1>
+<p class="font-body-md text-body-md text-[#587D90] mt-1.5">
+          Active semester: <strong class="font-semibold text-[#2D4358]">Fall 2025</strong> · 4 active study suites · 2 upcoming working sessions today
+        </p>
+</div>
+<!-- Quick Search & Course Code Filter Bar -->
+<div class="w-full md:w-80">
+<div class="relative">
+<span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#587D90]">
+<span class="material-symbols-outlined text-[18px]" data-icon="filter_list">filter_list</span>
+</span>
+<input class="w-full pl-9 pr-4 py-2 text-sm bg-white border border-[#E1DFE2] rounded-[6px] text-[#2C2C2C] placeholder-[#587D90] focus:outline-none focus:border-[#0247AE] focus:ring-2 focus:ring-[#0247AE]/15 transition-all" placeholder="Filter subject or code (e.g. MATH-301)..." type="search"/>
+</div>
+</div>
+</section>
+<!-- Two-Column Academic Dashboard Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+<!-- ===================================================================== -->
+<!-- LEFT COLUMN: My Study Suites (62% width on desktop -> 7.5 of 12 cols) -->
+<!-- ===================================================================== -->
+<section class="lg:col-span-7 xl:col-span-8 space-y-6">
+<!-- Header Controls & Scope Filter Tabs -->
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-[#E1DFE2]/70">
+<div class="flex items-center gap-3">
+<h2 class="font-title-lg text-title-lg text-[#2D4358] font-bold tracking-tight">
+              My Suites
+            </h2>
+<span class="px-2 py-0.5 text-xs font-semibold rounded-full bg-[#EBF8FF] text-[#0247AE] border border-[#0247AE]/20">
+              4 Active
+            </span>
+</div>
+<!-- Filter Tabs -->
+<div class="inline-flex p-1 bg-[#F6F3F2] border border-[#E1DFE2] rounded-[6px] text-xs font-medium text-[#587D90]">
+<button class="px-3 py-1 rounded-[4px] bg-white text-[#0247AE] font-semibold shadow-sm border border-[#E1DFE2]/40">
+              All
+            </button>
+<button class="px-3 py-1 hover:text-[#2C2C2C] transition-colors">
+              Hosted by Me
+            </button>
+<button class="px-3 py-1 hover:text-[#2C2C2C] transition-colors">
+              Joined as Member
+            </button>
+</div>
+</div>
+<!-- Academic Suite Cards List -->
+<div class="space-y-4">
+<!-- Card 1: Advanced Calculus & Linear Systems -->
+<article class="academic-card p-5 hover:border-[#0247AE]/40 transition-all duration-200">
+<div class="flex items-start justify-between gap-4">
+<div class="flex items-start gap-3.5">
+<!-- Subject Icon Box (Math ∫ dx) -->
+<div class="w-12 h-12 rounded-[8px] bg-[#F6E7D2] border border-[#D2BC8A] flex items-center justify-center text-[#483403] font-serif text-lg font-bold select-none shrink-0 shadow-xs">
+                  ∫ dx
+                </div>
+<div>
+<div class="flex flex-wrap items-center gap-2">
+<span class="font-label-sm text-label-sm tracking-wider uppercase font-semibold text-[#587D90]">
+                      MATH-301
+                    </span>
+<!-- Gold Host Badge -->
+<span class="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-[#FEFCBF] text-[#744210] border border-[#C8AA6E]/60 inline-flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-[#C8AA6E]"></span> Host
+                    </span>
+</div>
+<h3 class="text-[17px] font-semibold text-[#2C2C2C] mt-1 leading-snug">
+                    Suite 402: Advanced Calculus &amp; Linear Systems
+                  </h3>
+<div class="flex items-center gap-4 mt-2.5 text-xs text-[#587D90]">
+<span class="inline-flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-[#2E7D32]"></span>
+<strong class="font-medium text-[#2C2C2C]">8 members online</strong>
+</span>
+<span>·</span>
+<span class="inline-flex items-center gap-1">
+<span class="material-symbols-outlined text-[15px]" data-icon="sync">sync</span> Auto-synced
+                    </span>
+</div>
+</div>
+</div>
+<!-- Suite Actions Toolbar -->
+<div class="flex items-center gap-1 shrink-0">
+<button class="p-1.5 rounded-[6px] text-[#587D90] hover:text-[#0247AE] hover:bg-[#F6F3F2] transition-colors" title="Suite Settings" type="button">
+<span class="material-symbols-outlined text-[19px]" data-icon="settings">settings</span>
+</button>
+<button class="p-1.5 rounded-[6px] text-[#587D90] hover:text-[#C53030] hover:bg-[#FFF5F5] transition-colors" title="Host Archive / Delete" type="button">
+<span class="material-symbols-outlined text-[19px]" data-icon="delete">delete</span>
+</button>
+</div>
+</div>
+<div class="mt-4 pt-3.5 border-t border-[#E1DFE2] flex items-center justify-between">
+<span class="text-xs text-[#587D90]">Next group recitation: Today at 4:30 PM (Room 2B)</span>
+<a class="inline-flex items-center gap-1.5 px-4 py-2 bg-[#0247AE] hover:bg-[#023788] active:bg-[#012B6A] text-white text-xs font-semibold rounded-[6px] transition-all" href="#suite-room-402">
+                Enter Suite
+                <span class="material-symbols-outlined text-[14px]" data-icon="arrow_forward">arrow_forward</span>
+</a>
+</div>
+</article>
+<!-- Card 2: Distributed Systems & Consensus Protocols -->
+<article class="academic-card p-5 hover:border-[#0247AE]/40 transition-all duration-200">
+<div class="flex items-start justify-between gap-4">
+<div class="flex items-start gap-3.5">
+<!-- Subject Icon Box (Network Nodes) -->
+<div class="w-12 h-12 rounded-[8px] bg-[#EBF8FF] border border-[#BEE3F8] flex items-center justify-center text-[#0247AE] shrink-0 shadow-xs">
+<span class="material-symbols-outlined text-[22px]" data-icon="hub">hub</span>
+</div>
+<div>
+<div class="flex flex-wrap items-center gap-2">
+<span class="font-label-sm text-label-sm tracking-wider uppercase font-semibold text-[#587D90]">
+                      CS-480
+                    </span>
+<!-- Admin Badge -->
+<span class="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-[#EBF8FF] text-[#0247AE] border border-[#0247AE]/30 inline-flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-[#0247AE]"></span> Admin
+                    </span>
+</div>
+<h3 class="text-[17px] font-semibold text-[#2C2C2C] mt-1 leading-snug">
+                    Distributed Systems &amp; Consensus Protocols
+                  </h3>
+<div class="flex items-center gap-4 mt-2.5 text-xs text-[#587D90]">
+<span class="inline-flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-[#2E7D32]"></span>
+<strong class="font-medium text-[#2C2C2C]">5 members active</strong>
+</span>
+<span>·</span>
+<span class="inline-flex items-center gap-1 text-[#2E7D32]">
+<span class="material-symbols-outlined text-[15px]" data-icon="cloud_done">cloud_done</span> Drive sync active
+                    </span>
+</div>
+</div>
+</div>
+<!-- Suite Actions Toolbar -->
+<div class="flex items-center gap-1 shrink-0">
+<button class="p-1.5 rounded-[6px] text-[#587D90] hover:text-[#0247AE] hover:bg-[#F6F3F2] transition-colors" title="Suite Settings" type="button">
+<span class="material-symbols-outlined text-[19px]" data-icon="settings">settings</span>
+</button>
+</div>
+</div>
+<div class="mt-4 pt-3.5 border-t border-[#E1DFE2] flex items-center justify-between">
+<span class="text-xs text-[#587D90]">Raft paper synthesis annotated 14 mins ago</span>
+<a class="inline-flex items-center gap-1.5 px-4 py-2 bg-[#0247AE] hover:bg-[#023788] active:bg-[#012B6A] text-white text-xs font-semibold rounded-[6px] transition-all" href="#suite-room-cs480">
+                Enter Suite
+                <span class="material-symbols-outlined text-[14px]" data-icon="arrow_forward">arrow_forward</span>
+</a>
+</div>
+</article>
+<!-- Card 3: Quantum Mechanics & Wave Packets -->
+<article class="academic-card p-5 hover:border-[#0247AE]/40 transition-all duration-200">
+<div class="flex items-start justify-between gap-4">
+<div class="flex items-start gap-3.5">
+<!-- Subject Icon Box (Atom) -->
+<div class="w-12 h-12 rounded-[8px] bg-[#F6F3F2] border border-[#E1DFE2] flex items-center justify-center text-[#587D90] shrink-0 shadow-xs">
+<span class="material-symbols-outlined text-[22px]" data-icon="scatter_plot">scatter_plot</span>
+</div>
+<div>
+<div class="flex flex-wrap items-center gap-2">
+<span class="font-label-sm text-label-sm tracking-wider uppercase font-semibold text-[#587D90]">
+                      PHYS-315
+                    </span>
+<!-- Member Badge -->
+<span class="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-[#E7E3D8] text-[#587D90] border border-[#E1DFE2] inline-flex items-center gap-1">
+                      Member
+                    </span>
+</div>
+<h3 class="text-[17px] font-semibold text-[#2C2C2C] mt-1 leading-snug">
+                    Quantum Mechanics &amp; Wave Packets
+                  </h3>
+<div class="flex items-center gap-4 mt-2.5 text-xs text-[#587D90]">
+<span class="inline-flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-[#B7791F]"></span>
+<strong class="font-medium text-[#2C2C2C]">3 members active</strong>
+</span>
+<span>·</span>
+<span class="text-xs text-[#587D90]">Host: Prof. Vance</span>
+</div>
+</div>
+</div>
+<!-- Suite Actions Toolbar -->
+<div class="flex items-center gap-1 shrink-0">
+<button class="p-1.5 rounded-[6px] text-[#587D90] hover:text-[#0247AE] hover:bg-[#F6F3F2] transition-colors" title="View Details" type="button">
+<span class="material-symbols-outlined text-[19px]" data-icon="info">info</span>
+</button>
+</div>
+</div>
+<div class="mt-4 pt-3.5 border-t border-[#E1DFE2] flex items-center justify-between">
+<span class="text-xs text-[#587D90]">Schrodinger boundary conditions uploaded</span>
+<a class="inline-flex items-center gap-1.5 px-4 py-2 bg-[#0247AE] hover:bg-[#023788] active:bg-[#012B6A] text-white text-xs font-semibold rounded-[6px] transition-all" href="#suite-room-phys315">
+                Enter Suite
+                <span class="material-symbols-outlined text-[14px]" data-icon="arrow_forward">arrow_forward</span>
+</a>
+</div>
+</article>
+<!-- Card 4: Biochem Lab Group Delta: Enzyme Kinetics -->
+<article class="academic-card p-5 hover:border-[#0247AE]/40 transition-all duration-200">
+<div class="flex items-start justify-between gap-4">
+<div class="flex items-start gap-3.5">
+<!-- Subject Icon Box (Flask) -->
+<div class="w-12 h-12 rounded-[8px] bg-[#F6E7D2] border border-[#D2BC8A] flex items-center justify-center text-[#483403] shrink-0 shadow-xs">
+<span class="material-symbols-outlined text-[22px]" data-icon="science">science</span>
+</div>
+<div>
+<div class="flex flex-wrap items-center gap-2">
+<span class="font-label-sm text-label-sm tracking-wider uppercase font-semibold text-[#587D90]">
+                      CHEM-240
+                    </span>
+<!-- Gold Host Badge -->
+<span class="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-[#FEFCBF] text-[#744210] border border-[#C8AA6E]/60 inline-flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-[#C8AA6E]"></span> Host
+                    </span>
+</div>
+<h3 class="text-[17px] font-semibold text-[#2C2C2C] mt-1 leading-snug">
+                    Biochem Lab Group Delta: Enzyme Kinetics
+                  </h3>
+<div class="flex items-center gap-4 mt-2.5 text-xs text-[#587D90]">
+<span class="inline-flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-[#2E7D32]"></span>
+<strong class="font-medium text-[#2C2C2C]">6 members online</strong>
+</span>
+<span>·</span>
+<span class="text-xs text-[#587D90]">Spectrophotometer raw data synced</span>
+</div>
+</div>
+</div>
+<!-- Suite Actions Toolbar -->
+<div class="flex items-center gap-1 shrink-0">
+<button class="p-1.5 rounded-[6px] text-[#587D90] hover:text-[#C53030] hover:bg-[#FFF5F5] transition-colors" title="Host Archive / Delete" type="button">
+<span class="material-symbols-outlined text-[19px]" data-icon="delete">delete</span>
+</button>
+</div>
+</div>
+<div class="mt-4 pt-3.5 border-t border-[#E1DFE2] flex items-center justify-between">
+<span class="text-xs text-[#587D90]">Report draft due Friday 11:59 PM</span>
+<a class="inline-flex items-center gap-1.5 px-4 py-2 bg-[#0247AE] hover:bg-[#023788] active:bg-[#012B6A] text-white text-xs font-semibold rounded-[6px] transition-all" href="#suite-room-chem240">
+                Enter Suite
+                <span class="material-symbols-outlined text-[14px]" data-icon="arrow_forward">arrow_forward</span>
+</a>
+</div>
+</article>
+</div>
+<!-- Archived Suites Empty State Preview -->
+<div class="border border-dashed border-[#E1DFE2] rounded-[10px] p-6 text-center bg-[#FFFAFA]">
+<div class="w-10 h-10 mx-auto rounded-full bg-[#F6F3F2] flex items-center justify-center text-[#587D90] mb-2">
+<span class="material-symbols-outlined text-[20px]" data-icon="mark_email_unread">mark_email_unread</span>
+</div>
+<h4 class="font-title-md text-title-md text-[#2D4358] font-semibold">
+            No archived suites
+          </h4>
+<p class="font-body-sm text-body-sm text-[#587D90] max-w-sm mx-auto mt-1">
+            All your active workspaces appear above. Concluded semester suites will be preserved in your academic archive.
+          </p>
+</div>
+</section>
+<!-- ===================================================================== -->
+<!-- RIGHT COLUMN: Quick Actions (38% width on desktop -> 4.5 of 12 cols) -->
+<!-- ===================================================================== -->
+<aside class="lg:col-span-5 xl:col-span-4 space-y-6">
+<div class="pb-2 border-b border-[#E1DFE2]/70">
+<h2 class="font-title-lg text-title-lg text-[#2D4358] font-bold tracking-tight">
+            Suite Actions
+          </h2>
+</div>
+<!-- Action Card 1: Create Permanent Suite -->
+<div class="academic-card p-5 space-y-4">
+<div class="flex items-start gap-3">
+<div class="w-9 h-9 rounded-[6px] bg-[#EBF8FF] text-[#0247AE] flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[20px]" data-icon="add_circle">add_circle</span>
+</div>
+<div>
+<h3 class="font-title-md text-title-md font-semibold text-[#2C2C2C]">
+                Create New Suite
+              </h3>
+<p class="font-body-sm text-body-sm text-[#587D90] mt-1 leading-relaxed">
+                Set up a persistent, semester-long study room with Drive sync, member roles, and infinite whiteboard.
+              </p>
+</div>
+</div>
+<button class="w-full py-2.5 px-4 bg-[#0247AE] hover:bg-[#023788] active:bg-[#012B6A] text-white font-label-lg text-label-lg font-semibold rounded-[6px] shadow-xs transition-all flex items-center justify-center gap-2" onclick="toggleModal('modal-create-suite')" type="button">
+<span class="material-symbols-outlined text-[18px]" data-icon="add">add</span>
+            Create New Suite
+          </button>
+</div>
+<!-- Action Card 2: Quick Suite (Highlighted Soft Warm Accent) -->
+<div class="p-5 rounded-[10px] bg-[#F6E7D2]/80 border border-[#D2BC8A] space-y-4 shadow-sm relative overflow-hidden">
+<div class="flex items-center justify-between">
+<span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-[#FFFFFF]/90 text-[#744210] border border-[#C8AA6E]/40 flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[14px]" data-icon="bolt">bolt</span> Ephemeral 4-Hour Room
+            </span>
+<span class="text-[11px] text-[#483403] font-medium">No login required</span>
+</div>
+<div>
+<h3 class="font-title-md text-title-md font-bold text-[#2C2C2C]">
+              Instant Study Session
+            </h3>
+<p class="font-body-sm text-body-sm text-[#483403]/85 mt-1 leading-relaxed">
+              No registration or role assignment needed. Generate a fast PIN for spontaneous exam prep or problem-set collaboration.
+            </p>
+</div>
+<button class="w-full py-2.5 px-4 bg-[#2D4358] hover:bg-[#0247AE] active:bg-[#012B6A] text-white font-label-lg text-label-lg font-semibold rounded-[6px] shadow-xs transition-colors flex items-center justify-center gap-2" onclick="toggleModal('modal-quick-suite')" type="button">
+<span class="material-symbols-outlined text-[18px]" data-icon="flash_on">flash_on</span>
+            Create Quick Suite
+          </button>
+</div>
+<!-- Action Card 3: Join Existing Suite with Code -->
+<div class="academic-card p-5 space-y-4">
+<div class="flex items-start gap-3">
+<div class="w-9 h-9 rounded-[6px] bg-[#F6F3F2] text-[#587D90] flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[20px]" data-icon="key">key</span>
+</div>
+<div>
+<h3 class="font-title-md text-title-md font-semibold text-[#2C2C2C]">
+                Join with Code
+              </h3>
+<p class="font-body-sm text-body-sm text-[#587D90] mt-1">
+                Enter a 5-digit PIN or direct suite invite URL provided by your host.
+              </p>
+</div>
+</div>
+<form class="space-y-3" onsubmit="event.preventDefault();">
+<div class="relative">
+<input class="w-full px-3 py-2 text-sm bg-white border border-[#E1DFE2] rounded-[6px] text-[#2C2C2C] placeholder-[#587D90] focus:outline-none focus:border-[#0247AE] focus:ring-2 focus:ring-[#0247AE]/15 transition-all font-mono" placeholder="e.g. 849-20 or colearn.edu/suite/..." type="text"/>
+</div>
+<button class="w-full py-2 px-4 bg-white hover:bg-[#FFFAFA] active:bg-[#F6F3F2] text-[#0247AE] border border-[#0247AE] font-label-md text-label-md font-semibold rounded-[6px] transition-all flex items-center justify-center gap-1.5" type="submit">
+              Enter Room
+              <span class="material-symbols-outlined text-[16px]" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</form>
+</div>
+<!-- Academic Network Summary Pill -->
+<div class="p-4 bg-white border border-[#E1DFE2] rounded-[10px] text-xs text-[#587D90] space-y-2">
+<div class="flex justify-between items-center text-[#2C2C2C] font-semibold">
+<span>Federated Identity Status</span>
+<span class="text-[#2E7D32] flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-[#2E7D32]"></span> Verified
+            </span>
+</div>
+<p>Logged in via MIT Shibboleth SSO. Lab Drive space quota: 14.2 GB of 50 GB allocated.</p>
+</div>
+</aside>
+</div>
+<!-- ========================================================================= -->
+<!-- 4. MODALS & SUITE CREATION FLOW PREVIEWS                                 -->
+<!-- (Interactive Overlay Demos for Review & Showcase)                        -->
+<!-- ========================================================================= -->
+<section class="mt-12 pt-8 border-t border-[#E1DFE2] space-y-6">
+<div class="flex items-center justify-between">
+<div>
+<h2 class="font-title-lg text-title-lg text-[#2D4358] font-bold">
+            Interactive Flow Previews (Task 3 Specification)
+          </h2>
+<p class="font-body-sm text-body-sm text-[#587D90]">
+            Inspect and test the dynamic modals: Create Permanent Suite, Quick Suite Ephemeral Setup, and Researcher Profile.
+          </p>
+</div>
+<div class="flex gap-2">
+<button class="px-3 py-1.5 text-xs font-medium rounded-[6px] border border-[#E1DFE2] bg-white hover:bg-[#FFFAFA] text-[#0247AE]" onclick="toggleModal('modal-create-suite')">
+            Show Create Modal
+          </button>
+<button class="px-3 py-1.5 text-xs font-medium rounded-[6px] border border-[#E1DFE2] bg-white hover:bg-[#FFFAFA] text-[#0247AE]" onclick="toggleModal('modal-quick-suite')">
+            Show Quick Suite
+          </button>
+<button class="px-3 py-1.5 text-xs font-medium rounded-[6px] border border-[#E1DFE2] bg-white hover:bg-[#FFFAFA] text-[#0247AE]" onclick="toggleModal('modal-profile')">
+            Show Profile
+          </button>
+</div>
+</div>
+</section>
+</main>
+<!-- ========================================================================= -->
+<!-- MODAL 1: Create Permanent Suite (#modal-create-suite)                      -->
+<!-- ========================================================================= -->
+<div aria-modal="true" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#2D4358]/40 backdrop-blur-xs hidden" id="modal-create-suite" role="dialog">
+<div class="academic-modal w-full max-w-lg p-6 space-y-6 relative transform transition-all">
+<!-- Modal Header -->
+<div class="flex items-start justify-between border-b border-[#E1DFE2] pb-4">
+<div>
+<span class="font-label-sm text-label-sm uppercase font-semibold text-[#0247AE] tracking-wider">
+            Academic Suite Engine
+          </span>
+<h3 class="font-headline-sm text-headline-sm text-[#2C2C2C] font-bold mt-0.5">
+            Create Permanent Study Suite
+          </h3>
+</div>
+<button class="text-[#587D90] hover:text-[#2C2C2C] p-1 rounded-md" onclick="toggleModal('modal-create-suite')" type="button">
+<span class="material-symbols-outlined text-[20px]" data-icon="close">close</span>
+</button>
+</div>
+<!-- Form Body -->
+<form class="space-y-4" onsubmit="event.preventDefault(); alert('Permanent Suite successfully provisioned!'); toggleModal('modal-create-suite');">
+<!-- Suite Name Input -->
+<div class="space-y-1.5">
+<label class="block font-label-md text-label-md font-semibold text-[#2C2C2C]" for="cs-suite-name">
+            Suite Name &amp; Course Designation *
+          </label>
+<input class="w-full px-3 py-2 text-sm bg-white border border-[#E1DFE2] rounded-[6px] text-[#2C2C2C] placeholder-[#587D90] focus:outline-none focus:border-[#0247AE] focus:ring-2 focus:ring-[#0247AE]/15" id="cs-suite-name" placeholder="e.g. Suite 501: Algebraic Topology (MATH-450)" required="" type="text"/>
+</div>
+<!-- Privacy Toggle Switch with Dynamic Label -->
+<div class="p-3.5 bg-[#FFFAFA] border border-[#E1DFE2] rounded-[8px] space-y-2">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md font-semibold text-[#2C2C2C]">
+              Access Restriction
+            </span>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" id="privacy-toggle" onchange="handlePrivacyChange(this)" type="checkbox"/>
+<div class="w-11 h-6 bg-[#C3C6D5] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#0247AE]"></div>
+</label>
+</div>
+<p class="font-body-sm text-body-sm text-[#587D90]" id="privacy-hint">
+<strong class="font-medium text-[#2C2C2C]">Private Suite:</strong> Requires institutional invite or host passcode verification to enter.
+          </p>
+</div>
+<!-- Admin Allocation Stepper (Range 1-20, currently 4) -->
+<div class="space-y-1.5">
+<div class="flex justify-between items-center">
+<label class="block font-label-md text-label-md font-semibold text-[#2C2C2C]">
+              Co-Host / Admin Seats
+            </label>
+<span class="text-xs text-[#587D90]">Range: 1 - 20 seats</span>
+</div>
+<div class="flex items-center gap-3">
+<div class="inline-flex items-center border border-[#E1DFE2] rounded-[6px] bg-white overflow-hidden">
+<button class="px-3 py-2 text-[#587D90] hover:bg-[#F6F3F2] active:bg-[#E1DFE2] transition-colors" onclick="adjustStepper(-1)" type="button">
+<span class="material-symbols-outlined text-[18px]" data-icon="remove">remove</span>
+</button>
+<input class="w-14 text-center border-0 p-0 text-sm font-semibold text-[#2C2C2C] focus:ring-0 select-none" id="stepper-value" max="20" min="1" readonly="" type="number" value="4"/>
+<button class="px-3 py-2 text-[#587D90] hover:bg-[#F6F3F2] active:bg-[#E1DFE2] transition-colors" onclick="adjustStepper(1)" type="button">
+<span class="material-symbols-outlined text-[18px]" data-icon="add">add</span>
+</button>
+</div>
+<span class="text-xs text-[#587D90]">4 teaching assistants / peer leads can manage whiteboard and recordings.</span>
+</div>
+</div>
+<!-- Initial Member Invite Input -->
+<div class="space-y-1.5">
+<label class="block font-label-md text-label-md font-semibold text-[#2C2C2C]" for="member-invites">
+            Initial Working Group Invites
+          </label>
+<input class="w-full px-3 py-2 text-sm bg-white border border-[#E1DFE2] rounded-[6px] text-[#2C2C2C] placeholder-[#587D90] focus:outline-none focus:border-[#0247AE] focus:ring-2 focus:ring-[#0247AE]/15" id="member-invites" placeholder="friend@university.edu or @username, separated by comma" type="text"/>
+</div>
+<!-- Action Buttons -->
+<div class="pt-4 border-t border-[#E1DFE2] flex items-center justify-end gap-3">
+<button class="px-4 py-2 border border-[#E1DFE2] rounded-[6px] text-xs font-semibold text-[#587D90] hover:bg-[#F6F3F2]" onclick="toggleModal('modal-create-suite')" type="button">
+            Cancel
+          </button>
+<button class="px-5 py-2 bg-[#0247AE] hover:bg-[#023788] active:bg-[#012B6A] text-white rounded-[6px] text-xs font-semibold shadow-xs" type="submit">
+            Create Suite
+          </button>
+</div>
+</form>
+</div>
+</div>
+<!-- ========================================================================= -->
+<!-- MODAL 2: Quick Suite Ephemeral Room (#modal-quick-suite)                   -->
+<!-- ========================================================================= -->
+<div aria-modal="true" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#2D4358]/40 backdrop-blur-xs hidden" id="modal-quick-suite" role="dialog">
+<div class="academic-modal w-full max-w-md p-6 space-y-5 relative">
+<!-- Ephemeral Warning Banner -->
+<div class="p-3 bg-[#FEFCBF] border border-[#C8AA6E]/60 rounded-[8px] flex items-start gap-2.5">
+<span class="material-symbols-outlined text-[18px] text-[#744210] mt-0.5" data-icon="alarm">alarm</span>
+<div class="text-xs text-[#744210]">
+<strong>Ephemeral Session:</strong> Workspace expires and auto-clears after 4 hours of inactivity.
+        </div>
+</div>
+<div class="flex items-start justify-between">
+<div>
+<h3 class="font-headline-sm text-headline-sm text-[#2C2C2C] font-bold">
+            Launch Quick Suite
+          </h3>
+<p class="font-body-sm text-body-sm text-[#587D90]">Instant room for ad-hoc problem sets and finals review.</p>
+</div>
+<button class="text-[#587D90] hover:text-[#2C2C2C] p-1" onclick="toggleModal('modal-quick-suite')" type="button">
+<span class="material-symbols-outlined text-[20px]" data-icon="close">close</span>
+</button>
+</div>
+<form class="space-y-4" onsubmit="event.preventDefault(); alert('Quick Room PIN Generated: 781-44'); toggleModal('modal-quick-suite');">
+<div>
+<label class="block font-label-md text-label-md font-semibold text-[#2C2C2C] mb-1">
+            Quick Room Name
+          </label>
+<input class="w-full px-3 py-2 text-sm bg-white border border-[#E1DFE2] rounded-[6px] text-[#2C2C2C] focus:outline-none focus:border-[#0247AE]" type="text" value="Midterm Study Blitz #3"/>
+</div>
+<!-- Access Type Radio Cards -->
+<div class="space-y-2">
+<label class="block font-label-md text-label-md font-semibold text-[#2C2C2C]">
+            Room Entry Protocol
+          </label>
+<div class="grid grid-cols-1 gap-2">
+<label class="flex items-start gap-3 p-3 border border-[#0247AE] bg-[#EBF8FF]/50 rounded-[8px] cursor-pointer">
+<input checked="" class="mt-0.5 text-[#0247AE] focus:ring-0" name="quick-access" type="radio" value="direct"/>
+<div class="text-xs">
+<span class="font-semibold text-[#2C2C2C] block">Direct link join</span>
+<span class="text-[#587D90]">Anyone with the PIN or URL joins the whiteboard immediately.</span>
+</div>
+</label>
+<label class="flex items-start gap-3 p-3 border border-[#E1DFE2] hover:bg-[#FFFAFA] rounded-[8px] cursor-pointer">
+<input class="mt-0.5 text-[#0247AE] focus:ring-0" name="quick-access" type="radio" value="approval"/>
+<div class="text-xs">
+<span class="font-semibold text-[#2C2C2C] block">Admit approval required</span>
+<span class="text-[#587D90]">Host must grant admittance from the lobby drawer.</span>
+</div>
+</label>
+</div>
+</div>
+<button class="w-full py-2.5 bg-[#0247AE] hover:bg-[#023788] text-white text-xs font-semibold rounded-[6px] shadow-xs flex items-center justify-center gap-1.5" type="submit">
+<span class="material-symbols-outlined text-[16px]" data-icon="flash_on">flash_on</span>
+          Launch Quick Session
+        </button>
+</form>
+</div>
+</div>
+<!-- ========================================================================= -->
+<!-- MODAL 3: Academic Profile & Identity Preview (#modal-profile)              -->
+<!-- ========================================================================= -->
+<div aria-modal="true" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#2D4358]/40 backdrop-blur-xs hidden" id="modal-profile" role="dialog">
+<div class="academic-modal w-full max-w-sm p-6 space-y-5 relative">
+<div class="flex items-start justify-between">
+<span class="font-label-sm text-label-sm uppercase font-semibold text-[#587D90] tracking-wider">
+          Researcher Identity
+        </span>
+<button class="text-[#587D90] hover:text-[#2C2C2C] p-1" onclick="toggleModal('modal-profile')" type="button">
+<span class="material-symbols-outlined text-[20px]" data-icon="close">close</span>
+</button>
+</div>
+<div class="text-center space-y-3">
+<!-- Large Circular Initial Avatar -->
+<div class="w-16 h-16 mx-auto rounded-full bg-[#F6E7D2] border-2 border-[#C8AA6E] flex items-center justify-center text-[#2C2C2C] text-xl font-bold tracking-tight shadow-sm">
+          DR
+        </div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-[#2C2C2C] font-bold">
+            Dr. David Ross
+          </h3>
+<p class="font-body-sm text-body-sm text-[#587D90]">david.ross@mit.edu</p>
+</div>
+</div>
+<div class="space-y-2 border-t border-b border-[#E1DFE2] py-3 text-xs">
+<div class="flex justify-between py-1">
+<span class="text-[#587D90]">Institutional Affiliation:</span>
+<span class="font-medium text-[#2C2C2C] text-right">Dept. of Applied Mathematics</span>
+</div>
+<div class="flex justify-between py-1">
+<span class="text-[#587D90]">Role:</span>
+<span class="font-medium text-[#2C2C2C]">Postdoctoral Fellow</span>
+</div>
+<div class="flex justify-between py-1">
+<span class="text-[#587D90]">ORCID Record:</span>
+<span class="font-mono text-[#0247AE]">0000-0002-1825-0097</span>
+</div>
+</div>
+<!-- Destructive Log Out Button -->
+<div class="space-y-2">
+<button class="w-full py-2 px-3 border border-[#C53030] text-[#C53030] hover:bg-[#FFF5F5] rounded-[6px] text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors" onclick="alert('Terminated authenticated session.'); toggleModal('modal-profile');" type="button">
+<span class="material-symbols-outlined text-[16px]" data-icon="logout">logout</span>
+          Log Out
+        </button>
+</div>
+</div>
+</div>
+<!-- ========================================================================= -->
+<!-- FOOTER (Footer Shared Component)                                         -->
+<!-- ========================================================================= -->
+<footer class="w-full bg-surface-container-lowest border-t border-outline-variant/60 mt-auto">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs">
+<div class="flex flex-col sm:flex-row items-center gap-2 sm:gap-6 text-center sm:text-left">
+<span class="text-[#0247AE] font-semibold tracking-tight text-sm">CoLearn</span>
+<span class="text-secondary">
+          © 2025 CoLearn Academic Collaborative. Institutional Research Network. All rights reserved.
+        </span>
+</div>
+<nav class="flex flex-wrap justify-center items-center gap-x-6 gap-y-2 text-secondary font-body-sm">
+<a class="hover:text-primary hover:underline transition-all duration-150" href="#institutional-access">Institutional Access</a>
+<a class="hover:text-primary hover:underline transition-all duration-150" href="#research-ethics">Research Ethics</a>
+<a class="hover:text-primary hover:underline transition-all duration-150" href="#data-governance">Data Governance</a>
+<a class="hover:text-primary hover:underline transition-all duration-150" href="#peer-review-standards">Peer Review Standards</a>
+<a class="hover:text-primary hover:underline transition-all duration-150" href="#documentation">Documentation</a>
+<a class="hover:text-primary hover:underline transition-all duration-150" href="#contact">Contact Working Group</a>
+</nav>
+</div>
+</footer>
+<!-- ========================================================================= -->
+<!-- INLINE INTERACTION SCRIPTS (Vanilla JS Micro-Interactions)               -->
+<!-- ========================================================================= -->
+<script>
+    // Modal Toggle Helper
+    function toggleModal(modalId) {
+      const modal = document.getElementById(modalId);
+      if (modal) {
+        modal.classList.toggle('hidden');
+      }
+    }
+
+    // Dynamic Privacy Toggle Description
+    function handlePrivacyChange(checkbox) {
+      const hint = document.getElementById('privacy-hint');
+      if (checkbox.checked) {
+        hint.innerHTML = '<strong class="font-medium text-[#2C2C2C]">Private Suite:</strong> Requires institutional invite or host passcode verification to enter.';
+      } else {
+        hint.innerHTML = '<strong class="font-medium text-[#2C2C2C]">Public Working Room:</strong> Discoverable in campus directory; open to any enrolled mathematics student.';
+      }
+    }
+
+    // Number Stepper Control with Boundary Guard
+    function adjustStepper(delta) {
+      const input = document.getElementById('stepper-value');
+      let val = parseInt(input.value, 10) || 1;
+      val += delta;
+      if (val < 1) val = 1;
+      if (val > 20) val = 20;
+      input.value = val;
+    }
+
+    // Close modals on Escape key
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        ['modal-create-suite', 'modal-quick-suite', 'modal-profile'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el && !el.classList.contains('hidden')) {
+            el.classList.add('hidden');
+          }
+        });
+      }
+    });
+  </script>
+</body></html>

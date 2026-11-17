@@ -1,0 +1,595 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>CoLearn — Academic Collaboration Platform</title>
+<!-- Google Fonts: Inter -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Tailwind CSS v3 -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Theme Configuration verbatim from specification -->
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "surface-dim": "#dcd9d9",
+            "surface-variant": "#e4e2e1",
+            "on-tertiary-container": "#dbbc7e",
+            "inverse-primary": "#b2c5ff",
+            "on-surface-variant": "#434653",
+            "on-primary-fixed": "#001847",
+            "surface": "#fcf9f8",
+            "on-primary-fixed-variant": "#0040a0",
+            "on-tertiary-fixed-variant": "#594311",
+            "on-secondary-fixed": "#041d30",
+            "tertiary-container": "#614b18",
+            "on-primary": "#ffffff",
+            "primary-fixed": "#dae2ff",
+            "surface-container-high": "#eae7e7",
+            "primary-container": "#0247ae",
+            "error": "#ba1a1a",
+            "on-tertiary-fixed": "#261a00",
+            "surface-container": "#f0eded",
+            "surface-container-low": "#f6f3f2",
+            "outline-variant": "#c3c6d5",
+            "on-secondary-container": "#4f657b",
+            "on-error-container": "#93000a",
+            "secondary-container": "#cbe2fc",
+            "on-tertiary": "#ffffff",
+            "tertiary": "#483403",
+            "inverse-on-surface": "#f3f0f0",
+            "surface-tint": "#2559bf",
+            "surface-container-highest": "#e4e2e1",
+            "on-error": "#ffffff",
+            "tertiary-fixed": "#ffdfa0",
+            "primary-fixed-dim": "#b2c5ff",
+            "inverse-surface": "#303030",
+            "secondary-fixed": "#cee5ff",
+            "secondary": "#4b6077",
+            "tertiary-fixed-dim": "#e2c384",
+            "surface-bright": "#fcf9f8",
+            "on-primary-container": "#a7beff",
+            "background": "#fcf9f8",
+            "outline": "#737784",
+            "surface-container-lowest": "#ffffff",
+            "secondary-fixed-dim": "#b2c9e3",
+            "primary": "#003280",
+            "on-surface": "#1b1c1c",
+            "on-background": "#1b1c1c",
+            "on-secondary-fixed-variant": "#33495e",
+            "on-secondary": "#ffffff",
+            "error-container": "#ffdad6"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "space-lg": "1.5rem",
+            "margin": "2rem",
+            "space-xs": "0.25rem",
+            "space-xl": "2rem",
+            "margin-mobile": "1rem",
+            "gutter-mobile": "1rem",
+            "space-md": "1rem",
+            "gutter": "1.5rem",
+            "space-sm": "0.5rem"
+          },
+          "fontFamily": {
+            "title-lg": ["Inter"],
+            "headline-lg-mobile": ["Inter"],
+            "label-lg": ["Inter"],
+            "body-lg": ["Inter"],
+            "headline-sm": ["Inter"],
+            "headline-lg": ["Inter"],
+            "display-lg-mobile": ["Inter"],
+            "body-md": ["Inter"],
+            "headline-md": ["Inter"],
+            "label-sm": ["Inter"],
+            "title-md": ["Inter"],
+            "display-lg": ["Inter"],
+            "body-sm": ["Inter"],
+            "label-md": ["Inter"]
+          },
+          "fontSize": {
+            "title-lg": ["18px", { "lineHeight": "26px", "letterSpacing": "0em", "fontWeight": "600" }],
+            "headline-lg-mobile": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500" }],
+            "body-lg": ["16px", { "lineHeight": "26px", "letterSpacing": "0em", "fontWeight": "400" }],
+            "headline-sm": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.005em", "fontWeight": "600" }],
+            "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.015em", "fontWeight": "600" }],
+            "display-lg-mobile": ["30px", { "lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "body-md": ["14px", { "lineHeight": "22px", "letterSpacing": "0em", "fontWeight": "400" }],
+            "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "600" }],
+            "title-md": ["16px", { "lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "500" }],
+            "display-lg": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "body-sm": ["12px", { "lineHeight": "18px", "letterSpacing": "0.01em", "fontWeight": "400" }],
+            "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    /* Academic base precision */
+    body {
+      background-color: #FFFAFA;
+      color: #2C2C2C;
+      font-family: 'Inter', sans-serif;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+    }
+    .material-symbols-outlined {
+      font-size: 20px;
+      line-height: 1;
+      display: inline-block;
+      vertical-align: middle;
+    }
+    .academic-panel {
+      background: #FFFFFF;
+      border: 1px solid #E1DFE2;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(45, 67, 88, 0.06);
+    }
+    .academic-badge {
+      background-color: #F6E7D2;
+      color: #2C2C2C;
+      border: 1px solid #C8AA6E;
+    }
+    details > summary {
+      list-style: none;
+    }
+    details > summary::-webkit-details-marker {
+      display: none;
+    }
+    details[open] .faq-icon {
+      transform: rotate(180deg);
+    }
+  </style>
+</head>
+<body class="bg-surface text-on-surface antialiased min-h-screen flex flex-col" id="view-landing" style="background-color: rgb(255, 250, 250);">
+<!-- Sticky Glassmorphic Header -->
+<header class="sticky top-0 w-full z-50 bg-[#FFFAFA]/90 backdrop-blur-md border-b border-[#E1DFE2] shadow-[0_2px_8px_rgba(45,67,88,0.06)]">
+<div class="max-w-7xl mx-auto px-margin h-16 flex items-center justify-between">
+<!-- Brand Logo -->
+<a class="flex items-center gap-2 group" href="#view-landing">
+<span class="w-8 h-8 rounded bg-[#0247AE] flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-white" style="font-size: 18px;">menu_book</span>
+</span>
+<span class="font-title-lg text-title-lg font-semibold tracking-tight text-[#0247AE]">CoLearn</span>
+</a>
+<!-- Desktop Navigation Links -->
+<nav class="hidden md:flex items-center space-x-8">
+<a class="font-label-lg text-label-lg font-medium text-[#0247AE] border-b-2 border-[#0247AE] pb-1" href="#hero">Home</a>
+<a class="font-label-lg text-label-lg font-medium text-secondary hover:text-[#0247AE] transition-colors duration-150" href="#features">Features</a>
+<a class="font-label-lg text-label-lg font-medium text-secondary hover:text-[#0247AE] transition-colors duration-150" href="#how-it-works">How it Works</a>
+<a class="font-label-lg text-label-lg font-medium text-secondary hover:text-[#0247AE] transition-colors duration-150" href="#faq">FAQ</a>
+</nav>
+<!-- Trailing Action Cluster -->
+<div class="flex items-center gap-4">
+<a class="font-label-lg text-label-lg font-medium text-[#2C2C2C] hover:text-[#0247AE] transition-colors px-2 py-1" href="#login">Sign In</a>
+<a class="bg-[#0247AE] text-white font-label-lg text-label-lg font-medium rounded-full px-5 py-2 hover:bg-[#023788] active:scale-[0.99] transition-all shadow-sm" href="#register">
+          Get Started
+        </a>
+</div>
+</div>
+</header>
+<main class="flex-grow">
+<!-- Hero Section -->
+<section class="max-w-7xl mx-auto px-margin pt-12 pb-16 md:pt-16 md:pb-24" id="hero">
+<div class="text-center max-w-3xl mx-auto flex flex-col items-center">
+<!-- Academic Badge -->
+<div class="inline-flex items-center gap-2 academic-badge px-3 py-1 rounded-full text-label-sm font-label-sm mb-6">
+<span class="w-1.5 h-1.5 rounded-full bg-[#C8AA6E]"></span>
+<span class="text-[#2D4358] tracking-wider uppercase font-semibold">Built for Modern Study Groups</span>
+</div>
+<!-- Headline -->
+<h1 class="font-headline-lg text-headline-lg md:text-[36px] md:leading-[44px] text-[#2C2C2C] font-bold tracking-tight mb-5">
+          Study Together. Learn Better.
+        </h1>
+<!-- Rigorous Factual Paragraph -->
+<p class="font-body-lg text-body-lg text-secondary leading-relaxed max-w-2xl mb-8">
+          A dedicated academic collaboration workspace pairing multi-page whiteboards with live document synchronization, formula rendering, and subject-scoped private study suites.
+        </p>
+<!-- CTAs -->
+<div class="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
+<a class="w-full sm:w-auto h-10 px-6 rounded-[6px] bg-[#0247AE] hover:bg-[#023788] text-white font-label-lg text-label-lg font-medium flex items-center justify-center transition-all shadow-sm" href="#register">
+            Start Studying Free
+          </a>
+<a class="w-full sm:w-auto h-10 px-6 rounded-[6px] bg-[#FFFFFF] border border-[#E1DFE2] hover:bg-[#FFFAFA] hover:border-[#587D90] text-[#2C2C2C] font-label-lg text-label-lg font-medium flex items-center justify-center transition-all" href="#how-it-works">
+            See How It Works
+          </a>
+</div>
+</div>
+<!-- Realistic Workspace Mockup Graphic -->
+<div class="mt-12 md:mt-16 academic-panel overflow-hidden border border-[#E1DFE2]">
+<!-- Workspace Header Shell -->
+<div class="bg-[#FFFFFF] border-b border-[#E1DFE2] px-4 py-3 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<span class="flex gap-1.5">
+<span class="w-2.5 h-2.5 rounded-full bg-[#E1DFE2]"></span>
+<span class="w-2.5 h-2.5 rounded-full bg-[#E1DFE2]"></span>
+<span class="w-2.5 h-2.5 rounded-full bg-[#E1DFE2]"></span>
+</span>
+<div class="h-4 w-px bg-[#E1DFE2]"></div>
+<span class="font-label-sm text-label-sm font-semibold text-[#2C2C2C] flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[#0247AE]" style="font-size: 16px;">lock</span>
+              Suite 402: Advanced Calculus &amp; Linear Systems
+            </span>
+<span class="text-label-sm font-label-sm text-secondary bg-[#FFFAFA] border border-[#E1DFE2] px-2 py-0.5 rounded">MATH-301</span>
+</div>
+<!-- Active Participants presence dots -->
+<div class="flex items-center gap-3">
+<div class="flex items-center -space-x-2">
+<div class="relative">
+<div class="w-7 h-7 rounded-full bg-[#dae2ff] border border-white flex items-center justify-center text-xs font-semibold text-[#003280]">EL</div>
+<span class="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-emerald-600 ring-1 ring-white"></span>
+</div>
+<div class="relative">
+<div class="w-7 h-7 rounded-full bg-[#ffdfa0] border border-white flex items-center justify-center text-xs font-semibold text-[#483403]">JR</div>
+<span class="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-emerald-600 ring-1 ring-white"></span>
+</div>
+<div class="relative">
+<div class="w-7 h-7 rounded-full bg-[#cbe2fc] border border-white flex items-center justify-center text-xs font-semibold text-[#041d30]">MK</div>
+<span class="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-emerald-600 ring-1 ring-white"></span>
+</div>
+</div>
+<div class="h-4 w-px bg-[#E1DFE2]"></div>
+<div class="flex items-center gap-1 text-label-sm font-label-sm text-secondary">
+<span class="material-symbols-outlined text-emerald-600" style="font-size: 14px;">fiber_manual_record</span>
+<span>Sync Active</span>
+</div>
+</div>
+</div>
+<!-- Split Workspace Screen -->
+<div class="grid grid-cols-1 lg:grid-cols-12 min-h-[460px] bg-[#FFFFFF]">
+<!-- Left Pane: LaTeX / Proof Document (5 cols) -->
+<div class="lg:col-span-5 border-b lg:border-b-0 lg:border-r border-[#E1DFE2] p-6 bg-[#FFFFFF] flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-4 pb-3 border-b border-[#E1DFE2]">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[#587D90]">description</span>
+<span class="font-title-md text-title-md font-semibold text-[#2C2C2C]">Problem Set 04: Vector Spaces</span>
+</div>
+<span class="font-label-sm text-label-sm text-secondary">Rev. 3 · LaTeX</span>
+</div>
+<!-- Academic Document Content -->
+<div class="space-y-4 font-body-md text-body-md text-[#2C2C2C]">
+<div>
+<h4 class="font-label-lg text-label-lg font-semibold text-[#003280] mb-1">Proposition 3.2 (Orthogonal Projections)</h4>
+<p class="text-secondary leading-relaxed font-body-sm text-body-sm">
+                    Let \( V \) be an inner product space and \( W \subseteq V \) a finite-dimensional subspace. For any vector \( \mathbf{v} \in V \), the projection \( \mathrm{proj}_W(\mathbf{v}) \) satisfies:
+                  </p>
+</div>
+<div class="p-3 bg-[#FFFAFA] border border-[#E1DFE2] rounded-[6px] font-mono text-xs text-[#2C2C2C] space-y-1">
+<p class="text-secondary">% Orthogonal decomposition formula</p>
+<p>\mathbf{v} = \sum_{i=1}^{k} \frac{\langle \mathbf{v}, \mathbf{u}_i \rangle}{\|\mathbf{u}_i\|^2} \mathbf{u}_i + \mathbf{w}^\perp</p>
+<p class="text-[#0247AE]">where \(\mathbf{w}^\perp \in W^\perp \quad \text{and} \quad \langle \mathbf{w}^\perp, \mathbf{u}_j \rangle = 0\)</p>
+</div>
+<div class="space-y-2 pt-2">
+<span class="font-label-sm text-label-sm font-semibold uppercase tracking-wider text-[#587D90]">Collaborator Notes</span>
+<div class="p-2.5 bg-[#FFFAFA] border-l-2 border-[#0247AE] text-body-sm text-[#2C2C2C] rounded-r">
+<span class="font-semibold text-[#0247AE]">E. Lindqvist:</span> Gram-Schmidt normalization has already been applied to basis \( \{u_1, \dots, u_k\} \). See Lemma 3.1.
+                  </div>
+</div>
+</div>
+</div>
+<div class="pt-4 border-t border-[#E1DFE2] flex items-center justify-between text-secondary font-label-sm text-label-sm">
+<span>Lines: 142 · UTF-8</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined" style="font-size: 14px;">check_circle</span> Auto-saved</span>
+</div>
+</div>
+<!-- Right Pane: Live Shared Whiteboard Canvas (7 cols) -->
+<div class="lg:col-span-7 p-6 bg-[#FFFAFA] flex flex-col justify-between relative overflow-hidden">
+<!-- Canvas Toolbar -->
+<div class="flex items-center justify-between mb-4 bg-white p-2 rounded-[6px] border border-[#E1DFE2] shadow-sm">
+<div class="flex items-center gap-1">
+<button class="p-1.5 rounded hover:bg-[#FFFAFA] text-[#0247AE] bg-[#F6E7D2]/40" title="Select">
+<span class="material-symbols-outlined" style="font-size: 18px;">near_me</span>
+</button>
+<button class="p-1.5 rounded hover:bg-[#FFFAFA] text-[#587D90]" title="Flowchart Node">
+<span class="material-symbols-outlined" style="font-size: 18px;">crop_square</span>
+</button>
+<button class="p-1.5 rounded hover:bg-[#FFFAFA] text-[#587D90]" title="Connector">
+<span class="material-symbols-outlined" style="font-size: 18px;">arrow_forward</span>
+</button>
+<button class="p-1.5 rounded hover:bg-[#FFFAFA] text-[#587D90]" title="Freehand">
+<span class="material-symbols-outlined" style="font-size: 18px;">draw</span>
+</button>
+<button class="p-1.5 rounded hover:bg-[#FFFAFA] text-[#587D90]" title="LaTeX Node">
+<span class="material-symbols-outlined" style="font-size: 18px;">functions</span>
+</button>
+</div>
+<div class="flex items-center gap-3 font-label-sm text-label-sm text-secondary">
+<span>Canvas Page 2 of 4</span>
+<span class="h-3 w-px bg-[#E1DFE2]"></span>
+<span>Zoom: 100%</span>
+</div>
+</div>
+<!-- Geometric Canvas Area Representation -->
+<div class="flex-grow relative border border-[#E1DFE2] border-dashed rounded-[8px] bg-white p-6 flex flex-col justify-center items-center min-h-[300px]">
+<!-- Node 1: Vector Space -->
+<div class="absolute top-8 left-8 p-3 rounded-[6px] bg-[#FFFFFF] border-2 border-[#0247AE] shadow-sm w-44">
+<div class="font-label-sm text-label-sm font-semibold text-[#0247AE]">Inner Product Space V</div>
+<div class="text-[11px] text-secondary">dim(V) = n, over field ℝ</div>
+</div>
+<!-- Connecting Line with SVG -->
+<div class="w-full flex items-center justify-center my-6">
+<div class="flex items-center gap-4">
+<div class="h-px w-24 bg-[#587D90]"></div>
+<span class="px-2 py-0.5 rounded bg-[#FFFAFA] border border-[#E1DFE2] text-[10px] font-mono text-[#587D90]">T: V → W</span>
+<div class="h-px w-24 bg-[#587D90]"></div>
+</div>
+</div>
+<!-- Node 2: Subspace Projection -->
+<div class="p-4 rounded-[6px] bg-[#FFFAFA] border border-[#E1DFE2] shadow-sm text-center max-w-xs">
+<div class="font-label-sm text-label-sm font-semibold text-[#2C2C2C]">Subspace W ⊕ W^⊥</div>
+<div class="font-mono text-xs text-[#0247AE] mt-1">P^2 = P, P^* = P</div>
+<div class="text-[11px] text-secondary mt-1">Orthogonal Projection Matrix</div>
+</div>
+<!-- Simulated Participant Cursor -->
+<div class="absolute bottom-10 right-12 flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[#0247AE]" style="font-size: 16px;">near_me</span>
+<span class="bg-[#0247AE] text-white text-[10px] px-1.5 py-0.5 rounded font-mono">J. Roy (editing)</span>
+</div>
+</div>
+<!-- Canvas Bottom Metadata -->
+<div class="mt-3 flex items-center justify-between text-secondary font-label-sm text-label-sm">
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined" style="font-size: 14px;">lock_clock</span>
+                Peer-verified session snapshot
+              </span>
+<span>Hardware acceleration enabled</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Core Features Grid -->
+<section class="max-w-7xl mx-auto px-margin py-16 border-t border-[#E1DFE2]" id="features">
+<div class="mb-12">
+<span class="text-label-sm font-label-sm font-semibold text-[#587D90] uppercase tracking-wider">Functional Architecture</span>
+<h2 class="font-headline-lg text-headline-lg text-[#2C2C2C] font-semibold mt-1">Core System Capabilities</h2>
+<p class="font-body-md text-body-md text-secondary mt-2 max-w-xl">
+          Engineered for rigorous group synthesis, multi-device document handling, and structured communication.
+        </p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<!-- Card 1 -->
+<div class="academic-panel p-space-lg flex flex-col justify-between">
+<div>
+<div class="w-10 h-10 rounded-[6px] bg-[#dae2ff] flex items-center justify-center text-[#003280] mb-4">
+<span class="material-symbols-outlined">password</span>
+</div>
+<h3 class="font-title-md text-title-md font-semibold text-[#2C2C2C] mb-2">Secure OTP Access</h3>
+<p class="font-body-md text-body-md text-secondary">
+              Instant passwordless verification via institutional email with continuous session integrity and cryptographically signed recovery tokens.
+            </p>
+</div>
+<div class="mt-6 pt-3 border-t border-[#E1DFE2] flex items-center text-label-sm font-label-sm text-[#587D90]">
+            Zero credentials stored locally
+          </div>
+</div>
+<!-- Card 2 -->
+<div class="academic-panel p-space-lg flex flex-col justify-between">
+<div>
+<div class="w-10 h-10 rounded-[6px] bg-[#cbe2fc] flex items-center justify-center text-[#041d30] mb-4">
+<span class="material-symbols-outlined">meeting_room</span>
+</div>
+<h3 class="font-title-md text-title-md font-semibold text-[#2C2C2C] mb-2">Private Study Suites</h3>
+<p class="font-body-md text-body-md text-secondary">
+              Dedicated collaborative rooms partitioned by course code and topic, featuring fine-grained host governance, moderation queues, and invite permissions.
+            </p>
+</div>
+<div class="mt-6 pt-3 border-t border-[#E1DFE2] flex items-center text-label-sm font-label-sm text-[#587D90]">
+            Host and administrator access hierarchy
+          </div>
+</div>
+<!-- Card 3 -->
+<div class="academic-panel p-space-lg flex flex-col justify-between">
+<div>
+<div class="w-10 h-10 rounded-[6px] bg-[#dae2ff] flex items-center justify-center text-[#003280] mb-4">
+<span class="material-symbols-outlined">forum</span>
+</div>
+<h3 class="font-title-md text-title-md font-semibold text-[#2C2C2C] mb-2">Rich Academic Chat</h3>
+<p class="font-body-md text-body-md text-secondary">
+              Synchronous peer discussion supporting inline KaTeX mathematical notations, syntax-highlighted code blocks, and threaded document references.
+            </p>
+</div>
+<div class="mt-6 pt-3 border-t border-[#E1DFE2] flex items-center text-label-sm font-label-sm text-[#587D90]">
+            Instant KaTeX &amp; Markdown parsing
+          </div>
+</div>
+<!-- Card 4 -->
+<div class="academic-panel p-space-lg flex flex-col justify-between">
+<div>
+<div class="w-10 h-10 rounded-[6px] bg-[#cbe2fc] flex items-center justify-center text-[#041d30] mb-4">
+<span class="material-symbols-outlined">draw</span>
+</div>
+<h3 class="font-title-md text-title-md font-semibold text-[#2C2C2C] mb-2">Infinite Whiteboard</h3>
+<p class="font-body-md text-body-md text-secondary">
+              Multi-page vector drawing canvas equipped with geometric node alignment, structured flowchart connectors, and stroke-to-shape vectorization.
+            </p>
+</div>
+<div class="mt-6 pt-3 border-t border-[#E1DFE2] flex items-center text-label-sm font-label-sm text-[#587D90]">
+            Multi-page vector state tracking
+          </div>
+</div>
+<!-- Card 5 -->
+<div class="academic-panel p-space-lg flex flex-col justify-between">
+<div>
+<div class="w-10 h-10 rounded-[6px] bg-[#ffdfa0] flex items-center justify-center text-[#483403] mb-4">
+<span class="material-symbols-outlined">sync_alt</span>
+</div>
+<h3 class="font-title-md text-title-md font-semibold text-[#2C2C2C] mb-2">Instant Document Sync</h3>
+<p class="font-body-md text-body-md text-secondary">
+              Cloud integration with Google Drive and institutional repositories. Native viewing and simultaneous page tracking for PDF, DOCX, and slide decks.
+            </p>
+</div>
+<div class="mt-6 pt-3 border-t border-[#E1DFE2] flex items-center text-label-sm font-label-sm text-[#587D90]">
+            Direct cloud drive integration
+          </div>
+</div>
+<!-- Card 6 -->
+<div class="academic-panel p-space-lg flex flex-col justify-between">
+<div>
+<div class="w-10 h-10 rounded-[6px] bg-[#dae2ff] flex items-center justify-center text-[#003280] mb-4">
+<span class="material-symbols-outlined">devices</span>
+</div>
+<h3 class="font-title-md text-title-md font-semibold text-[#2C2C2C] mb-2">Browser-First Collaboration</h3>
+<p class="font-body-md text-body-md text-secondary">
+              Zero client installation or proprietary drivers needed. Operates via WebRTC standards for ultra-low latency audio, screen sharing, and data mesh.
+            </p>
+</div>
+<div class="mt-6 pt-3 border-t border-[#E1DFE2] flex items-center text-label-sm font-label-sm text-[#587D90]">
+            Encrypted WebRTC transport protocol
+          </div>
+</div>
+</div>
+</section>
+<!-- How It Works Section -->
+<section class="max-w-7xl mx-auto px-margin py-16 border-t border-[#E1DFE2]" id="how-it-works">
+<div class="mb-12">
+<span class="text-label-sm font-label-sm font-semibold text-[#587D90] uppercase tracking-wider">Operational Sequence</span>
+<h2 class="font-headline-lg text-headline-lg text-[#2C2C2C] font-semibold mt-1">How CoLearn Operates</h2>
+<p class="font-body-md text-body-md text-secondary mt-2 max-w-xl">
+          Three precise steps to initiate and coordinate peer-to-peer study sessions without administrative friction.
+        </p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Step 1 -->
+<div class="academic-panel p-space-lg relative">
+<div class="text-[#0247AE] font-mono font-bold text-headline-sm mb-4">01</div>
+<h3 class="font-title-md text-title-md font-semibold text-[#2C2C2C] mb-2">Suite Creation</h3>
+<p class="font-body-md text-body-md text-secondary mb-4">
+            Initialize an isolated study environment by selecting your subject area, module syllabus, and collaborative permissions (view-only vs. co-author).
+          </p>
+<div class="p-2.5 rounded bg-[#FFFAFA] border border-[#E1DFE2] text-label-sm font-label-sm text-[#2D4358] font-mono">
+            Status: Initialized (256-bit room key)
+          </div>
+</div>
+<!-- Step 2 -->
+<div class="academic-panel p-space-lg relative">
+<div class="text-[#0247AE] font-mono font-bold text-headline-sm mb-4">02</div>
+<h3 class="font-title-md text-title-md font-semibold text-[#2C2C2C] mb-2">Invite Distribution</h3>
+<p class="font-body-md text-body-md text-secondary mb-4">
+            Distribute a temporary 5-digit session PIN or an authenticated institutional link directly to peer researchers and study group participants.
+          </p>
+<div class="p-2.5 rounded bg-[#FFFAFA] border border-[#E1DFE2] text-label-sm font-label-sm text-[#2D4358] font-mono flex items-center justify-between">
+<span>Passcode: <strong class="text-[#0247AE]">849-20</strong></span>
+<span class="text-[11px] text-secondary">Expires in 2h</span>
+</div>
+</div>
+<!-- Step 3 -->
+<div class="academic-panel p-space-lg relative">
+<div class="text-[#0247AE] font-mono font-bold text-headline-sm mb-4">03</div>
+<h3 class="font-title-md text-title-md font-semibold text-[#2C2C2C] mb-2">Live Session Collaboration</h3>
+<p class="font-body-md text-body-md text-secondary mb-4">
+            Commence split-view problem solving, synchronous document markup, and whiteboard derivation with zero latency and automatic version archiving.
+          </p>
+<div class="p-2.5 rounded bg-[#FFFAFA] border border-[#E1DFE2] text-label-sm font-label-sm text-[#2D4358] font-mono">
+            Mesh: Connected (Peer P2P Active)
+          </div>
+</div>
+</div>
+</section>
+<!-- FAQ Accordion Section -->
+<section class="max-w-7xl mx-auto px-margin py-16 border-t border-[#E1DFE2]" id="faq">
+<div class="max-w-3xl mx-auto">
+<div class="text-center mb-10">
+<span class="text-label-sm font-label-sm font-semibold text-[#587D90] uppercase tracking-wider">Documentation &amp; Answers</span>
+<h2 class="font-headline-lg text-headline-lg text-[#2C2C2C] font-semibold mt-1">Frequently Asked Questions</h2>
+<p class="font-body-md text-body-md text-secondary mt-2">
+            Details regarding architecture, data privacy, device compatibility, and storage governance.
+          </p>
+</div>
+<div class="space-y-4">
+<!-- Accordion Item 1 -->
+<details class="academic-panel overflow-hidden group">
+<summary class="p-5 cursor-pointer flex items-center justify-between font-title-md text-title-md font-medium text-[#2C2C2C] hover:bg-[#FFFAFA] transition-colors select-none">
+<span>How is study suite privacy and access control enforced?</span>
+<span class="material-symbols-outlined faq-icon text-[#587D90] transition-transform duration-200">expand_more</span>
+</summary>
+<div class="px-5 pb-5 pt-1 text-body-md text-secondary border-t border-[#E1DFE2]/60">
+              Each study suite is provisioned as an isolated environment protected by ephemeral 5-digit passcodes or institutional single sign-on (SSO) verification. Room hosts maintain administrative authority to grant read-only observer status, revoke entry permissions, or terminate sessions instantly.
+            </div>
+</details>
+<!-- Accordion Item 2 -->
+<details class="academic-panel overflow-hidden group">
+<summary class="p-5 cursor-pointer flex items-center justify-between font-title-md text-title-md font-medium text-[#2C2C2C] hover:bg-[#FFFAFA] transition-colors select-none">
+<span>Can CoLearn be accessed across multiple devices simultaneously?</span>
+<span class="material-symbols-outlined faq-icon text-[#587D90] transition-transform duration-200">expand_more</span>
+</summary>
+<div class="px-5 pb-5 pt-1 text-body-md text-secondary border-t border-[#E1DFE2]/60">
+              Yes. The platform is engineered with a responsive browser-first architecture. Researchers commonly utilize a tablet with a stylus for high-precision whiteboard calculations while maintaining a parallel desktop session for reading research manuscripts and monitoring text discussion.
+            </div>
+</details>
+<!-- Accordion Item 3 -->
+<details class="academic-panel overflow-hidden group">
+<summary class="p-5 cursor-pointer flex items-center justify-between font-title-md text-title-md font-medium text-[#2C2C2C] hover:bg-[#FFFAFA] transition-colors select-none">
+<span>How does Google Drive integration handle document permissions?</span>
+<span class="material-symbols-outlined faq-icon text-[#587D90] transition-transform duration-200">expand_more</span>
+</summary>
+<div class="px-5 pb-5 pt-1 text-body-md text-secondary border-t border-[#E1DFE2]/60">
+              CoLearn utilizes OAuth 2.0 scoped access tokens strictly restricted to files explicitly selected by the user. Documents remain hosted on Google's cloud infrastructure; CoLearn renders synchronous views and markup layers without storing copies of proprietary research files on external servers.
+            </div>
+</details>
+<!-- Accordion Item 4 -->
+<details class="academic-panel overflow-hidden group">
+<summary class="p-5 cursor-pointer flex items-center justify-between font-title-md text-title-md font-medium text-[#2C2C2C] hover:bg-[#FFFAFA] transition-colors select-none">
+<span>Are formulas rendered client-side or server-side?</span>
+<span class="material-symbols-outlined faq-icon text-[#587D90] transition-transform duration-200">expand_more</span>
+</summary>
+<div class="px-5 pb-5 pt-1 text-body-md text-secondary border-t border-[#E1DFE2]/60">
+              Mathematical formulas written in LaTeX format are rendered directly in the client browser utilizing KaTeX. This ensures instantaneous sub-millisecond redraws during active typing and eliminates computational server roundtrips.
+            </div>
+</details>
+</div>
+</div>
+</section>
+<!-- Direct Support Card -->
+<section class="max-w-7xl mx-auto px-margin py-12 border-t border-[#E1DFE2]">
+<div class="academic-panel p-space-xl bg-[#FFFFFF] max-w-2xl mx-auto text-center">
+<div class="w-12 h-12 rounded-full bg-[#dae2ff] flex items-center justify-center text-[#003280] mx-auto mb-4">
+<span class="material-symbols-outlined" style="font-size: 24px;">mail</span>
+</div>
+<h3 class="font-title-lg text-title-lg font-semibold text-[#2C2C2C] mb-2">Institutional Support &amp; Working Groups</h3>
+<p class="font-body-md text-body-md text-secondary mb-6 leading-relaxed">
+          Questions regarding departmental deployment, lab cluster access, or security audits? Reach our core academic engineering group directly.
+        </p>
+<div class="inline-flex items-center gap-2 p-2 px-4 rounded-[6px] bg-[#FFFAFA] border border-[#E1DFE2]">
+<span class="material-symbols-outlined text-[#587D90]" style="font-size: 18px;">alternate_email</span>
+<a class="font-mono text-label-lg font-semibold text-[#0247AE] hover:underline" href="mailto:colearn.inc@gmail.com">
+            colearn.inc@gmail.com
+          </a>
+</div>
+</div>
+</section>
+</main>
+<!-- Academic Footer verbatim from specification -->
+<footer class="w-full bg-surface-container-lowest border-t border-[#E1DFE2] mt-auto">
+<div class="max-w-7xl mx-auto px-margin py-space-xl flex flex-col md:flex-row justify-between items-center gap-space-md">
+<!-- Copyright & Brand info -->
+<div class="flex flex-col sm:flex-row items-center gap-3 text-center sm:text-left">
+<span class="font-title-md text-title-md font-semibold text-primary">CoLearn</span>
+<span class="hidden sm:inline text-outline-variant">|</span>
+<span class="font-body-sm text-body-sm text-secondary">
+          © 2026 CoLearn Academic Collaborative. Institutional Research Network. All rights reserved.
+        </span>
+</div>
+<!-- Footer Navigation Links -->
+
+</div>
+</footer>
+
+
+</body></html>

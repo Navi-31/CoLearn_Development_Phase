@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CoLearn Suite 402 - Academic Communication &amp; Scholar AI</title>
+<!-- Google Fonts: Inter -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS v3 -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config Verbatim -->
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "surface-container-high": "#eae7e7",
+            "tertiary-fixed": "#ffdfa0",
+            "on-secondary-fixed": "#041d30",
+            "on-error-container": "#93000a",
+            "inverse-surface": "#303030",
+            "surface-container-low": "#f6f3f2",
+            "surface-dim": "#dcd9d9",
+            "inverse-on-surface": "#f3f0f0",
+            "primary-fixed-dim": "#b2c5ff",
+            "inverse-primary": "#b2c5ff",
+            "surface-container-lowest": "#ffffff",
+            "on-error": "#ffffff",
+            "primary": "#003280",
+            "secondary-fixed-dim": "#b2c9e3",
+            "tertiary-fixed-dim": "#e2c384",
+            "error-container": "#ffdad6",
+            "on-surface-variant": "#434653",
+            "surface": "#fcf9f8",
+            "on-primary-fixed-variant": "#0040a0",
+            "background": "#fcf9f8",
+            "on-tertiary": "#ffffff",
+            "secondary-container": "#cbe2fc",
+            "on-tertiary-container": "#dbbc7e",
+            "surface-variant": "#e4e2e1",
+            "on-tertiary-fixed-variant": "#594311",
+            "on-secondary": "#ffffff",
+            "primary-fixed": "#dae2ff",
+            "surface-container": "#f0eded",
+            "on-primary": "#ffffff",
+            "secondary-fixed": "#cee5ff",
+            "on-primary-fixed": "#001847",
+            "tertiary-container": "#614b18",
+            "on-surface": "#1b1c1c",
+            "outline": "#737784",
+            "primary-container": "#0247ae",
+            "surface-bright": "#fcf9f8",
+            "on-secondary-fixed-variant": "#33495e",
+            "surface-tint": "#2559bf",
+            "on-primary-container": "#a7beff",
+            "on-tertiary-fixed": "#261a00",
+            "surface-container-highest": "#e4e2e1",
+            "tertiary": "#483403",
+            "on-background": "#1b1c1c",
+            "outline-variant": "#c3c6d5",
+            "on-secondary-container": "#4f657b",
+            "error": "#ba1a1a",
+            "secondary": "#4b6077"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "space-sm": "0.5rem",
+            "space-xl": "2rem",
+            "space-lg": "1.5rem",
+            "gutter": "1.5rem",
+            "margin-mobile": "1rem",
+            "gutter-mobile": "1rem",
+            "space-xs": "0.25rem",
+            "space-md": "1rem",
+            "margin": "2rem"
+          },
+          "fontFamily": {
+            "title-md": ["Inter"],
+            "display-lg": ["Inter"],
+            "title-lg": ["Inter"],
+            "body-md": ["Inter"],
+            "headline-sm": ["Inter"],
+            "display-lg-mobile": ["Inter"],
+            "headline-lg": ["Inter"],
+            "headline-lg-mobile": ["Inter"],
+            "body-lg": ["Inter"],
+            "label-md": ["Inter"],
+            "headline-md": ["Inter"],
+            "label-sm": ["Inter"],
+            "body-sm": ["Inter"],
+            "label-lg": ["Inter"]
+          },
+          "fontSize": {
+            "title-md": ["16px", { "lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "500" }],
+            "display-lg": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "title-lg": ["18px", { "lineHeight": "26px", "letterSpacing": "0em", "fontWeight": "600" }],
+            "body-md": ["14px", { "lineHeight": "22px", "letterSpacing": "0em", "fontWeight": "400" }],
+            "headline-sm": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.005em", "fontWeight": "600" }],
+            "display-lg-mobile": ["30px", { "lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.015em", "fontWeight": "600" }],
+            "headline-lg-mobile": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "body-lg": ["16px", { "lineHeight": "26px", "letterSpacing": "0em", "fontWeight": "400" }],
+            "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500" }],
+            "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "600" }],
+            "body-sm": ["12px", { "lineHeight": "18px", "letterSpacing": "0.01em", "fontWeight": "400" }],
+            "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-family: 'Material Symbols Outlined';
+      font-weight: normal;
+      font-style: normal;
+      font-size: 20px;
+      line-height: 1;
+      letter-spacing: normal;
+      text-transform: none;
+      display: inline-block;
+      white-space: nowrap;
+      word-wrap: normal;
+      direction: ltr;
+      -webkit-font-feature-settings: 'liga';
+      -webkit-font-smoothing: antialiased;
+    }
+    /* Custom subtle scrollbar for academic dense reading */
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f6f3f2;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #c3c6d5;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #737784;
+    }
+  </style>
+</head>
+<body class="bg-background text-on-surface antialiased font-body-md text-body-md min-h-screen flex flex-col selection:bg-secondary-container selection:text-primary">
+<!-- ========================================================================= -->
+<!-- 1. TOP APP BAR (52px Height, Institutional Prestige & Active State Badges) -->
+<!-- ========================================================================= -->
+<header class="h-[52px] bg-surface-container-lowest border-b border-outline-variant/60 px-4 flex items-center justify-between shrink-0 sticky top-0 z-40 shadow-sm">
+<!-- Left: Brand, Suite Identifier & Lock pill -->
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-2">
+<div class="w-7 h-7 bg-primary-container rounded flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined text-[18px]">school</span>
+</div>
+<span class="font-title-md text-title-md font-semibold text-primary tracking-tight">CoLearn Suite 402</span>
+</div>
+<span class="text-outline-variant font-light">|</span>
+<div class="hidden sm:flex items-center gap-2 text-on-surface-variant font-body-sm text-body-sm">
+<span class="font-medium text-on-surface">Advanced Calculus &amp; Linear Systems</span>
+<span class="text-secondary">(MATH-301)</span>
+</div>
+<div class="flex items-center gap-1 px-2 py-0.5 rounded bg-surface-container-high text-on-surface-variant border border-outline-variant/40 font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[14px]">lock</span>
+<span>Private Suite</span>
+</div>
+</div>
+<!-- Center: Live Global Session Pills -->
+<div class="hidden md:flex items-center gap-2">
+<!-- Voice session pill -->
+<a class="flex items-center gap-1.5 px-2.5 py-1 rounded bg-secondary-container/40 hover:bg-secondary-container/60 text-primary border border-secondary-container font-label-md text-label-md transition-colors" href="#call-overlay">
+<span class="material-symbols-outlined text-[15px] text-primary">videocam</span>
+<span class="font-medium">Return to Call · 00:32:15</span>
+</a>
+<!-- Screen share indicator -->
+<div class="flex items-center gap-1.5 px-2.5 py-1 rounded bg-surface-container-high/70 border border-outline-variant/40 text-on-surface-variant font-label-md text-label-md">
+<span class="material-symbols-outlined text-[15px] text-primary">screen_share</span>
+<span>J. Roy is sharing canvas</span>
+</div>
+</div>
+<!-- Right: Suite Actions & User Profile -->
+<div class="flex items-center gap-2">
+<button class="w-8 h-8 rounded flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors" title="Suite Settings">
+<span class="material-symbols-outlined text-[19px]">settings</span>
+</button>
+<button class="w-8 h-8 rounded relative flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors" title="Notifications">
+<span class="material-symbols-outlined text-[19px]">notifications</span>
+<span class="absolute top-1.5 right-1.5 w-4 h-4 bg-error text-on-error font-label-sm text-[10px] rounded-full flex items-center justify-center leading-none">3</span>
+</button>
+<div class="h-4 w-px bg-outline-variant/60 mx-1"></div>
+<!-- Avatar: Dr. David Ross (Host) -->
+<div class="flex items-center gap-2 pl-1 cursor-pointer">
+<div class="w-7 h-7 rounded bg-primary text-on-primary font-label-md text-label-md font-semibold flex items-center justify-center border border-outline-variant/40">
+          DR
+        </div>
+<div class="hidden lg:flex flex-col text-left">
+<span class="font-label-md text-label-md font-semibold text-on-surface leading-tight">Dr. Ross</span>
+<span class="font-label-sm text-label-sm text-secondary leading-none">Fellow / Host</span>
+</div>
+</div>
+</div>
+</header>
+<!-- ========================================================================= -->
+<!-- 2. SUB-NAVIGATION BAR (Academic Breadcrumb & Workspace Switcher) -->
+<!-- ========================================================================= -->
+<nav class="h-11 bg-surface border-b border-outline-variant/50 px-4 flex items-center justify-between shrink-0 text-body-sm font-body-sm">
+<!-- Breadcrumbs -->
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="hover:text-primary cursor-pointer">Workspaces</span>
+<span class="text-outline-variant">/</span>
+<span class="font-medium text-on-surface">MATH-301</span>
+<span class="text-outline-variant">/</span>
+<span class="text-primary font-medium">Communications &amp; Scholar AI</span>
+</div>
+<!-- Central View Switcher Tabs -->
+<div class="hidden lg:flex items-center gap-1 h-full">
+<button class="h-full px-3 text-primary font-semibold border-b-2 border-primary flex items-center gap-2">
+<span class="material-symbols-outlined text-[17px]">forum</span>
+<span>#recitation-chat</span>
+<span class="px-1.5 py-0.2 bg-secondary-container text-on-secondary-container rounded-full font-label-sm text-[10px]">12</span>
+</button>
+<button class="h-full px-3 text-on-surface-variant hover:text-on-surface transition-colors flex items-center gap-2 border-b-2 border-transparent">
+<span class="material-symbols-outlined text-[17px]">chat</span>
+<span>Direct Messages</span>
+</button>
+<button class="h-full px-3 text-on-surface-variant hover:text-on-surface transition-colors flex items-center gap-2 border-b-2 border-transparent">
+<span class="material-symbols-outlined text-[17px] text-tertiary-container">psychology</span>
+<span>Scholar AI Buddy</span>
+</button>
+</div>
+<!-- Quick Utilities -->
+<div class="flex items-center gap-2">
+<button class="hidden sm:flex items-center gap-1.5 px-2.5 py-1 text-on-surface-variant hover:text-primary rounded hover:bg-surface-container transition-colors font-label-md text-label-md">
+<span class="material-symbols-outlined text-[16px]">tune</span>
+<span>Audio Settings</span>
+</button>
+<div class="relative hidden sm:block">
+<input class="h-7 w-48 text-label-md font-label-md bg-surface-container-lowest border border-outline-variant/60 rounded px-2.5 pl-7 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 text-on-surface placeholder:text-secondary" placeholder="Search proofs &amp; citations..." type="text"/>
+<span class="material-symbols-outlined text-[14px] text-secondary absolute left-2 top-1.5">search</span>
+</div>
+<button class="flex items-center gap-1 px-2 py-1 text-secondary hover:text-primary rounded border border-outline-variant/60 font-label-md text-label-md bg-surface-container-lowest" title="Pop out Video Grid">
+<span class="material-symbols-outlined text-[16px]">open_in_new</span>
+<span class="hidden md:inline">Pop Out Video</span>
+</button>
+</div>
+</nav>
+<!-- ========================================================================= -->
+<!-- 3. MAIN COMMUNICATION WORKSPACE (3-COLUMN LAYOUT) -->
+<!-- ========================================================================= -->
+<main class="flex-1 flex overflow-hidden">
+<!-- ------------------------------------------------------------- -->
+<!-- COLUMN 1: LEFT NAVIGATION & CHANNELS (240px) -->
+<!-- ------------------------------------------------------------- -->
+<aside class="w-60 bg-surface-container-lowest border-r border-outline-variant/60 flex flex-col shrink-0 overflow-y-auto select-none">
+<!-- Section: Suite Channels -->
+<div class="pt-3 pb-2 px-3">
+<div class="flex items-center justify-between px-2 mb-1.5 text-secondary font-label-sm text-label-sm font-semibold tracking-wider">
+<span>SUITE CHANNELS</span>
+<button class="hover:text-primary transition-colors" title="Add Channel">
+<span class="material-symbols-outlined text-[16px]">add</span>
+</button>
+</div>
+<div class="space-y-0.5">
+<a class="flex items-center justify-between px-2.5 py-1.5 rounded text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-sm text-body-sm" href="#">
+<span class="flex items-center gap-2 truncate">
+<span class="text-secondary font-mono">#</span>
+<span class="truncate">general-announcements</span>
+</span>
+</a>
+<!-- Active Channel -->
+<a class="flex items-center justify-between px-2.5 py-1.5 rounded font-semibold bg-secondary-container/30 text-primary border-l-2 border-primary font-body-sm text-body-sm" href="#">
+<span class="flex items-center gap-2 truncate">
+<span class="text-primary font-mono">#</span>
+<span class="truncate font-semibold">math-301-recitation</span>
+</span>
+<span class="w-2 h-2 rounded-full bg-primary shrink-0"></span>
+</a>
+<a class="flex items-center justify-between px-2.5 py-1.5 rounded text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-sm text-body-sm" href="#">
+<span class="flex items-center gap-2 truncate">
+<span class="text-secondary font-mono">#</span>
+<span class="truncate">problem-set-4-help</span>
+</span>
+<span class="px-1.5 py-0.2 bg-secondary-container text-on-secondary-container rounded-full font-label-sm text-[11px]">3</span>
+</a>
+<a class="flex items-center justify-between px-2.5 py-1.5 rounded text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-sm text-body-sm" href="#">
+<span class="flex items-center gap-2 truncate">
+<span class="text-secondary font-mono">#</span>
+<span class="truncate">exam-prep-archive</span>
+</span>
+</a>
+</div>
+</div>
+<div class="h-px bg-outline-variant/40 mx-3 my-1"></div>
+<!-- Section: Direct Messages -->
+<div class="py-2 px-3">
+<div class="flex items-center justify-between px-2 mb-1.5 text-secondary font-label-sm text-label-sm font-semibold tracking-wider">
+<span>PEER DIRECT MESSAGES</span>
+<button class="hover:text-primary transition-colors" title="New Message">
+<span class="material-symbols-outlined text-[16px]">edit_square</span>
+</button>
+</div>
+<div class="space-y-0.5">
+<!-- Elena Lindqvist -->
+<div class="flex items-center justify-between px-2.5 py-1.5 rounded hover:bg-surface-container-high cursor-pointer group transition-colors">
+<div class="flex items-center gap-2 truncate">
+<div class="relative w-6 h-6 rounded-full bg-primary-fixed text-primary font-label-sm flex items-center justify-center shrink-0">
+                EL
+                <span class="absolute bottom-0 right-0 w-2 h-2 bg-emerald-600 rounded-full ring-2 ring-surface-container-lowest"></span>
+</div>
+<span class="truncate font-body-sm text-body-sm text-on-surface">Prof. E. Lindqvist</span>
+</div>
+<span class="px-1 py-0.2 rounded bg-tertiary-fixed/60 border border-tertiary-fixed text-on-tertiary-fixed font-label-sm text-[10px]">Admin</span>
+</div>
+<!-- Julian Roy -->
+<div class="flex items-center justify-between px-2.5 py-1.5 rounded hover:bg-surface-container-high cursor-pointer group transition-colors">
+<div class="flex items-center gap-2 truncate">
+<div class="relative w-6 h-6 rounded-full bg-secondary-fixed text-on-secondary-fixed font-label-sm flex items-center justify-center shrink-0">
+                JR
+                <span class="absolute bottom-0 right-0 w-2 h-2 bg-emerald-600 rounded-full ring-2 ring-surface-container-lowest"></span>
+</div>
+<span class="truncate font-body-sm text-body-sm text-on-surface">Julian Roy</span>
+</div>
+<span class="material-symbols-outlined text-[14px] text-primary" title="Screen Sharing">screen_share</span>
+</div>
+<!-- Marcus Vance -->
+<div class="flex items-center justify-between px-2.5 py-1.5 rounded hover:bg-surface-container-high cursor-pointer group transition-colors">
+<div class="flex items-center gap-2 truncate">
+<div class="relative w-6 h-6 rounded-full bg-surface-container-high text-on-surface font-label-sm flex items-center justify-center shrink-0">
+                MV
+                <span class="absolute bottom-0 right-0 w-2 h-2 bg-amber-500 rounded-full ring-2 ring-surface-container-lowest"></span>
+</div>
+<span class="truncate font-body-sm text-body-sm text-on-surface-variant">Marcus Vance</span>
+</div>
+</div>
+<!-- Sarah Chen -->
+<div class="flex items-center justify-between px-2.5 py-1.5 rounded hover:bg-surface-container-high cursor-pointer group transition-colors">
+<div class="flex items-center gap-2 truncate">
+<div class="relative w-6 h-6 rounded-full bg-surface-container text-secondary font-label-sm flex items-center justify-center shrink-0">
+                SC
+                <span class="absolute bottom-0 right-0 w-2 h-2 bg-outline-variant rounded-full ring-2 ring-surface-container-lowest"></span>
+</div>
+<span class="truncate font-body-sm text-body-sm text-secondary">Sarah Chen</span>
+</div>
+</div>
+</div>
+</div>
+<div class="h-px bg-outline-variant/40 mx-3 my-1"></div>
+<!-- Section: Academic AI Assistant -->
+<div class="py-2 px-3 flex-1">
+<div class="flex items-center justify-between px-2 mb-1.5 text-secondary font-label-sm text-label-sm font-semibold tracking-wider">
+<span>ACADEMIC AI ASSISTANT</span>
+</div>
+<div class="bg-surface-container-low border border-outline-variant/60 rounded p-2.5 mb-2 hover:border-primary/40 transition-colors">
+<div class="flex items-center gap-1.5 text-primary font-semibold font-label-md text-label-md mb-1">
+<span class="material-symbols-outlined text-[16px] text-tertiary-container">auto_awesome</span>
+<span>Scholar AI Suite Core</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2">Active thread: Gram-Schmidt &amp; Hilbert Spaces validation engine.</p>
+</div>
+<button class="w-full flex items-center justify-center gap-2 py-1.5 px-3 rounded border border-outline-variant/80 bg-surface-container-lowest hover:bg-surface-container-high text-on-surface font-label-md text-label-md transition-colors">
+<span class="material-symbols-outlined text-[16px]">add</span>
+<span>New AI Proof Query</span>
+</button>
+</div>
+<!-- Left Column Footer (Peer audio status indicator) -->
+<div class="p-3 bg-surface-container-low border-t border-outline-variant/60">
+<div class="flex items-center justify-between text-body-sm font-body-sm">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+<span class="font-medium text-on-surface">Voice Connected</span>
+</div>
+<span class="font-label-sm text-label-sm text-secondary">42ms · 0% loss</span>
+</div>
+</div>
+</aside>
+<!-- ------------------------------------------------------------- -->
+<!-- COLUMN 2: CENTER ACTIVE DISCUSSION (Flexible Width) -->
+<!-- ------------------------------------------------------------- -->
+<section class="flex-1 flex flex-col bg-background min-w-0 border-r border-outline-variant/60">
+<!-- Channel Topic Header -->
+<div class="h-14 px-5 bg-surface-container-lowest border-b border-outline-variant/60 flex items-center justify-between shrink-0">
+<div class="flex flex-col min-w-0 pr-4">
+<div class="flex items-center gap-2">
+<span class="text-primary font-mono font-bold text-lg">#</span>
+<h1 class="font-headline-sm text-headline-sm font-semibold text-on-surface truncate">math-301-recitation</h1>
+<span class="px-2 py-0.5 rounded bg-surface-container text-secondary font-label-sm text-label-sm">LaTeX math rendering on</span>
+</div>
+<p class="font-body-sm text-body-sm text-secondary truncate">
+            Topic: Orthogonal projections, Gram-Schmidt algorithm &amp; Spectral decomposition theorem proofs.
+          </p>
+</div>
+<div class="flex items-center gap-2 shrink-0">
+<button class="flex items-center gap-1 px-2.5 py-1 rounded bg-surface-container-low border border-outline-variant/60 text-on-surface-variant hover:text-primary transition-colors font-label-md text-label-md">
+<span class="material-symbols-outlined text-[16px]">push_pin</span>
+<span class="hidden sm:inline">4 Pinned</span>
+</button>
+<button class="p-1 rounded text-on-surface-variant hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-[20px]">person_add</span>
+</button>
+</div>
+</div>
+<!-- Message Stream (Scrollable) -->
+<div class="flex-1 overflow-y-auto p-5 space-y-5">
+<!-- Divider: Date Anchor -->
+<div class="flex items-center my-2">
+<div class="flex-1 h-px bg-outline-variant/50"></div>
+<span class="px-3 py-0.5 text-secondary font-label-sm text-label-sm bg-surface-container rounded-full border border-outline-variant/40">Today, October 24 · Recitation Session 04</span>
+<div class="flex-1 h-px bg-outline-variant/50"></div>
+</div>
+<!-- MESSAGE 1: Dr. David Ross (Host) -->
+<div class="flex items-start gap-3 group">
+<div class="w-8 h-8 rounded bg-primary text-on-primary font-label-md font-semibold flex items-center justify-center shrink-0">
+            DR
+          </div>
+<div class="flex-1 min-w-0">
+<div class="flex items-baseline gap-2 mb-1">
+<span class="font-title-md text-title-md font-semibold text-on-surface">Dr. David Ross</span>
+<span class="font-label-sm text-label-sm text-primary font-medium px-1.5 py-0.2 rounded bg-primary-fixed/40">Host</span>
+<span class="font-body-sm text-body-sm text-secondary">10:14 AM</span>
+</div>
+<p class="text-on-surface text-body-md font-body-md leading-relaxed mb-2.5">
+              Good morning everyone. Welcome to the Week 4 synchronous recitation on inner product spaces. Please open Problem Set 4 and follow the notation introduced in Theorem 3.2.
+            </p>
+<!-- Citation Pill Attachment -->
+<div class="inline-flex items-center gap-2.5 px-3 py-2 rounded bg-surface-container-lowest border border-outline-variant/70 shadow-sm hover:border-primary/50 cursor-pointer transition-colors max-w-md">
+<div class="w-7 h-7 rounded bg-error-container text-on-error-container flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[17px]">picture_as_pdf</span>
+</div>
+<div class="min-w-0">
+<div class="font-label-md text-label-md font-medium text-on-surface truncate">Problem_Set_04_Vector_Spaces.pdf</div>
+<div class="font-label-sm text-label-sm text-secondary">1.4 MB · Verified suite preprint archive</div>
+</div>
+<span class="material-symbols-outlined text-[16px] text-secondary ml-auto">download</span>
+</div>
+</div>
+</div>
+<!-- MESSAGE 2: Prof. Elena Lindqvist (Admin) with LaTeX Rendered Block -->
+<div class="flex items-start gap-3 group">
+<div class="w-8 h-8 rounded bg-primary-fixed text-primary font-label-md font-semibold flex items-center justify-center shrink-0">
+            EL
+          </div>
+<div class="flex-1 min-w-0">
+<div class="flex items-baseline gap-2 mb-1">
+<span class="font-title-md text-title-md font-semibold text-on-surface">Prof. Elena Lindqvist</span>
+<span class="font-label-sm text-label-sm text-tertiary-container font-medium px-1.5 py-0.2 rounded bg-tertiary-fixed/60 border border-tertiary-fixed">Admin</span>
+<span class="font-body-sm text-body-sm text-secondary">10:18 AM</span>
+</div>
+<p class="text-on-surface text-body-md font-body-md leading-relaxed mb-2">
+              Note regarding Lemma 4.1: When projecting any vector \(v \in V\) onto the closed finite-dimensional subspace \(W = \text{span}\{u_1, \dots, u_k\}\) with an orthogonal basis:
+            </p>
+<!-- Rendered Academic LaTeX Block -->
+<div class="bg-surface-container-lowest border border-outline-variant/80 rounded-lg p-3.5 my-2 shadow-sm font-mono text-[15px] overflow-x-auto text-primary">
+<div class="flex items-center justify-between text-secondary font-sans font-label-sm text-label-sm mb-1 pb-1 border-b border-outline-variant/40">
+<span>Display Equation (4.2) · Subspace Orthogonal Projection</span>
+<span class="text-primary cursor-pointer hover:underline">Copy LaTeX</span>
+</div>
+<div class="text-center py-2 text-on-surface font-semibold tracking-wide">
+                P_W(v) = ∑<sub>i=1</sub><sup>k</sup> &amp;frac⟨v, u<sub>i</sub>⟩{ ‖u<sub>i</sub>‖<sup>2</sup> } · u<sub>i</sub>
+</div>
+</div>
+<p class="text-on-surface text-body-md font-body-md leading-relaxed mb-2">
+              Ensure you confirm the vectors \(\{u_i\}\) are mutually orthogonal before applying this closed expression directly.
+            </p>
+<!-- Academic Reaction Pills -->
+<div class="flex items-center gap-2 mt-2">
+<button class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-surface-container border border-outline-variant/60 text-on-surface font-label-sm text-label-sm hover:border-primary transition-colors">
+<span>👍</span>
+<span>4</span>
+</button>
+<button class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-secondary-container/40 border border-primary/30 text-primary font-label-sm text-label-sm font-medium">
+<span>💡</span>
+<span>6</span>
+</button>
+<button class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-surface-container border border-outline-variant/60 text-on-surface font-label-sm text-label-sm hover:border-primary transition-colors">
+<span>📐</span>
+<span>2</span>
+</button>
+<button class="p-1 rounded-full text-secondary hover:text-on-surface hover:bg-surface-container">
+<span class="material-symbols-outlined text-[16px]">add_reaction</span>
+</button>
+</div>
+</div>
+</div>
+<!-- MESSAGE 3: Julian Roy (Teaching Fellow) with Code Snippet -->
+<div class="flex items-start gap-3 group">
+<div class="w-8 h-8 rounded bg-secondary-fixed text-on-secondary-fixed font-label-md font-semibold flex items-center justify-center shrink-0">
+            JR
+          </div>
+<div class="flex-1 min-w-0">
+<div class="flex items-baseline gap-2 mb-1">
+<span class="font-title-md text-title-md font-semibold text-on-surface">Julian Roy</span>
+<span class="font-label-sm text-label-sm text-secondary font-medium px-1.5 py-0.2 rounded bg-surface-container">Teaching Fellow</span>
+<span class="font-body-sm text-body-sm text-secondary">10:22 AM</span>
+</div>
+<p class="text-on-surface text-body-md font-body-md leading-relaxed mb-2">
+              I put together a quick Python validation script using NumPy to check step-by-step orthogonality and Gram-Schmidt normalization on arbitrary finite matrices:
+            </p>
+<!-- Code block container with subtle academic border -->
+<div class="rounded-lg border border-outline-variant/80 bg-surface-container-lowest overflow-hidden my-2 shadow-sm font-mono text-[12px]">
+<div class="flex items-center justify-between px-3 py-1.5 bg-surface-container-low border-b border-outline-variant/50 text-secondary font-sans font-label-sm text-label-sm">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-error/70"></span>
+<span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+<span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+<span class="ml-1 text-on-surface font-medium">gram_schmidt_verifier.py</span>
+</div>
+<span>Python 3.11 · NumPy</span>
+</div>
+<pre class="p-3 text-on-surface overflow-x-auto leading-5"><code><span class="text-secondary"># Gram-Schmidt Orthonormalization</span>
+<span class="text-primary font-semibold">import</span> numpy <span class="text-primary font-semibold">as</span> np
+
+<span class="text-primary font-semibold">def</span> <span class="font-semibold text-tertiary-container">gram_schmidt</span>(V):
+    U = []
+    <span class="text-primary font-semibold">for</span> v <span class="text-primary font-semibold">in</span> V:
+        w = v - sum(np.dot(v, u) / np.dot(u, u) * u <span class="text-primary font-semibold">for</span> u <span class="text-primary font-semibold">in</span> U)
+        <span class="text-primary font-semibold">if</span> np.linalg.norm(w) &gt; 1e-10:
+            U.append(w / np.linalg.norm(w))
+    <span class="text-primary font-semibold">return</span> np.array(U)</code></pre>
+</div>
+</div>
+</div>
+<!-- MESSAGE 4: SCHOLAR AI Inline Academic Assistant Callout -->
+<div class="flex items-start gap-3 bg-surface-container-low/60 p-3.5 rounded-lg border border-primary/20 relative">
+<!-- Left blue vertical grounding line -->
+<div class="w-8 h-8 rounded bg-primary-container text-on-primary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[18px]">psychology</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between mb-1.5 flex-wrap gap-1">
+<div class="flex items-center gap-2">
+<span class="font-title-md text-title-md font-semibold text-primary">Scholar AI Assistant</span>
+<span class="flex items-center gap-1 px-2 py-0.5 rounded-full bg-tertiary-fixed text-on-tertiary-fixed font-label-sm text-label-sm border border-tertiary-fixed-dim font-medium">
+<span class="material-symbols-outlined text-[13px]">verified</span>
+<span>Verified by ArXiv &amp; MathSciNet</span>
+</span>
+</div>
+<span class="font-body-sm text-body-sm text-secondary">Response to @ScholarAI proof prompt</span>
+</div>
+<!-- Mathematical Reasoning Step -->
+<div class="space-y-2 text-on-surface font-body-md text-body-md leading-relaxed">
+<p>
+<strong>Verification Request:</strong> Cauchy-Schwarz inequality validation for the Hilbert projection step:
+              </p>
+<div class="p-2.5 rounded bg-surface-container-lowest border border-outline-variant/60 font-body-sm text-body-sm space-y-1.5">
+<div class="font-medium text-primary">Theorem Validation: Step 2.4</div>
+<p class="text-on-surface-variant">
+                  Given the Hilbert inner product space \(\mathcal{H}\), for all \(x, y \in \mathcal{H}\), the absolute value satisfies:
+                  <span class="font-mono text-on-surface font-semibold block text-center py-1">|⟨x, y⟩| ≤ ‖x‖ · ‖y‖</span>
+                  Equality holds if and only if \(x\) and \(y\) are linearly dependent.
+                </p>
+</div>
+<!-- Direct Citation Footnote -->
+<div class="flex items-center gap-2 text-secondary font-label-md text-label-md pt-1">
+<span class="material-symbols-outlined text-[15px] text-tertiary-container">auto_stories</span>
+<span>Direct Citation: <em>Conway, J. B. (1990). A Course in Functional Analysis (2nd ed.). Springer GTM 96, p. 14, Theorem 1.3.</em></span>
+</div>
+</div>
+<!-- AI Action Buttons -->
+<div class="flex items-center gap-2 mt-3 pt-2 border-t border-outline-variant/40">
+<button class="px-2.5 py-1 rounded bg-surface-container-lowest border border-outline-variant/60 text-on-surface font-label-sm text-label-sm hover:border-primary transition-colors flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">fact_check</span>
+<span>Expand Full Proof Trace</span>
+</button>
+<button class="px-2.5 py-1 rounded bg-surface-container-lowest border border-outline-variant/60 text-on-surface font-label-sm text-label-sm hover:border-primary transition-colors flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">bookmark_add</span>
+<span>Pin to Suite Bibliography</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Rich Academic Message Composer -->
+<div class="p-4 bg-surface-container-lowest border-t border-outline-variant/60 shrink-0">
+<div class="border border-outline-variant/80 rounded-lg bg-surface-container-lowest shadow-sm focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/15 transition-all">
+<!-- Text Input Area -->
+<textarea class="w-full p-3 font-body-md text-body-md text-on-surface placeholder:text-secondary bg-transparent resize-none border-0 focus:outline-none focus:ring-0" placeholder="Message #math-301-recitation or tag @ScholarAI for proof verification..." rows="2"></textarea>
+<!-- Formatting & Attachment Toolbar -->
+<div class="flex items-center justify-between px-3 py-2 border-t border-outline-variant/40 bg-surface-container-low/40">
+<div class="flex items-center gap-1 text-on-surface-variant">
+<button class="w-7 h-7 rounded flex items-center justify-center hover:bg-surface-container-high hover:text-on-surface transition-colors" title="Bold">
+<span class="font-bold text-sm">B</span>
+</button>
+<button class="w-7 h-7 rounded flex items-center justify-center hover:bg-surface-container-high hover:text-on-surface transition-colors" title="Italic">
+<span class="italic text-sm">I</span>
+</button>
+<button class="w-7 h-7 rounded flex items-center justify-center hover:bg-surface-container-high hover:text-on-surface transition-colors" title="Insert Code Block">
+<span class="material-symbols-outlined text-[18px]">code</span>
+</button>
+<button class="w-7 h-7 rounded flex items-center justify-center hover:bg-surface-container-high hover:text-primary transition-colors font-mono font-bold" title="Insert LaTeX Equation">
+                ∑
+              </button>
+<div class="h-4 w-px bg-outline-variant/60 mx-1"></div>
+<button class="w-7 h-7 rounded flex items-center justify-center hover:bg-surface-container-high hover:text-on-surface transition-colors" title="Attach Research Paper">
+<span class="material-symbols-outlined text-[18px]">attach_file</span>
+</button>
+<button class="w-7 h-7 rounded flex items-center justify-center hover:bg-surface-container-high hover:text-on-surface transition-colors" title="Record Voice Proof Note">
+<span class="material-symbols-outlined text-[18px]">mic</span>
+</button>
+<button class="px-2 py-0.5 rounded text-tertiary-container hover:bg-surface-container-high transition-colors font-label-sm text-label-sm font-semibold flex items-center gap-1" title="Tag Scholar AI">
+<span class="material-symbols-outlined text-[14px]">auto_awesome</span>
+<span>@ScholarAI</span>
+</button>
+</div>
+<!-- Primary Send Button -->
+<button class="h-8 px-4 rounded bg-primary-container text-on-primary hover:bg-primary font-label-md text-label-md font-semibold flex items-center gap-1.5 transition-colors shadow-sm">
+<span>Send</span>
+<span class="material-symbols-outlined text-[16px]">send</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- ------------------------------------------------------------- -->
+<!-- COLUMN 3: RIGHT FLOATING OVERLAY / VIDEO & COLLABORATORS (320px) -->
+<!-- ------------------------------------------------------------- -->
+<aside class="w-80 bg-surface-container-lowest border-l border-outline-variant/60 flex flex-col shrink-0 overflow-y-auto" id="call-overlay">
+<!-- Video Conference Header -->
+<div class="p-3.5 border-b border-outline-variant/60 bg-surface-container-low/50">
+<div class="flex items-center justify-between mb-1">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
+<h2 class="font-title-md text-title-md font-semibold text-on-surface">Active Session (5)</h2>
+</div>
+<span class="px-2 py-0.5 rounded bg-surface-container-high text-secondary font-label-sm text-[10px] font-mono">HD 1080p · Opus 48kHz</span>
+</div>
+<p class="font-label-sm text-label-sm text-secondary">MATH-301 Recitation Voice &amp; Canvas Grid</p>
+</div>
+<!-- Multi-Party Video Conference Participant Grid -->
+<div class="p-3 space-y-2.5">
+<!-- Tile 1: Dr. David Ross (Host - Active Speaker) -->
+<div class="relative h-32 rounded-lg bg-surface-container-high border-2 border-primary overflow-hidden shadow-sm flex items-center justify-center">
+<img class="w-full h-full object-cover" data-alt="A distinguished university professor in a modern academic office lined with research texts and calculus chalkboard notes. High-key natural daylight illuminates the scene with academic rigor and pristine clarity in deep navy and cool white tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBezq5f9wBGlTfeWOTpPwx4w1KK-eZ_cQGn4-3RL2ks3fRZkW3Z2XEL--YIvwe5hEEZa5Ztc49f54nUKsFSNE7wLPk965VWNARwOqYtdZ9KSGrOE8KbCTGVxuBZRPKKx58xwKcLHcJ7Ipe3-b6J7AubvdDWsdVrx4vC7AQqhQK0hLe2It1Rf92kEb8LtGIA9ym6rsBy4bXcQwJalUS_KXsoG4-XXBH7hH_1KPJLpo1O"/>
+<!-- Active waveform overlay -->
+<div class="absolute bottom-2 left-2 flex items-center gap-1.5 px-2 py-1 rounded bg-inverse-surface/80 text-inverse-on-surface backdrop-blur-sm font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[14px] text-emerald-400">mic</span>
+<span class="font-medium truncate max-w-[120px]">Dr. Ross (Host)</span>
+<span class="w-1.5 h-3 bg-emerald-400 rounded-full animate-pulse ml-0.5"></span>
+</div>
+</div>
+<!-- Tile 2: Prof. Elena Lindqvist -->
+<div class="relative h-28 rounded-lg bg-surface-container-high border border-outline-variant/60 overflow-hidden shadow-sm flex items-center justify-center">
+<img class="w-full h-full object-cover" data-alt="A senior academic mathematics researcher sitting before an organized collaborative workspace with clean lines and soft architectural daylight. The atmosphere conveys intellectual precision and scholarship in subtle cool slate tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBlQNOVjHQeZ53SpyMLcEwqAKu7JHd4BaLP_27AGRP1Lh6jVmOIVI1vG6sFxJp5-gkf3fl6T2s23KFoe9oisQn-JITh7dJCpDrgu7PZKXibIf01JDCsqjBXw8yDsBSnCp9wCkl458rwTWMrP1k4bMqvVU9eJEcYkDYPUpoBWswdZGQDBLBzrUyuzPzkZtwweMXWxlYRO6kTdMzhnU-znADsrVJBEac1-sWS8Ot4z_84"/>
+<div class="absolute bottom-2 left-2 flex items-center gap-1.5 px-2 py-0.5 rounded bg-inverse-surface/80 text-inverse-on-surface backdrop-blur-sm font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[13px] text-error">mic_off</span>
+<span class="font-medium truncate max-w-[120px]">Prof. E. Lindqvist</span>
+</div>
+<span class="absolute top-2 right-2 px-1.5 py-0.2 rounded bg-surface-container-lowest/90 text-on-surface font-label-sm text-[10px] border border-outline-variant/40">Uppsala Univ</span>
+</div>
+<!-- Tile 3: Julian Roy (Screen Sharing Live Whiteboard) -->
+<div class="relative h-32 rounded-lg bg-surface-container-low border border-primary/50 overflow-hidden shadow-sm">
+<img class="w-full h-full object-cover" data-alt="A clean collaborative digital whiteboard interface displaying mathematical vector diagrams, coordinate axes, and handwritten orthogonal proof derivations with minimal noise and precise blue line geometry." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBBfIptldYQZsw_6qDnM7-MvSbWE1LQU2Av59htBKarHi15kZoSOHhElysNx_qEiG98SGYSzA3vy3xv0Cj7XyMfFSfU4qNhrB27tc41zknY3RYV4MJYOCrGdOEvMaDJ9aLIsz4FMcUEkk4KHM2zp-fk_qXy7YLfSYOcI1U0-yDiN5Gszd7bQHMFR4DoMj_WKWQFbz5GuoUE7KyojZ4y5vtHdT8ZqDPsUeXHJ8xWMKAw"/>
+<div class="absolute inset-0 bg-primary/5 pointer-events-none"></div>
+<div class="absolute top-2 left-2 px-2 py-0.5 rounded bg-primary text-on-primary font-label-sm text-[11px] font-semibold flex items-center gap-1 shadow-sm">
+<span class="material-symbols-outlined text-[13px]">screen_share</span>
+<span>Viewing Stream: J. Roy</span>
+</div>
+<div class="absolute bottom-2 right-2">
+<button class="p-1 rounded bg-inverse-surface/80 text-inverse-on-surface hover:bg-inverse-surface transition-colors" title="Expand Whiteboard">
+<span class="material-symbols-outlined text-[15px]">fullscreen</span>
+</button>
+</div>
+</div>
+<!-- Two small tiles side by side: Marcus Vance & Sarah Chen -->
+<div class="grid grid-cols-2 gap-2">
+<!-- Marcus Vance (Audio Only) -->
+<div class="h-20 rounded-lg bg-surface-container border border-outline-variant/60 flex flex-col items-center justify-center p-2 relative">
+<div class="w-8 h-8 rounded-full bg-surface-container-high text-on-surface font-label-md font-semibold flex items-center justify-center mb-1">
+              MV
+            </div>
+<span class="font-label-sm text-[11px] text-on-surface truncate max-w-full">Marcus Vance</span>
+<div class="absolute bottom-1 right-1">
+<span class="material-symbols-outlined text-[12px] text-emerald-600">graphic_eq</span>
+</div>
+</div>
+<!-- Sarah Chen (Camera Off) -->
+<div class="h-20 rounded-lg bg-surface-container border border-outline-variant/60 flex flex-col items-center justify-center p-2 relative">
+<div class="w-8 h-8 rounded-full bg-surface-variant text-secondary font-label-md font-semibold flex items-center justify-center mb-1">
+              SC
+            </div>
+<span class="font-label-sm text-[11px] text-secondary truncate max-w-full">Sarah Chen</span>
+<div class="absolute bottom-1 right-1">
+<span class="material-symbols-outlined text-[12px] text-outline">mic_off</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Quick Call Control Strip Inside Video Column -->
+<div class="mx-3 p-2 rounded-lg bg-surface-container-low border border-outline-variant/60 flex items-center justify-around">
+<button class="p-2 rounded-md hover:bg-surface-container-high text-on-surface-variant transition-colors" title="Toggle Mic">
+<span class="material-symbols-outlined text-[18px]">mic</span>
+</button>
+<button class="p-2 rounded-md hover:bg-surface-container-high text-on-surface-variant transition-colors" title="Toggle Video">
+<span class="material-symbols-outlined text-[18px]">videocam</span>
+</button>
+<button class="p-2 rounded-md hover:bg-surface-container-high text-primary transition-colors" title="Share Screen">
+<span class="material-symbols-outlined text-[18px]">present_to_all</span>
+</button>
+<button class="p-2 rounded-md bg-error/10 hover:bg-error/20 text-error transition-colors" title="Leave Call">
+<span class="material-symbols-outlined text-[18px]">call_end</span>
+</button>
+</div>
+<div class="h-px bg-outline-variant/40 mx-3 my-3"></div>
+<!-- Sidebar Tab: Shared Citations & Quick Notes -->
+<div class="px-3 pb-4 flex-1">
+<div class="flex items-center justify-between mb-2">
+<span class="font-label-sm text-label-sm font-semibold text-secondary tracking-wider">PINNED CITATIONS &amp; DOCS</span>
+<span class="font-label-sm text-label-sm text-primary cursor-pointer hover:underline">View All</span>
+</div>
+<div class="space-y-1.5 font-body-sm text-body-sm">
+<div class="p-2 rounded border border-outline-variant/50 hover:bg-surface-container-low cursor-pointer transition-colors bg-surface-container-lowest">
+<div class="font-medium text-on-surface truncate">Hilbert_Spaces_Reference_Card.pdf</div>
+<div class="text-secondary font-label-sm text-[11px]">Pinned by Dr. Ross · Page 4 highlighted</div>
+</div>
+<div class="p-2 rounded border border-outline-variant/50 hover:bg-surface-container-low cursor-pointer transition-colors bg-surface-container-lowest">
+<div class="font-medium text-on-surface truncate">ArXiv:2308.10928v2 [math.FA]</div>
+<div class="text-secondary font-label-sm text-[11px]">Spectral theory for unbounded self-adjoint ops</div>
+</div>
+<div class="p-2 rounded border border-outline-variant/50 hover:bg-surface-container-low cursor-pointer transition-colors bg-surface-container-lowest">
+<div class="font-medium text-on-surface truncate">LaTeX Quick Scratchpad</div>
+<div class="text-secondary font-label-sm text-[11px]">Last edited 4m ago by Julian Roy</div>
+</div>
+</div>
+</div>
+</aside>
+</main>
+<!-- ========================================================================= -->
+<!-- 4. BOTTOM UTILITY DOCK (54px Signature Floating Dock) -->
+<!-- ========================================================================= -->
+<footer class="h-[54px] bg-surface-container-lowest border-t border-outline-variant/60 px-6 flex items-center justify-between shrink-0 z-30 shadow-md">
+<!-- Left Workspace Anchor -->
+<div class="flex items-center gap-3">
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded hover:bg-surface-container-high text-on-surface font-label-md text-label-md transition-colors" title="Suite Hub">
+<span class="material-symbols-outlined text-[18px]">grid_view</span>
+<span class="hidden sm:inline">Suite Hub</span>
+</button>
+<div class="h-4 w-px bg-outline-variant/60"></div>
+<!-- Active Chat Indicator Button -->
+<button class="relative flex items-center gap-1.5 px-3 py-1.5 rounded bg-secondary-container/40 text-primary font-label-md text-label-md font-semibold border border-secondary-container">
+<span class="material-symbols-outlined text-[18px]">forum</span>
+<span>Suite Chat</span>
+<span class="w-1.5 h-1.5 rounded-full bg-primary absolute -top-0.5 -right-0.5"></span>
+</button>
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded hover:bg-surface-container-high text-on-surface-variant font-label-md text-label-md transition-colors" title="Open Whiteboard">
+<span class="material-symbols-outlined text-[18px]">draw</span>
+<span class="hidden md:inline">Whiteboard</span>
+</button>
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded hover:bg-surface-container-high text-on-surface-variant font-label-md text-label-md transition-colors" title="Suite Documents">
+<span class="material-symbols-outlined text-[18px]">folder</span>
+<span class="hidden md:inline">Documents</span>
+</button>
+</div>
+<!-- Center Call Controls (Global Dock) -->
+<div class="flex items-center gap-2">
+<!-- Mute Mic Toggle -->
+<button class="h-9 px-3 rounded-md bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-label-md text-label-md flex items-center gap-1.5 transition-colors border border-outline-variant/40" title="Mute Microphone">
+<span class="material-symbols-outlined text-[18px]">mic</span>
+<span class="hidden sm:inline">Mute</span>
+</button>
+<!-- Camera Toggle -->
+<button class="h-9 px-3 rounded-md bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-label-md text-label-md flex items-center gap-1.5 transition-colors border border-outline-variant/40" title="Toggle Camera">
+<span class="material-symbols-outlined text-[18px]">videocam</span>
+<span class="hidden sm:inline">Camera</span>
+</button>
+<!-- Screen Share -->
+<button class="h-9 px-3 rounded-md bg-surface-container-high hover:bg-surface-container-highest text-primary font-label-md text-label-md flex items-center gap-1.5 transition-colors border border-outline-variant/40" title="Share Screen">
+<span class="material-symbols-outlined text-[18px]">screen_share</span>
+<span class="hidden lg:inline">Share</span>
+</button>
+<!-- Red Leave Call -->
+<button class="h-9 px-3.5 rounded-md bg-error text-on-error hover:bg-error/90 font-label-md text-label-md font-semibold flex items-center gap-1.5 transition-colors shadow-sm ml-1" title="Leave Current Session">
+<span class="material-symbols-outlined text-[18px]">call_end</span>
+<span>Leave Call</span>
+</button>
+</div>
+<!-- Right Floating Notes trigger -->
+<div class="flex items-center gap-2">
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded hover:bg-surface-container-high text-on-surface-variant font-label-md text-label-md transition-colors" title="Toggle Scratch Notes">
+<span class="material-symbols-outlined text-[18px]">edit_note</span>
+<span class="hidden sm:inline">Scratchpad</span>
+</button>
+</div>
+</footer>
+</body></html>
