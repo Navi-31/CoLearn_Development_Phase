@@ -260,6 +260,11 @@
         window.CONFIG.API_BASE = publicBackend;
         window.CONFIG.IS_CONFIGURED = true;
 
+        if (data.firebase && typeof data.firebase === 'object') {
+          window.CONFIG.FIREBASE = Object.assign({}, window.CONFIG.FIREBASE, data.firebase);
+          window.__FIREBASE_CONFIG__ = window.CONFIG.FIREBASE;
+        }
+
         // Dynamically derive WebSocket URL (https -> wss, http -> ws, append /ws/video)
         try {
           const parsed = new URL(publicBackend);

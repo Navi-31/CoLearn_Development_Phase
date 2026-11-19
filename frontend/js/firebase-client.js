@@ -102,6 +102,13 @@
     }
   };
 
+  window.isFirebaseConfigured = function () {
+    const cfg = getActiveConfig();
+    return Boolean(!isPlaceholderConfig(cfg) && window.fsAuth);
+  };
+
+  window.getActiveFirebaseConfig = getActiveConfig;
+
   let _configFetchPromise = null;
 
   /**
@@ -127,7 +134,7 @@
             if (window.CONFIG) window.CONFIG.FIREBASE = cfgRes.firebase;
             activeConfig = cfgRes.firebase;
             await window.initFirebaseClient(cfgRes.firebase);
-            return Boolean(window.fsAuth);
+            return window.isFirebaseConfigured();
           }
         }
       } catch (e) {
@@ -135,7 +142,7 @@
       } finally {
         _configFetchPromise = null;
       }
-      return Boolean(window.fsAuth);
+      return window.isFirebaseConfigured();
     })();
 
     return _configFetchPromise;

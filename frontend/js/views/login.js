@@ -45,32 +45,34 @@ function toggleLoginPassword() {
 function getFirebaseAuthErrorMessage(err) {
   if (!err) return 'Login failed. Please try again.';
   const code = (err.code || '').toLowerCase();
-  switch (code) {
-    case 'auth/invalid-credential':
-    case 'auth/wrong-password':
-    case 'auth/user-not-found':
-      return 'Incorrect email or password. Please try again.';
-    case 'auth/invalid-email':
-      return 'Please enter a valid email address.';
-    case 'auth/user-disabled':
-      return 'This account has been disabled. Please contact support.';
-    case 'auth/too-many-requests':
-      return 'Access temporarily disabled due to many failed login attempts. Please reset your password or try again later.';
-    case 'auth/network-request-failed':
-      return 'Network connection error. Please check your internet connection.';
-    case 'auth/api-key-not-valid':
-    case 'auth/invalid-api-key':
-      return 'Firebase Web API key is not valid. Please verify your Firebase project configuration.';
-    default:
-      return err.message || 'Login failed. Please check your credentials or try again.';
+  const msg  = (err.message || '').toLowerCase();
+
+  if (code.includes('api-key') || msg.includes('api-key') || code.includes('invalid-api-key')) {
+    return 'Firebase Web API key is not valid or could not be loaded from backend. Please verify your backend server is running.';
   }
+  if (code.includes('invalid-credential') || code.includes('wrong-password') || code.includes('user-not-found')) {
+    return 'Incorrect email or password. Please try again.';
+  }
+  if (code.includes('invalid-email')) {
+    return 'Please enter a valid email address.';
+  }
+  if (code.includes('user-disabled')) {
+    return 'This account has been disabled. Please contact support.';
+  }
+  if (code.includes('too-many-requests')) {
+    return 'Access temporarily disabled due to many failed login attempts. Please reset your password or try again later.';
+  }
+  if (code.includes('network-request-failed') || msg.includes('network') || msg.includes('failed to fetch')) {
+    return 'Network connection error. Please check your internet connection.';
+  }
+  return err.message || 'Login failed. Please check your credentials or try again.';
 }
 
 async function handleLogin() {
   const email   = document.getElementById('login-email').value.trim().toLowerCase();
   const pw      = document.getElementById('login-password').value;
   const alertEl = document.getElementById('login-alert');
-  const btn     = document.querySelector('#view-login .btn-primary');
+  const btn     = document.querySelector('#view-login .btn-primary') || document.getElementById('btn-login-submit');
 
   // Clear any stale error immediately (before the async request)
   alertEl.className = 'hidden';
@@ -91,11 +93,16 @@ async function handleLogin() {
       await window.ensureFirebaseClientReady().catch(() => {});
     }
 
-    // Verify Firebase Client Auth is initialized
-    if (typeof window.fsAuth === 'undefined' || !window.fsAuth || typeof window.fsAuth.signInWithEmailAndPassword !== 'function') {
-      const errorMsg = 'Firebase client authentication service is not ready. Please verify project configuration.';
-      console.warn('[Login] Firebase Client Auth service unavailable.');
+    // Verify Firebase Client Auth is initialized and configured with valid credentials
+    const isConfigured = (typeof window.isFirebaseConfigured === 'function')
+      ? window.isFirebaseConfigured()
+      : (typeof window.fsAuth !== 'undefined' && window.fsAuth && typeof window.fsAuth.signInWithEmailAndPassword === 'function');
+
+    if (!isConfigured) {
+      const errorMsg = '⚠️ Cannot connect to backend server or Firebase authentication service is not ready. Please ensure the backend server is running.';
+      console.warn('[Login] Firebase Client Auth service unavailable or using placeholder configuration.');
       showTempError(alertEl, errorMsg, 6000);
+      if (btn) { btn.disabled = false; btn.textContent = 'Sign In'; }
       return;
     }
 
@@ -113,11 +120,13 @@ async function handleLogin() {
       console.warn('[Login] Firebase Client SDK authentication failed:', clientAuthErr.code || clientAuthErr.message);
       const friendlyMsg = getFirebaseAuthErrorMessage(clientAuthErr);
       showTempError(alertEl, friendlyMsg, 6000);
+      if (btn) { btn.disabled = false; btn.textContent = 'Sign In'; }
       return; // Strict halt: never fall back to unauthenticated backend call
     }
 
     if (!idToken) {
       showTempError(alertEl, 'Failed to obtain authentication token. Please try again.', 6000);
+      if (btn) { btn.disabled = false; btn.textContent = 'Sign In'; }
       return;
     }
 
