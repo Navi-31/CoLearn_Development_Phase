@@ -15,6 +15,11 @@ function navigate(viewId, fromPopState = false) {
   if (!target) { console.error('Unknown view:', viewId); return; }
   target.classList.add('active');
 
+  // Track active view in sessionStorage to distinguish in-session refreshes from initial visits
+  try {
+    sessionStorage.setItem('colearn_active_view', viewId);
+  } catch (_) {}
+
   // Scroll to top when navigating views
   window.scrollTo(0, 0);
 
@@ -74,17 +79,11 @@ window.addEventListener('popstate', event => {
       navigate('view-login', true);
       return;
     }
-    const isAuthPage = state.view === 'view-login' || state.view === 'view-signup' || state.view === 'view-forgot';
-    if (AppState.currentUser && isAuthPage) {
-      history.pushState({ view: 'view-dashboard' }, '');
-      navigate('view-dashboard', true);
-      return;
-    }
+    // Do NOT auto-redirect users from auth pages to view-dashboard even if AppState.currentUser exists.
+    // Users must be able to view the login form, enter credentials, use browser autofill, or re-authenticate.
     navigate(state.view, true);
   } else {
-    if (!AppState.currentUser) {
-      navigate('view-landing', true);
-    }
+    navigate('view-landing', true);
   }
 });
 
@@ -143,7 +142,17 @@ async function initApp() {
 }
 
 function _initAppNav(hadSession) {
-  if (hadSession) {
+  // Determine if this is an explicit in-session refresh on an authenticated page (workspace or dashboard)
+  let lastActiveView = '';
+  try {
+    lastActiveView = sessionStorage.getItem('colearn_active_view') || '';
+  } catch (_) {}
+
+  const stateView = history.state && history.state.view;
+  const targetView = stateView || lastActiveView;
+  const isAuthSessionRefresh = hadSession && (targetView === 'view-dashboard' || targetView === 'view-workspace');
+
+  if (isAuthSessionRefresh) {
     // Check if we were in a suite when we refreshed
     if (AppState.currentSuite && AppState.currentSuite.id) {
       // Verify suite still exists, then navigate to workspace
@@ -176,12 +185,12 @@ function _initAppNav(hadSession) {
         navigate('view-workspace', true);
       }
     } else {
-      // Logged in, no active suite — go to dashboard
+      // Logged in, was on dashboard — restore dashboard
       history.replaceState({ view: 'view-dashboard' }, '');
       navigate('view-dashboard', true);
     }
   } else {
-    // No session — check if path explicitly asks for auth view
+    // Not an active protected session refresh — check if path explicitly requests an auth route
     const path = (window.location.pathname || '').replace(/\/$/, '');
     if (path === '/login' || path.endsWith('/login')) {
       history.replaceState({ view: 'view-login' }, '');
@@ -193,7 +202,7 @@ function _initAppNav(hadSession) {
       history.replaceState({ view: 'view-forgot' }, '');
       navigate('view-forgot', true);
     } else {
-      // Root / first page: show landing page
+      // Root / landing visit: always show landing page
       history.replaceState({ view: 'view-landing' }, '');
       navigate('view-landing', true);
     }

@@ -219,6 +219,13 @@ window.DocumentService = new DocumentServiceClass();
 /* ══ Drive OAuth connection state ════════════════════════════════ */
 var _driveConnected = null; // null=unknown, true=connected, false=not connected
 var _driveEmail     = '';
+try {
+  var _cachedDrive = sessionStorage.getItem('colearn_drive_connected');
+  if (_cachedDrive !== null) {
+    _driveConnected = _cachedDrive === '1';
+    _driveEmail = sessionStorage.getItem('colearn_drive_email') || '';
+  }
+} catch (_) {}
 
 async function _checkDriveStatus() {
   if (!window.AppState || !window.AppState.currentUser) return false;
@@ -226,10 +233,20 @@ async function _checkDriveStatus() {
     var data = await API.getDriveStatus();
     _driveConnected = data.connected === true;
     _driveEmail     = data.googleEmail || '';
+    try {
+      if (_driveConnected) {
+        sessionStorage.setItem('colearn_drive_connected', '1');
+        sessionStorage.setItem('colearn_drive_email', _driveEmail);
+      } else {
+        sessionStorage.setItem('colearn_drive_connected', '0');
+        sessionStorage.removeItem('colearn_drive_email');
+      }
+    } catch (_) {}
     _updateDriveStatusBadge();
     return _driveConnected;
   } catch (e) {
     _driveConnected = false;
+    _updateDriveStatusBadge();
     return false;
   }
 }
@@ -238,34 +255,61 @@ function _updateDriveStatusBadge() {
   if (window.DocumentService) {
     window.DocumentService.driveConnected = _driveConnected;
   }
-  var badge      = document.getElementById('drive-status-badge');
-  var homeBadge  = document.getElementById('drive-status-badge-home');
-  var emailEl    = document.getElementById('drive-connected-email');
-  var banner     = document.getElementById('drive-connect-banner');
-  var homeBanner = document.getElementById('drive-connect-banner-home');
+  var badge         = document.getElementById('drive-status-badge');
+  var homeBadge     = document.getElementById('drive-status-badge-home');
+  var emailEl       = document.getElementById('drive-connected-email');
+  var banner        = document.getElementById('drive-connect-banner');
+  var homeBanner    = document.getElementById('drive-connect-banner-home');
+  var btnConnect    = document.getElementById('btn-connect-drive');
+  var btnDisconnect = document.getElementById('btn-disconnect-drive');
 
   if (_driveConnected) {
     if (badge) {
-      badge.style.display = 'flex';
-      badge.style.color   = 'var(--c-green)';
-      badge.innerHTML     = '✅ Connected' + (_driveEmail ? ' · ' + escapeHtml(_driveEmail) : '');
+      badge.style.display = 'inline-flex';
+      badge.className     = 'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-[#E6F4EA] text-[#137333] border border-[#CEEAD6]';
+      badge.innerHTML     = '<span class="w-1.5 h-1.5 rounded-full bg-[#137333]"></span><span>Connected' + (_driveEmail ? ' · ' + escapeHtml(_driveEmail) : '') + '</span>';
     }
     if (homeBadge) {
-      homeBadge.style.display = 'flex';
-      homeBadge.style.color   = 'var(--c-green)';
-      homeBadge.innerHTML     = '✅ Connected' + (_driveEmail ? ' · ' + escapeHtml(_driveEmail) : '');
+      homeBadge.style.display = 'inline-flex';
+      homeBadge.className     = 'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-[#E6F4EA] text-[#137333] border border-[#CEEAD6]';
+      homeBadge.innerHTML     = '<span class="w-1.5 h-1.5 rounded-full bg-[#137333]"></span><span>Connected' + (_driveEmail ? ' · ' + escapeHtml(_driveEmail) : '') + '</span>';
     }
-    if (emailEl) emailEl.textContent = _driveEmail;
+    if (emailEl) {
+      emailEl.textContent = _driveEmail
+        ? 'Connected to Google Drive as ' + _driveEmail
+        : 'Google Drive is connected and synchronizing with your suite repository.';
+    }
+    if (btnConnect) {
+      btnConnect.style.display = 'none';
+    }
+    if (btnDisconnect) {
+      btnDisconnect.style.display = 'inline-flex';
+      btnDisconnect.disabled = false;
+      btnDisconnect.innerHTML = '<span class="material-symbols-outlined text-sm text-[#BA1A1A]">link_off</span><span>Disconnect Drive</span>';
+    }
     if (banner) banner.style.display = 'none';
     if (homeBanner) homeBanner.style.display = 'none';
   } else {
     if (badge) {
-      badge.style.color = 'var(--c-slate)';
-      badge.innerHTML   = '⚠️ Not connected';
+      badge.style.display = 'inline-flex';
+      badge.className     = 'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-[#F6F3F2] text-[#587D90] border border-[#E1DFE2]';
+      badge.innerHTML     = '<span class="w-1.5 h-1.5 rounded-full bg-[#8E9099]"></span><span>Not Connected</span>';
     }
     if (homeBadge) {
-      homeBadge.style.color = 'var(--c-slate)';
-      homeBadge.innerHTML   = '⚠️ Not connected';
+      homeBadge.style.display = 'inline-flex';
+      homeBadge.className     = 'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-[#F6F3F2] text-[#587D90] border border-[#E1DFE2]';
+      homeBadge.innerHTML     = '<span class="w-1.5 h-1.5 rounded-full bg-[#8E9099]"></span><span>Not Connected</span>';
+    }
+    if (emailEl) {
+      emailEl.textContent = 'Authorize your personal Google Drive to synchronize lecture slides and study files.';
+    }
+    if (btnConnect) {
+      btnConnect.style.display = 'inline-flex';
+      btnConnect.disabled = false;
+      btnConnect.innerHTML = '<span class="material-symbols-outlined text-sm">link</span><span>Connect Google Drive</span>';
+    }
+    if (btnDisconnect) {
+      btnDisconnect.style.display = 'none';
     }
     if (banner) banner.style.display = 'flex';
     if (homeBanner) homeBanner.style.display = 'flex';
@@ -312,12 +356,18 @@ async function connectGoogleDrive() {
 
       if (event.data.success) {
         _driveConnected = true;
+        _driveEmail     = event.data.email || _driveEmail || '';
+        try {
+          sessionStorage.setItem('colearn_drive_connected', '1');
+          if (_driveEmail) sessionStorage.setItem('colearn_drive_email', _driveEmail);
+        } catch (_) {}
         _updateDriveStatusBadge();
         _checkDriveStatus(); // fetches email + updates badge
         showToast('main-toast', '✅ Google Drive connected! Resuming upload…', 'dark');
         _resumePendingUploads(); // ← auto-start all queued files
       } else {
         showToast('main-toast', '⚠️ Drive connection failed: ' + (event.data.message || 'Unknown error'), 'dark');
+        _updateDriveStatusBadge();
       }
     }
     window.addEventListener('message', handleOAuthMessage);
@@ -340,9 +390,46 @@ async function connectGoogleDrive() {
   } catch (e) {
     showToast('main-toast', '⚠️ ' + e.message, 'dark');
   } finally {
-    if (btn) { btn.disabled = false; btn.textContent = '🔗 Connect Google Drive'; }
+    if (btn && !_driveConnected) {
+      btn.disabled = false;
+      btn.innerHTML = '<span class="material-symbols-outlined text-sm">link</span><span>Connect Google Drive</span>';
+    }
   }
 }
+
+/* ══ Disconnect Google Drive ═════════════════════════════════════ */
+async function disconnectGoogleDrive() {
+  var btn = document.getElementById('btn-disconnect-drive');
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<span class="material-symbols-outlined text-sm animate-spin">sync</span><span>Disconnecting…</span>';
+  }
+
+  try {
+    var data = await API.disconnectDrive();
+    if (data && data.success) {
+      _driveConnected = false;
+      _driveEmail = '';
+      try {
+        sessionStorage.setItem('colearn_drive_connected', '0');
+        sessionStorage.removeItem('colearn_drive_email');
+      } catch (_) {}
+      _updateDriveStatusBadge();
+      showToast('main-toast', 'Google Drive disconnected.', 'dark');
+      if (window.AppState && window.AppState.currentSuite && window.AppState.currentSuite.id && typeof loadSuiteDriveFiles === 'function') {
+        loadSuiteDriveFiles(window.AppState.currentSuite.id);
+      }
+    } else {
+      showToast('main-toast', '⚠️ Failed to disconnect: ' + ((data && data.error) || 'Unknown error'), 'dark');
+      _updateDriveStatusBadge();
+    }
+  } catch (err) {
+    console.error('[Drive] Disconnect failed:', err);
+    showToast('main-toast', '⚠️ Disconnect error: ' + (err.message || 'Server error'), 'dark');
+    _updateDriveStatusBadge();
+  }
+}
+window.disconnectGoogleDrive = disconnectGoogleDrive;
 
 /* ══ handleDocumentUpload – entry point from "Upload Document" btn ═ */
 async function handleDocumentUpload() {
@@ -1488,7 +1575,11 @@ function _initDragAndDrop() {
 
 // Initialize on DOM ready
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', _initDragAndDrop);
+  document.addEventListener('DOMContentLoaded', function() {
+    _initDragAndDrop();
+    _updateDriveStatusBadge();
+  });
 } else {
   _initDragAndDrop();
+  _updateDriveStatusBadge();
 }

@@ -98,6 +98,9 @@ const AppState = {
       localStorage.removeItem('fs_user');
       localStorage.removeItem('fs_suite');
       localStorage.removeItem('fs_token');
+      sessionStorage.removeItem('colearn_active_view');
+      sessionStorage.removeItem('colearn_drive_connected');
+      sessionStorage.removeItem('colearn_drive_email');
     } catch (e) {
       console.warn('[AppState] Could not clear session:', e.message);
     }
