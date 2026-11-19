@@ -430,7 +430,7 @@
   </section>
 
   <!-- VIEW 3: SIGNUP (#view-signup) -->
-  <section id="view-signup" class="view flex flex-col min-h-screen bg-[#FFFAFA] items-center justify-center p-4">
+  <section id="view-signup" class="view flex flex-col min-h-screen bg-[#FFFAFA] items-center justify-start sm:justify-center p-4 py-8 overflow-y-auto">
     <div class="w-full max-w-lg my-auto">
       <!-- Mode Tabs -->
       <div class="flex border-b border-[#E1DFE2] mb-6">
@@ -449,11 +449,11 @@
       <div class="bg-white border border-[#E1DFE2] rounded-xl p-6 sm:p-8 shadow-[0_4px_20px_rgba(45,67,88,0.08)]">
         <div class="text-center mb-6">
           <h2 class="text-xl font-bold text-[#2C2C2C]">Create Academic Account</h2>
-          <p class="text-xs text-[#587D90] mt-1" id="signup-step-subtext">Join study suites and collaborate with peers.</p>
+          <p class="text-xs text-[#587D90] mt-1" id="signup-step-subtext">Step 1 of 2: Researcher Profile &amp; Credentials</p>
           <!-- Stepper Indicator -->
           <div class="flex items-center justify-center gap-2 mt-4">
-            <div id="step-bar-1" class="h-1.5 w-16 rounded-full bg-[#0247AE]"></div>
-            <div id="step-bar-2" class="h-1.5 w-16 rounded-full bg-[#E1DFE2]"></div>
+            <div id="step-bar-1" class="h-1.5 w-16 rounded-full bg-[#0247AE] transition-colors"></div>
+            <div id="step-bar-2" class="h-1.5 w-16 rounded-full bg-[#E1DFE2] transition-colors"></div>
           </div>
         </div>
 
@@ -495,41 +495,69 @@
             </div>
 
             <div id="signup-continue-section">
-              <button type="button" id="btn-signup-continue" onclick="handleSignupContinue()" class="btn-primary-stitch w-full py-2.5 rounded-md font-semibold text-sm cursor-pointer shadow-sm">
-                Continue to Verification
+              <button type="button" id="btn-signup-continue" onclick="handleSignupContinue()" class="btn-primary-stitch w-full py-2.5 rounded-md font-semibold text-sm cursor-pointer shadow-sm flex items-center justify-center gap-2">
+                <span>Continue to Verification</span>
+                <span class="material-symbols-outlined text-base">arrow_forward</span>
               </button>
             </div>
           </div>
         </div>
 
         <!-- Stage 2: OTP Verification -->
-        <div id="signup-stage-2" style="display:none;" class="space-y-4 pt-2">
-          <div class="p-3 bg-[#EBF8FF] border border-[#CEE5FF] rounded-md text-xs text-[#0247AE]">
-            We sent a 6-digit confirmation code to your email. Enter the code below to complete registration.
+        <div id="signup-stage-2" style="display:none;" class="space-y-4 pt-1">
+          <div class="p-3.5 bg-[#EBF8FF] border border-[#CEE5FF] rounded-lg text-xs text-[#0247AE] space-y-1">
+            <div class="font-semibold flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-sm">mark_email_read</span>
+              <span>Verification Code Sent</span>
+            </div>
+            <div class="leading-relaxed">
+              Enter the 6-digit confirmation code sent to <strong id="signup-otp-email" class="font-bold underline text-[#0247AE]">your institutional email</strong>.
+            </div>
           </div>
 
-          <div>
-            <label class="block text-xs font-semibold text-[#2C2C2C] mb-1 text-center" for="signup-otp">Verification OTP</label>
-            <input id="signup-otp" type="text" maxlength="6" placeholder="••••••" class="input-stitch text-center tracking-widest text-lg font-mono"/>
+          <div class="space-y-2">
+            <label class="block text-xs font-semibold text-[#2C2C2C] text-center" for="signup-otp-1">Enter 6-Digit Authorization Code</label>
+            <div class="flex justify-between items-center gap-1.5 sm:gap-2 max-w-[320px] mx-auto py-1" id="signup-otp-cluster">
+              <input id="signup-otp-1" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" autocomplete="one-time-code" class="otp-digit-box w-10 sm:w-11 h-12 sm:h-13 text-center text-xl font-bold border-2 border-[#E1DFE2] rounded-lg bg-[#FFFAFA] text-[#0247AE] focus:border-[#0247AE] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0247AE]/20 transition-all shadow-sm" />
+              <input id="signup-otp-2" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" autocomplete="one-time-code" class="otp-digit-box w-10 sm:w-11 h-12 sm:h-13 text-center text-xl font-bold border-2 border-[#E1DFE2] rounded-lg bg-[#FFFAFA] text-[#0247AE] focus:border-[#0247AE] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0247AE]/20 transition-all shadow-sm" />
+              <input id="signup-otp-3" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" autocomplete="one-time-code" class="otp-digit-box w-10 sm:w-11 h-12 sm:h-13 text-center text-xl font-bold border-2 border-[#E1DFE2] rounded-lg bg-[#FFFAFA] text-[#0247AE] focus:border-[#0247AE] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0247AE]/20 transition-all shadow-sm" />
+              <input id="signup-otp-4" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" autocomplete="one-time-code" class="otp-digit-box w-10 sm:w-11 h-12 sm:h-13 text-center text-xl font-bold border-2 border-[#E1DFE2] rounded-lg bg-[#FFFAFA] text-[#0247AE] focus:border-[#0247AE] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0247AE]/20 transition-all shadow-sm" />
+              <input id="signup-otp-5" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" autocomplete="one-time-code" class="otp-digit-box w-10 sm:w-11 h-12 sm:h-13 text-center text-xl font-bold border-2 border-[#E1DFE2] rounded-lg bg-[#FFFAFA] text-[#0247AE] focus:border-[#0247AE] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0247AE]/20 transition-all shadow-sm" />
+              <input id="signup-otp-6" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" autocomplete="one-time-code" class="otp-digit-box w-10 sm:w-11 h-12 sm:h-13 text-center text-xl font-bold border-2 border-[#E1DFE2] rounded-lg bg-[#FFFAFA] text-[#0247AE] focus:border-[#0247AE] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0247AE]/20 transition-all shadow-sm" />
+            </div>
+            <!-- Hidden input synced with 6-digit cluster for complete API and contract compatibility -->
+            <input id="signup-otp" type="hidden" />
           </div>
 
           <!-- Countdown Wrap -->
           <div id="otp-countdown-wrap" style="display:none;" class="flex items-center justify-between text-xs text-[#587D90] px-1">
             <div class="flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-sm text-[#0247AE]">schedule</span>
               <span>Code expires in:</span>
               <span id="otp-timer-text" class="font-bold text-[#0247AE]">300s</span>
             </div>
-            <div class="w-24 h-1.5 bg-[#E1DFE2] rounded-full overflow-hidden">
-              <div id="otp-progress-bar" class="h-full bg-[#0247AE] w-full transition-all"></div>
+            <div class="w-24 sm:w-28 h-1.5 bg-[#E1DFE2] rounded-full overflow-hidden">
+              <div id="otp-progress-bar" class="h-full bg-[#0247AE] w-full transition-all duration-1000"></div>
             </div>
           </div>
 
-          <div class="flex gap-3">
-            <button type="button" id="btn-send-otp" onclick="sendOTP()" class="btn-secondary-stitch flex-1 py-2 rounded-md text-xs font-semibold cursor-pointer">
-              Resend OTP
+          <div class="flex items-center justify-between text-xs pt-1 px-1">
+            <button type="button" id="btn-send-otp" onclick="sendOTP()" class="text-[#0247AE] font-semibold hover:underline flex items-center gap-1 cursor-pointer">
+              <span class="material-symbols-outlined text-sm">refresh</span>
+              <span>Resend Code</span>
             </button>
-            <button type="button" id="btn-signup-submit" onclick="handleSignup()" class="btn-primary-stitch flex-1 py-2 rounded-md text-xs font-semibold cursor-pointer shadow-sm">
-              Verify &amp; Register
+            <button type="button" id="btn-change-email" onclick="showSignupStage1()" class="text-[#587D90] hover:text-[#0247AE] hover:underline cursor-pointer">
+              Change Email
+            </button>
+          </div>
+
+          <div class="pt-2 space-y-2">
+            <button type="button" id="btn-signup-submit" onclick="handleSignup()" class="btn-primary-stitch w-full py-2.5 rounded-md font-semibold text-sm cursor-pointer shadow-sm flex items-center justify-center gap-2">
+              <span class="material-symbols-outlined text-base">verified</span>
+              <span>Verify &amp; Register</span>
+            </button>
+            <button type="button" id="btn-signup-back" onclick="showSignupStage1()" class="w-full py-2 text-xs font-semibold text-[#587D90] hover:text-[#0247AE] hover:bg-[#F8F9FA] rounded-md transition-colors cursor-pointer flex items-center justify-center gap-1">
+              <span>← Back to Details</span>
             </button>
           </div>
         </div>

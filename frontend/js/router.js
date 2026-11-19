@@ -27,6 +27,11 @@ function navigate(viewId, fromPopState = false) {
   if (viewId === 'view-landing') {
     if (typeof initLandingPage === 'function') initLandingPage();
   }
+  if (viewId === 'view-signup') {
+    if (typeof showSignupStage1 === 'function' && (!window.AppState || !window.AppState.otpSent)) {
+      showSignupStage1();
+    }
+  }
   if (viewId === 'view-dashboard') {
     if (typeof updateProfileDisplay === 'function') updateProfileDisplay();
     // Always reload suites from backend on every dashboard visit
