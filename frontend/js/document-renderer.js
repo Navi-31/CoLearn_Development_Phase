@@ -58,11 +58,14 @@ var DocumentRenderer = (function () {
       card.dataset.fileType = file.fileType || 'other';
 
       var icon = _getDriveFileIcon(file.mimeType, file.fileName);
+      var uploader = file.uploadedByName || file.uploaderName || file.ownerName || 'Unknown uploader';
+      var uploadedAt = file.uploadedAt ? new Date(file.uploadedAt).toLocaleDateString() : '';
 
       card.innerHTML =
         '<div class="doc-pending-icon">' + icon + '</div>' +
         '<div class="doc-pending-info">' +
           '<div class="doc-pending-name" title="' + escapeHtml(file.fileName || '') + '">' + escapeHtml(file.fileName || 'Untitled') + '</div>' +
+          '<div class="doc-pending-uploader" style="font-size:0.75rem;color:#587D90;margin-top:2px;">Uploaded by <span style="font-weight:600;color:#2C2C2C;">' + escapeHtml(uploader) + '</span>' + (uploadedAt ? ' · ' + uploadedAt : '') + '</div>' +
         '</div>';
 
       // Left click opens overlay
@@ -191,6 +194,7 @@ var DocumentRenderer = (function () {
 
       var mimeType = (file.mimeType || '').toLowerCase();
       var fileName = file.fileName || 'Document';
+      var uploader = file.uploadedByName || file.uploaderName || file.ownerName || 'Unknown uploader';
       var icon = _getDriveFileIcon(mimeType, fileName);
       var downloadUrl = file.driveDownloadLink || file.driveWebViewLink || '#';
       var embedUrl = file.driveEmbedUrl || (mimeType.includes('pdf') || fileName.toLowerCase().endsWith('.pdf') ? file.driveWebViewLink : '');
@@ -234,7 +238,10 @@ var DocumentRenderer = (function () {
           '<div class="cl-viewer-header">' +
             '<div class="cl-viewer-title-box">' +
               '<span style="font-size:1.5rem;">' + icon + '</span>' +
-              '<span class="cl-viewer-title">' + escapeHtml(fileName) + '</span>' +
+              '<div>' +
+                '<span class="cl-viewer-title">' + escapeHtml(fileName) + '</span>' +
+                '<div style="font-size:0.75rem;color:#64748b;margin-top:2px;">Uploaded by <span style="font-weight:600;color:#0f172a;">' + escapeHtml(uploader) + '</span></div>' +
+              '</div>' +
             '</div>' +
             '<div style="display:flex;align-items:center;gap:10px;">' +
               '<a href="' + escapeHtml(downloadUrl) + '" target="_blank" class="cl-btn">⬇️ Download</a>' +

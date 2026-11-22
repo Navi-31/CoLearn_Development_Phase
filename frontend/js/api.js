@@ -283,22 +283,10 @@ const API = {
   /* ── Invites ─────────────────────────────────────────────── */
 
   /**
-   * POST /api/invite/send
-   * Body: { suiteId, uid, email }
-   * Generates invite + sends email. Returns { success, inviteCode, inviteUrl }
-   */
-  async sendInvite({ suiteId, uid, email }) {
-    return apiFetch('/api/invite/send', {
-      method: 'POST',
-      body:   JSON.stringify({ suiteId, uid, email }),
-    });
-  },
-
-  /**
    * POST /api/invite/generate
    * Body: { suiteId, uid }
-   * Generates invite code + link without sending email.
-   * Returns { success, inviteCode, inviteUrl }
+   * Generates 5-digit suite invite code.
+   * Returns { success, inviteCode }
    */
   async generateInvite({ suiteId, uid }) {
     return apiFetch('/api/invite/generate', {
@@ -322,15 +310,18 @@ const API = {
 
   /**
    * POST /api/invite/link
-   * Body: { token }
-   * Validates an invite token from a URL.
-   * Returns { success, suiteId, suiteName } | { success: false, error }
+   * Obsolete: Join with Link has been removed.
    */
   async validateInviteToken(token) {
-    return apiFetch('/api/invite/link', {
-      method: 'POST',
-      body:   JSON.stringify({ token }),
-    });
+    return { success: false, error: 'Join with Link has been removed. Please use a 5-digit code.' };
+  },
+
+  /**
+   * POST /api/invite/send
+   * Obsolete: Email invitations have been removed.
+   */
+  async sendInvite({ suiteId, uid, email }) {
+    return { success: false, error: 'Email invitations have been removed. Please share the 5-digit suite code.' };
   },
 
   /**

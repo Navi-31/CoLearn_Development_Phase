@@ -834,9 +834,9 @@
           <!-- Action Card 3: Join with Code -->
           <div class="bg-white border border-[#E1DFE2] rounded-xl p-5 shadow-[0_2px_8px_rgba(45,67,88,0.06)]">
             <h3 class="text-sm font-bold text-[#2C2C2C] mb-1">Join with Suite Code</h3>
-            <p class="text-xs text-[#587D90] mb-3">Enter an invitation code or link shared by your study group host.</p>
+            <p class="text-xs text-[#587D90] mb-3">Enter the 5-digit code shared by your study group host.</p>
             <div class="flex gap-2">
-              <input id="join-suite-code" type="text" placeholder="Enter code (e.g. 84920)" class="input-stitch text-xs uppercase"/>
+              <input id="join-suite-code" type="text" placeholder="Enter 5-digit code (e.g. 84920)" maxlength="5" class="input-stitch text-xs uppercase" onkeydown="if(event.key==='Enter') handleJoinSuite()"/>
               <button type="button" onclick="handleJoinSuite()" class="btn-primary-stitch text-xs px-3 py-1.5 rounded shrink-0 cursor-pointer">
                 Join
               </button>
@@ -902,6 +902,30 @@
         <div id="ws-screen-share-pill" style="display:none;" onclick="if(document.getElementById('screen-share-overlay') && !document.getElementById('screen-share-overlay').classList.contains('hidden')){ document.getElementById('screen-share-overlay').classList.add('hidden'); } else if(document.getElementById('screen-share-overlay')){ document.getElementById('screen-share-overlay').classList.remove('hidden'); }" class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-[#F0EDED] text-[#2D4358] border border-[#E1DFE2] cursor-pointer" title="Screen share active">
           <span class="material-symbols-outlined text-sm text-[#0247AE]">screen_share</span>
           <span id="ws-ss-indicator-text">Sharing</span>
+        </div>
+
+        <!-- Workspace Notification Bell Trigger & Dropdown -->
+        <div id="ws-notification-bell-wrap" class="relative">
+          <button type="button" id="ws-btn-notification-bell" onclick="toggleNotificationPanel('ws')" class="w-8 h-8 rounded hover:bg-[#F6F3F2] border border-[#E1DFE2] flex items-center justify-center text-[#587D90] transition-colors relative cursor-pointer" title="Suite Notifications">
+            <span class="material-symbols-outlined text-lg">notifications</span>
+            <span id="ws-notification-count" class="hidden absolute -top-1 -right-1 w-4 h-4 bg-[#BA1A1A] text-white text-[10px] font-bold rounded-full flex items-center justify-center">0</span>
+          </button>
+
+          <!-- Workspace Notification Dropdown -->
+          <div id="ws-notification-dropdown" class="hidden absolute right-0 mt-2 w-80 sm:w-96 bg-white border border-[#E1DFE2] rounded-xl shadow-[0_8px_30px_rgba(45,67,88,0.12)] z-50 overflow-hidden">
+            <div class="px-4 py-3 border-b border-[#E1DFE2] bg-[#F6F3F2] flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-sm text-[#0247AE]">notifications</span>
+                <span class="text-xs font-bold text-[#2C2C2C]">Suite Notifications</span>
+              </div>
+              <button type="button" onclick="clearAllNotifications()" class="text-[11px] font-semibold text-[#0247AE] hover:underline cursor-pointer">
+                Clear all
+              </button>
+            </div>
+            <div id="ws-notification-list" class="max-h-80 overflow-y-auto divide-y divide-[#E1DFE2]/60 text-xs">
+              <div class="p-6 text-center text-[#587D90]">No notifications</div>
+            </div>
+          </div>
         </div>
 
         <!-- Suite Settings Button -->
@@ -982,15 +1006,16 @@
             </div>
           </div>
 
-          <!-- Invite Distribution Strip -->
+          <!-- Invite Code Distribution Strip -->
           <div class="bg-white border border-[#E1DFE2] rounded-xl p-5 shadow-[0_1px_4px_rgba(45,67,88,0.04)]">
-            <h4 class="text-xs font-bold uppercase tracking-wider text-[#587D90] mb-2">Suite Invitation Link</h4>
+            <h4 class="text-xs font-bold uppercase tracking-wider text-[#587D90] mb-2">5-Digit Suite Invite Code</h4>
             <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-              <div id="invite-link-text" class="flex-1 bg-[#F6F3F2] border border-[#E1DFE2] rounded px-3 py-2 text-xs font-mono text-[#2C2C2C] select-all truncate">
-                Generating invitation link...
+              <div id="invite-code-text" class="flex-1 bg-[#F6F3F2] border border-[#E1DFE2] rounded px-3 py-2 text-sm font-mono font-bold tracking-widest text-[#2C2C2C] select-all truncate">
+                Generating invite code...
               </div>
-              <button type="button" onclick="copyInviteLink()" class="btn-primary-stitch text-xs px-4 py-2 rounded shrink-0 cursor-pointer">
-                Copy Link
+              <div id="invite-link-text" style="display:none;"></div>
+              <button type="button" onclick="copyInviteCode()" class="btn-primary-stitch text-xs px-4 py-2 rounded shrink-0 cursor-pointer">
+                Copy Code
               </button>
             </div>
           </div>
@@ -1601,61 +1626,41 @@
     <div class="modal-dialog max-w-md">
       <div class="modal-header">
         <div class="modal-title">
-          <span class="material-symbols-outlined text-[#0247AE]">mail</span>
-          <span>Invite to Suite</span>
+          <span class="material-symbols-outlined text-[#0247AE]">key</span>
+          <span>Suite Invite Code</span>
         </div>
         <button type="button" onclick="closeModal('modal-ws-invite')" class="text-[#587D90] hover:text-[#2C2C2C] cursor-pointer">
           <span class="material-symbols-outlined">close</span>
         </button>
       </div>
       <div class="modal-body space-y-4">
-        <!-- Step 1: Generated code + link -->
-        <div id="invite-info-panel" style="display:none;" class="space-y-3">
-          <div class="bg-[#2D4358] rounded-xl p-4 text-center">
-            <div class="text-[11px] font-semibold text-[#DAE2FF] uppercase tracking-wider mb-1">5-Digit Invite Code</div>
-            <div id="invite-code-display" class="text-3xl font-mono font-bold tracking-widest text-white">─ ─ ─ ─ ─</div>
-          </div>
-          <div class="flex items-center gap-2 p-2 bg-[#F6F3F2] border border-[#E1DFE2] rounded-lg">
-            <span id="invite-link-display" class="text-xs text-[#0247AE] font-mono truncate flex-1 select-all">Generating…</span>
-            <button type="button" onclick="copyInviteLink()" class="btn-primary-stitch text-xs py-1 px-2.5 rounded shrink-0 cursor-pointer">
-              Copy Link
+        <!-- Generated 5-Digit Invite Code -->
+        <div id="invite-info-panel" style="display:none;" class="space-y-4">
+          <div class="bg-[#2D4358] rounded-xl p-5 text-center">
+            <div class="text-[11px] font-semibold text-[#DAE2FF] uppercase tracking-wider mb-2">5-Digit Suite Invite Code</div>
+            <div id="invite-code-display" class="text-4xl font-mono font-bold tracking-widest text-white mb-3">─ ─ ─ ─ ─</div>
+            <button type="button" onclick="copyInviteCode()" class="btn-primary-stitch text-xs py-2 px-4 rounded-lg inline-flex items-center gap-1.5 cursor-pointer">
+              <span class="material-symbols-outlined text-sm">content_copy</span>
+              <span>Copy Code</span>
             </button>
           </div>
+          <span id="invite-link-display" style="display:none;"></span>
           <div class="text-[11px] text-[#587D90] bg-[#FFF8F0] border border-[#F6E7D2] rounded-lg p-2.5 flex items-start gap-1.5">
             <span class="material-symbols-outlined text-sm text-[#C8AA6E] shrink-0 mt-0.5">info</span>
-            <span>This code is active while you (the suite host) remain connected.</span>
+            <span>Share this 5-digit code with your peers. They can enter it under "Join with Suite Code" on their dashboard. This code remains active while you (the suite host) stay connected.</span>
           </div>
         </div>
 
-        <!-- Divider -->
-        <div id="invite-divider" style="display:none;" class="flex items-center gap-3">
-          <div class="flex-1 h-px bg-[#E1DFE2]"></div>
-          <span class="text-[11px] font-bold text-[#8E9099] uppercase tracking-wider">Send via Email</span>
-          <div class="flex-1 h-px bg-[#E1DFE2]"></div>
-        </div>
-
-        <!-- Step 2: Email form -->
-        <div id="invite-email-form" class="space-y-3">
-          <div>
-            <label class="block text-xs font-semibold text-[#2C2C2C] mb-1" for="invite-email-input">Recipient Institutional Email</label>
-            <input id="invite-email-input" type="email" class="input-stitch" placeholder="colleague@university.edu" onkeydown="if(event.key==='Enter') handleSendInviteEmail()"/>
-          </div>
-          <div id="invite-email-alert" class="hidden text-xs p-2.5 rounded-lg"></div>
-          <button type="button" id="btn-send-invite" onclick="handleSendInviteEmail()" class="btn-primary-stitch w-full py-2.5 rounded-lg text-xs font-semibold cursor-pointer">
-            Send Invitation
-          </button>
-        </div>
-
-        <!-- Loading state -->
-        <div id="invite-loading" style="display:none;" class="text-center py-4 text-xs text-[#587D90]">
-          <span class="material-symbols-outlined animate-spin text-xl text-[#0247AE] block mb-1">progress_activity</span>
-          Sending invitation…
-        </div>
+        <!-- Hidden elements for backward compatibility -->
+        <div id="invite-divider" style="display:none;"></div>
+        <div id="invite-email-form" style="display:none;"></div>
+        <div id="invite-email-alert" class="hidden text-xs p-2.5 rounded-lg"></div>
+        <div id="invite-loading" style="display:none;"></div>
 
         <!-- Loading spinner for generating code -->
-        <div id="invite-generating" style="display:none;" class="text-center py-4 text-xs text-[#587D90]">
-          <span class="material-symbols-outlined animate-spin text-xl text-[#0247AE] block mb-1">progress_activity</span>
-          Generating invite code…
+        <div id="invite-generating" style="display:none;" class="text-center py-6 text-xs text-[#587D90]">
+          <span class="material-symbols-outlined animate-spin text-2xl text-[#0247AE] block mb-2">progress_activity</span>
+          Generating 5-digit invite code…
         </div>
       </div>
       <div class="modal-footer">

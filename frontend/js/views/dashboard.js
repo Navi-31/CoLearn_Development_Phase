@@ -253,16 +253,18 @@ async function confirmDeleteSuite(suiteId, suiteName) {
 
 /* ─ Join Suite ────────────────────────────────────────────────── */
 function handleJoinSuite() {
+  if (typeof window.handleJoinSuite === 'function' && window.handleJoinSuite !== handleJoinSuite) {
+    return window.handleJoinSuite();
+  }
   const input = document.getElementById('join-suite-code');
   const code  = input ? input.value.trim() : '';
-  if (!code) { showToast('main-toast', '⚠️ Please enter a suite code or link.'); return; }
-  AppState.currentSuite = {
-    name:      'Joined Suite – ' + code.slice(-6).toUpperCase(),
-    isPrivate: false,
-    type:      'joined',
-  };
-  if (input) input.value = '';
-  navigate('view-workspace');
+  if (!code || !/^\d{5}$/.test(code)) {
+    showToast('main-toast', '⚠️ Please enter a valid 5-digit suite code.');
+    return;
+  }
+  if (typeof _processJoinInput === 'function') {
+    _processJoinInput(code, AppState.currentUser);
+  }
 }
 
 /* ─ Toggle switch ────────────────────────────────────────────── */

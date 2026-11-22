@@ -14,11 +14,17 @@ function showTempError(el, msg, ms) {
 
 /** Show a toast notification */
 function showToast(id, text, type) {
-  const el    = document.getElementById(id);
-  const inner = el ? el.querySelector('.toast-inner') : null;
+  const el = document.getElementById(id) || document.getElementById('main-toast');
   if (!el) return;
-  if (inner && text) inner.innerHTML = text;
-  if (inner && type) { inner.className = 'toast-inner'; if (type !== 'dark') inner.classList.add(type); }
+  let inner = el.querySelector('.toast-inner');
+  if (!inner) {
+    inner = document.createElement('div');
+    inner.className = 'toast-inner';
+    el.appendChild(inner);
+  }
+  if (text) inner.innerHTML = text;
+  inner.className = 'toast-inner';
+  if (type && type !== 'dark') inner.classList.add(type);
   el.style.display = 'block';
   setTimeout(() => { el.style.display = 'none'; }, 2800);
 }

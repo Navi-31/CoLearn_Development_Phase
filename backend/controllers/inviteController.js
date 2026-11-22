@@ -37,64 +37,14 @@ function buildInviteUrl(req, token) {
 
 /* ══════════════════════════════════════════════════════════════════
    POST /api/invite/send
-   Body: { suiteId, uid, email }
-   Generates invite + sends email to recipient.
+   DISABLED: Email-based suite invitations have been removed.
+   Suites can only be joined using a 5-digit suite code.
    ══════════════════════════════════════════════════════════════════ */
 async function sendInvite(req, res) {
-  const suiteId = (req.body.suiteId || '').trim();
-  const uid     = (req.body.uid     || '').trim();
-  const email   = (req.body.email   || '').trim().toLowerCase();
-
-  // Validation
-  if (!suiteId) return res.status(400).json({ success: false, error: 'suiteId is required.' });
-  if (!uid)     return res.status(400).json({ success: false, error: 'uid is required.' });
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return res.status(400).json({ success: false, error: 'Please provide a valid email address.' });
-  }
-
-  // Fetch suite from Firestore
-  let suite;
-  try {
-    const doc = await firestoreWithRetry(() => db.collection('suites').doc(suiteId).get());
-    if (!doc.exists) {
-      return res.status(404).json({ success: false, error: 'Suite not found.' });
-    }
-    suite = { id: doc.id, ...doc.data() };
-  } catch (e) {
-    console.error('[sendInvite] Firestore error. Message:', e.message, 'Code:', e.code, 'Details:', e.details);
-    return res.status(500).json({ success: false, error: 'Server error. Please try again.' });
-  }
-
-  const callerUid = req.verifiedUid || uid;
-
-  // Authorisation: Only Host or Admin can send invites / add people
-  const isHost = suite.ownerUid === callerUid || suite.hostUid === callerUid;
-  const adminUids = Array.isArray(suite.adminUids) ? suite.adminUids : [];
-  const isAdmin = !isHost && adminUids.includes(callerUid);
-  if (!isHost && !isAdmin) {
-    return res.status(403).json({ success: false, error: 'Only the suite host or admins can send invitations.' });
-  }
-
-  // Generate invite (or re-use existing active one for this suite+host)
-  const { inviteCode, inviteToken } = inviteStore.createInvite(suiteId, suite.name, suite.ownerUid);
-  const inviteUrl = buildInviteUrl(req, inviteToken);
-
-  // Send email
-  try {
-    await emailService.sendInviteEmail(email, suite.name, inviteCode, inviteUrl);
-    console.log(`[Invite] Email sent to ${email} — suite=${suiteId} code=${inviteCode}`);
-  } catch (e) {
-    console.error('[sendInvite] Email error:', e.message);
-    // Non-fatal: invite is generated, inform caller
-    return res.json({
-      success: true,
-      warning: 'Invite generated but email delivery failed. Share the code/link manually.',
-      inviteCode,
-      inviteUrl,
-    });
-  }
-
-  return res.json({ success: true, inviteCode, inviteUrl });
+  return res.status(410).json({
+    success: false,
+    error: 'Email-based suite invitations have been removed. Please share the 5-digit suite code directly.',
+  });
 }
 
 /* ══════════════════════════════════════════════════════════════════
@@ -132,10 +82,9 @@ async function generateInvite(req, res) {
     return res.status(403).json({ success: false, error: 'Only the suite host or admins can generate invitations.' });
   }
 
-  const { inviteCode, inviteToken } = inviteStore.createInvite(suiteId, suite.name, suite.ownerUid);
-  const inviteUrl = buildInviteUrl(req, inviteToken);
+  const { inviteCode } = inviteStore.createInvite(suiteId, suite.name, suite.ownerUid);
 
-  return res.json({ success: true, inviteCode, inviteUrl });
+  return res.json({ success: true, inviteCode });
 }
 
 /* ══════════════════════════════════════════════════════════════════
@@ -165,29 +114,13 @@ function validateCode(req, res) {
 
 /* ══════════════════════════════════════════════════════════════════
    POST /api/invite/link
-   Body: { token }
-   Validates an invite token (from URL).
+   DISABLED: Join with Link has been removed.
+   Suites can only be joined using a 5-digit suite code.
    ══════════════════════════════════════════════════════════════════ */
 function validateToken(req, res) {
-  const token = (req.body.token || '').trim();
-
-  if (!token) {
-    return res.status(400).json({ success: false, error: 'Invite token is required.' });
-  }
-
-  const invite = inviteStore.getByToken(token);
-
-  if (!invite) {
-    return res.status(404).json({
-      success: false,
-      error:   'This invitation link is invalid or has expired.',
-    });
-  }
-
-  return res.json({
-    success:   true,
-    suiteId:   invite.suiteId,
-    suiteName: invite.suiteName,
+  return res.status(410).json({
+    success: false,
+    error: 'Join with Link has been removed. Please join using a 5-digit suite code.',
   });
 }
 

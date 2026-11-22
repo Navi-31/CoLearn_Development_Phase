@@ -46,6 +46,9 @@ function navigate(viewId, fromPopState = false) {
     if (typeof loadUserSuites === 'function' && AppState.currentUser) {
       loadUserSuites();
     }
+    if (typeof initNotifications === 'function' && AppState.currentUser) {
+      initNotifications(AppState.currentUser.uid);
+    }
   }
   if (viewId === 'view-workspace') {
     if (typeof initWorkspace === 'function') initWorkspace();
@@ -108,10 +111,14 @@ document.addEventListener('keydown', e => {
     // 1. Close all open modal overlays
     document.querySelectorAll('.modal-overlay:not(.hidden)').forEach(el => el.classList.add('hidden'));
 
-    // 2. Close notification dropdown
+    // 2. Close notification dropdowns
     const notifDropdown = document.getElementById('notification-dropdown');
     if (notifDropdown && !notifDropdown.classList.contains('hidden')) {
       notifDropdown.classList.add('hidden');
+    }
+    const wsNotifDropdown = document.getElementById('ws-notification-dropdown');
+    if (wsNotifDropdown && !wsNotifDropdown.classList.contains('hidden')) {
+      wsNotifDropdown.classList.add('hidden');
     }
 
     // 3. Close context menus

@@ -1,26 +1,24 @@
 /* ── invite.js – Frontend Invite System ──────────────────────────
  *
  * Handles:
- *  • Showing the invite modal with real code + link
- *  • Sending invite emails
- *  • Joining via 5-digit code or invite link
- *  • Invite link URL handling (/invite/:token)
+ *  • Showing the invite modal with 5-digit suite code
+ *  • Joining via 5-digit code (Join with Code only)
  *  • SSE member-list real-time updates
  *  • Host invalidation on logout/leave
  */
 
 /* ── State ───────────────────────────────────────────────────────── */
-let _currentInviteLink  = '';   // Full invite URL currently displayed
+let _currentInviteCode  = '';   // Active 5-digit code
 let _sseEventSource     = null; // Active SSE connection
 let _sseReconnectCount  = 0;    // How many times SSE has dropped and reconnected
 
 /* ══════════════════════════════════════════════════════════════════
-   INVITE MODAL — show with real code + link
+   INVITE MODAL — show with real 5-digit code
    ══════════════════════════════════════════════════════════════════ */
 
 /**
  * Called by the "+ Invite" button in the workspace sidebar.
- * Opens the modal and immediately generates/fetches the invite code + link.
+ * Opens the modal and immediately generates/fetches the 5-digit code.
  */
 async function showInviteModal() {
   openModal('modal-ws-invite');
@@ -33,7 +31,6 @@ async function showInviteModal() {
 
   // Only permanent suites (with a real ID + owner) can generate backend invites
   if (!suite || !suite.id || !user) {
-    // Fallback for quick/temporary suites: show a static message
     _setInviteModalState('no-backend');
     return;
   }
@@ -49,19 +46,19 @@ async function showInviteModal() {
 
   try {
     const data = await API.generateInvite({ suiteId: suite.id, uid: user.uid });
-    if (data.success) {
-      _currentInviteLink = data.inviteUrl;
-      _setInviteModalState('ready', data.inviteCode, data.inviteUrl);
+    if (data && data.success && data.inviteCode) {
+      _currentInviteCode = String(data.inviteCode);
+      _setInviteModalState('ready', data.inviteCode);
     } else {
-      _setInviteModalState('error', null, null, data.error || 'Failed to generate invite.');
+      _setInviteModalState('error', null, (data && data.error) || 'Failed to generate invite code.');
     }
   } catch (err) {
-    _setInviteModalState('error', null, null, 'Connection error. Please try again.');
+    _setInviteModalState('error', null, 'Connection error. Please try again.');
   }
 }
 
 /** Set the invite modal to a specific display state. */
-function _setInviteModalState(state, code, link, errorMsg) {
+function _setInviteModalState(state, code, errorMsg) {
   const generatingEl  = document.getElementById('invite-generating');
   const infoPanel     = document.getElementById('invite-info-panel');
   const divider       = document.getElementById('invite-divider');
@@ -69,16 +66,12 @@ function _setInviteModalState(state, code, link, errorMsg) {
   const loadingEl     = document.getElementById('invite-loading');
   const alertEl       = document.getElementById('invite-email-alert');
   const codeEl        = document.getElementById('invite-code-display');
-  const linkEl        = document.getElementById('invite-link-display');
-  const emailInput    = document.getElementById('invite-email-input');
-  const sendBtn       = document.getElementById('btn-send-invite');
 
-  // Hide everything first
+  // Hide obsolete / auxiliary sections
   [generatingEl, infoPanel, divider, emailForm, loadingEl].forEach(el => {
     if (el) el.style.display = 'none';
   });
   if (alertEl) { alertEl.className = 'hidden'; alertEl.textContent = ''; }
-  if (emailInput) emailInput.value = '';
 
   switch (state) {
     case 'generating':
@@ -86,157 +79,74 @@ function _setInviteModalState(state, code, link, errorMsg) {
       break;
 
     case 'ready':
-      // Show code
       if (codeEl && code) {
-        // Format as spaced digits: "4 9 2 8 3"
+        _currentInviteCode = String(code);
         codeEl.textContent = String(code).split('').join(' ');
       }
-      // Show link
-      if (linkEl && link) {
-        linkEl.textContent = link;
-        _currentInviteLink = link;
-      }
-      if (infoPanel)  infoPanel.style.display  = 'block';
-      if (divider)    divider.style.display     = 'flex';
-      if (emailForm)  emailForm.style.display   = 'block';
-      break;
-
-    case 'loading':
-      if (infoPanel)   infoPanel.style.display   = 'block';
-      if (divider)     divider.style.display      = 'flex';
-      if (loadingEl)   loadingEl.style.display    = 'block';
-      if (emailForm)   emailForm.style.display    = 'none';
+      if (infoPanel) infoPanel.style.display = 'block';
       break;
 
     case 'not-host':
-      if (infoPanel)  infoPanel.style.display  = 'none';
-      if (divider)    divider.style.display     = 'none';
-      if (emailForm)  emailForm.style.display   = 'block';
+      if (infoPanel) infoPanel.style.display = 'none';
       if (alertEl) {
-        alertEl.className   = 'alert-error';
-        alertEl.textContent = 'Only the Suite Host or Admins can send invitations.';
+        alertEl.className   = 'text-xs p-2.5 rounded-lg bg-red-50 text-red-700 border border-red-200';
+        alertEl.textContent = 'Only the Suite Host or Admins can access invitation codes.';
         alertEl.style.display = 'block';
       }
-      if (sendBtn) sendBtn.disabled = true;
       break;
 
     case 'no-backend':
-      // Quick suite — no DB record
-      if (emailForm) emailForm.style.display = 'block';
       if (alertEl) {
-        alertEl.className = 'alert-info';
-        alertEl.innerHTML = '⚡ Quick suites don\'t support invite emails.<br>Create a <strong>Permanent Suite</strong> from the dashboard to enable invitations.';
+        alertEl.className = 'text-xs p-2.5 rounded-lg bg-amber-50 text-amber-800 border border-amber-200';
+        alertEl.innerHTML = '⚡ Quick suites don\'t support permanent invite codes.<br>Create a <strong>Permanent Suite</strong> from the dashboard to invite peers with a code.';
         alertEl.style.display = 'block';
       }
-      if (sendBtn) sendBtn.disabled = true;
       break;
 
     case 'error':
-      if (emailForm) emailForm.style.display = 'block';
       if (alertEl) {
-        alertEl.className   = 'alert-error';
-        alertEl.textContent = errorMsg || 'An error occurred.';
+        alertEl.className   = 'text-xs p-2.5 rounded-lg bg-red-50 text-red-700 border border-red-200';
+        alertEl.textContent = errorMsg || 'An error occurred generating the code.';
         alertEl.style.display = 'block';
       }
-      break;
-
-    case 'sent':
-      if (infoPanel) infoPanel.style.display = 'block';
-      if (emailForm) emailForm.style.display = 'block';
-      if (alertEl) {
-        alertEl.className   = 'alert-success';
-        alertEl.innerHTML   = '✅ Invitation sent successfully!';
-        alertEl.style.display = 'block';
-      }
-      if (emailInput) emailInput.value = '';
       break;
   }
 }
 
 /* ══════════════════════════════════════════════════════════════════
-   SEND INVITE EMAIL
+   COPY INVITE CODE
    ══════════════════════════════════════════════════════════════════ */
 
-async function handleSendInviteEmail() {
-  const emailInput = document.getElementById('invite-email-input');
-  const alertEl    = document.getElementById('invite-email-alert');
-  const email      = (emailInput ? emailInput.value.trim() : '').toLowerCase();
+function copyInviteCode() {
+  const codeEl = document.getElementById('invite-code-display');
+  const textEl = document.getElementById('invite-code-text');
 
-  // Client-side validation
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    if (alertEl) {
-      alertEl.className = 'alert-error';
-      alertEl.textContent = 'Please enter a valid email address.';
-      alertEl.style.display = 'block';
-    }
-    return;
+  let text = _currentInviteCode;
+  if (!text && codeEl) {
+    text = codeEl.textContent.replace(/\s+/g, '').trim();
+  }
+  if ((!text || text.includes('─')) && textEl) {
+    text = textEl.textContent.trim();
   }
 
-  const suite = AppState.currentSuite;
-  const user  = AppState.currentUser;
+  // Clean formatted code
+  text = (text || '').replace(/[^0-9]/g, '');
 
-  if (!suite || !suite.id || !user) {
-    if (alertEl) {
-      alertEl.className = 'alert-error';
-      alertEl.textContent = 'Cannot send invite for this suite type.';
-      alertEl.style.display = 'block';
-    }
-    return;
-  }
-
-  _setInviteModalState('loading');
-
-  try {
-    const data = await API.sendInvite({ suiteId: suite.id, uid: user.uid, email });
-
-    if (data.success) {
-      // Update displayed code/link in case they were regenerated
-      if (data.inviteCode || data.inviteUrl) {
-        _currentInviteLink = data.inviteUrl || _currentInviteLink;
-        const codeEl = document.getElementById('invite-code-display');
-        const linkEl = document.getElementById('invite-link-display');
-        if (codeEl && data.inviteCode) codeEl.textContent = String(data.inviteCode).split('').join(' ');
-        if (linkEl && data.inviteUrl)  linkEl.textContent = data.inviteUrl;
-      }
-      _setInviteModalState('sent');
-
-      if (data.warning) {
-        // Email failed but invite was generated
-        const alertEl2 = document.getElementById('invite-email-alert');
-        if (alertEl2) {
-          alertEl2.className = 'alert-warn';
-          alertEl2.innerHTML = `⚠️ ${data.warning}`;
-          alertEl2.style.display = 'block';
-        }
-      }
-    } else {
-      _setInviteModalState('error', null, null, data.error || 'Failed to send invitation.');
-    }
-  } catch (err) {
-    _setInviteModalState('error', null, null, 'Connection error. Please try again.');
+  if (text) {
+    copyToClipboard(text);
+    showToast('main-toast', `✓ Suite code ${text} copied to clipboard!`, 'green');
+  } else {
+    showToast('main-toast', '⚠️ No invite code available to copy.');
   }
 }
 
-/* ══════════════════════════════════════════════════════════════════
-   COPY INVITE LINK
-   (Overrides the stub in workspace.js)
-   ══════════════════════════════════════════════════════════════════ */
-
+// Backward compatibility alias for any existing callers of copyInviteLink
 function copyInviteLink() {
-  // Prefer the real backend-generated link; fall back to what's shown on screen
-  const linkEl = document.getElementById('invite-link-display')
-               || document.getElementById('invite-link-text');
-  const text   = _currentInviteLink
-               || (linkEl ? linkEl.textContent.trim() : '')
-               || location.href;
-
-  copyToClipboard(text);
-  showToast('copy-toast', '✓ Invite link copied!', 'green');
+  copyInviteCode();
 }
 
 /* ══════════════════════════════════════════════════════════════════
-   JOIN SUITE — from dashboard "Join Suite" section
-   (Replaces the stub handleJoinSuite in dashboard.js)
+   JOIN SUITE — Join with 5-digit code only
    ══════════════════════════════════════════════════════════════════ */
 
 async function handleJoinSuite() {
@@ -244,68 +154,56 @@ async function handleJoinSuite() {
   const raw   = input ? input.value.trim() : '';
 
   if (!raw) {
-    showToast('main-toast', '⚠️ Please enter a suite code or invite link.');
+    showToast('main-toast', '⚠️ Please enter a 5-digit suite code.');
     return;
   }
 
   const user = AppState.currentUser;
   if (!user) {
-    // Not logged in — save pending and redirect to login
+    // Not logged in — save pending code and redirect to login
     sessionStorage.setItem('pendingInviteRaw', raw);
     navigate('view-login');
     return;
   }
 
   // Show loading
-  const btn = document.querySelector('#view-dashboard .action-block .btn-primary[onclick*="handleJoinSuite"]');
+  const btn = document.querySelector('#view-dashboard .action-block .btn-primary[onclick*="handleJoinSuite"]')
+           || document.querySelector('button[onclick="handleJoinSuite()"]');
   if (btn) { btn.disabled = true; btn.textContent = '⏳'; }
 
   try {
     await _processJoinInput(raw, user);
   } finally {
-    if (btn) { btn.disabled = false; btn.textContent = 'Enter'; }
+    if (btn) { btn.disabled = false; btn.textContent = 'Join'; }
     if (input) input.value = '';
   }
 }
 
 /**
- * Process raw join input: detects invite URL vs 5-digit code,
- * validates against backend, and joins the suite.
+ * Process join input: accepts 5-digit codes only.
+ * Validates against backend and joins the suite.
  */
 async function _processJoinInput(raw, user) {
+  const code = (raw || '').trim();
+
+  // Explicitly reject links
+  if (code.startsWith('http') || code.includes('/invite/')) {
+    return _joinError('Join with Link has been removed. Please enter a 5-digit suite code.');
+  }
+
+  if (!/^\d{5}$/.test(code)) {
+    return _joinError('Please enter a valid 5-digit suite code.');
+  }
+
   let inviteData = null;
-
-  // Detect invite link
-  const isUrl = raw.startsWith('http') || raw.includes('/invite/');
-  if (isUrl) {
-    // Extract token from URL
-    const match = raw.match(/\/invite\/([a-f0-9]+)/i);
-    const token = match ? match[1] : raw;
-
-    try {
-      const res = await API.validateInviteToken(token);
-      if (!res.success) {
-        return _joinError(res.error || 'This invitation link is invalid or has expired.');
-      }
-      inviteData = { suiteId: res.suiteId, suiteName: res.suiteName };
-    } catch (e) {
-      return _joinError('Connection error. Please try again.');
+  try {
+    const res = await API.validateInviteCode(code);
+    if (!res.success) {
+      return _joinError(res.error || 'This invite code is invalid or has expired.');
     }
-
-  } else if (/^\d{5}$/.test(raw)) {
-    // 5-digit code
-    try {
-      const res = await API.validateInviteCode(raw);
-      if (!res.success) {
-        return _joinError(res.error || 'This invite code is invalid or has expired.');
-      }
-      inviteData = { suiteId: res.suiteId, suiteName: res.suiteName };
-    } catch (e) {
-      return _joinError('Connection error. Please try again.');
-    }
-
-  } else {
-    return _joinError('Please enter a valid 5-digit code or invite link.');
+    inviteData = { suiteId: res.suiteId, suiteName: res.suiteName };
+  } catch (e) {
+    return _joinError('Connection error. Please try again.');
   }
 
   // Now join the suite
@@ -323,13 +221,13 @@ async function _processJoinInput(raw, user) {
       };
       AppState.saveSuite(suite);
       navigate('view-workspace');
-    } else if (joinRes.error && joinRes.error.includes("already a member")) {
+    } else if (joinRes.error && joinRes.error.includes('already a member')) {
       // Already joined — just open the suite
       const suite = {
-        id:       inviteData.suiteId,
-        name:     inviteData.suiteName,
+        id:        inviteData.suiteId,
+        name:      inviteData.suiteName,
         isPrivate: false,
-        type:     'joined',
+        type:      'joined',
       };
       AppState.saveSuite(suite);
       navigate('view-workspace');
@@ -346,121 +244,30 @@ function _joinError(msg) {
 }
 
 /* ══════════════════════════════════════════════════════════════════
-   INVITE LINK URL HANDLER
-   Checks window.location.pathname for /invite/:token on page load
+   INVITE LINK URL CLEANUP (Obsolete link handler)
    ══════════════════════════════════════════════════════════════════ */
 
 async function handleInviteUrlOnLoad() {
   const path  = window.location.pathname;
-  const match = path.match(/^\/invite\/([a-f0-9]+)$/i);
-  if (!match) return;
-
-  const token = match[1];
-
-  // Validate the token first
-  let inviteData = null;
-  try {
-    const res = await API.validateInviteToken(token);
-    const cleanUrl = (window.CONFIG && window.CONFIG.BASE_PATH) || '/';
-    if (!res.success) {
-      // Invalid/expired — just navigate to login with a message
-      sessionStorage.removeItem('pendingInviteToken');
-      showToast('main-toast', `⚠️ ${res.error || 'This invitation link is invalid.'}`);
-      // Clean URL and stay on login
-      history.replaceState({}, '', cleanUrl);
-      return;
-    }
-    inviteData = { suiteId: res.suiteId, suiteName: res.suiteName, token };
-  } catch (e) {
+  if (/^\/invite\//i.test(path)) {
     const cleanUrl = (window.CONFIG && window.CONFIG.BASE_PATH) || '/';
     history.replaceState({}, '', cleanUrl);
-    return;
+    showToast('main-toast', '⚠️ Join with Link has been removed. Please join using a 5-digit suite code.');
   }
-
-  // Store pending invite data
-  sessionStorage.setItem('pendingInviteToken', token);
-  sessionStorage.setItem('pendingInviteSuiteId', inviteData.suiteId);
-  sessionStorage.setItem('pendingInviteSuiteName', inviteData.suiteName);
-
-  // Clean the URL
-  const cleanUrl = (window.CONFIG && window.CONFIG.BASE_PATH) || '/';
-  history.replaceState({}, '', cleanUrl);
-
-  const user = AppState.currentUser;
-  if (user) {
-    // Already logged in → join immediately
-    await _resumePendingInvite(user);
-  } else {
-    // Show a friendly banner on the login page
-    _showPendingInviteBanner(inviteData.suiteName);
-    navigate('view-login');
-  }
-}
-
-/** Show a notice on login page that an invite is waiting */
-function _showPendingInviteBanner(suiteName) {
-  const loginAlert = document.getElementById('login-alert');
-  if (!loginAlert) return;
-  loginAlert.className = 'alert alert-info';
-  loginAlert.innerHTML = `
-    <strong>🔗 Suite Invite Waiting</strong><br>
-    You've been invited to join <strong>${escapeHtml(suiteName)}</strong>.<br>
-    Log in to continue joining.
-  `;
-  loginAlert.classList.remove('hidden');
 }
 
 /**
- * Called after successful login to check for a pending invite.
- * Returns true if a pending invite was processed.
+ * Called after successful login to check for a pending invite code.
  */
 async function resumePendingInvite(user) {
-  const token     = sessionStorage.getItem('pendingInviteToken');
-  const raw       = sessionStorage.getItem('pendingInviteRaw');
-  const suiteId   = sessionStorage.getItem('pendingInviteSuiteId');
-  const suiteName = sessionStorage.getItem('pendingInviteSuiteName');
+  const raw = sessionStorage.getItem('pendingInviteRaw');
+  _clearPendingInvite();
 
-  if (token && suiteId) {
-    _clearPendingInvite();
-    await _resumePendingInvite(user, { suiteId, suiteName, token });
-    return true;
-  } else if (raw) {
-    _clearPendingInvite();
-    await _processJoinInput(raw, user);
+  if (raw && /^\d{5}$/.test(raw.trim())) {
+    await _processJoinInput(raw.trim(), user);
     return true;
   }
   return false;
-}
-
-async function _resumePendingInvite(user, override) {
-  const suiteId   = override ? override.suiteId   : sessionStorage.getItem('pendingInviteSuiteId');
-  const suiteName = override ? override.suiteName : sessionStorage.getItem('pendingInviteSuiteName');
-
-  if (!suiteId) return;
-  _clearPendingInvite();
-
-  showToast('main-toast', '⏳ Joining suite…', 'dark');
-
-  try {
-    const joinRes = await API.joinSuite({ uid: user.uid, suiteId });
-    if (joinRes.success || (joinRes.error && joinRes.error.includes('already a member'))) {
-      const suite = {
-        id:        suiteId,
-        name:      (joinRes.suite && joinRes.suite.name) || suiteName || 'Suite',
-        isPrivate: joinRes.suite ? joinRes.suite.isPrivate : false,
-        ownerUid:  joinRes.suite ? joinRes.suite.ownerUid : null,
-        type:      'joined',
-      };
-      AppState.saveSuite(suite);
-      navigate('view-workspace');
-    } else {
-      showToast('main-toast', `⚠️ ${joinRes.error || 'Failed to join suite.'}`);
-      navigate('view-dashboard');
-    }
-  } catch (e) {
-    showToast('main-toast', '⚠️ Connection error. Could not join suite.');
-    navigate('view-dashboard');
-  }
 }
 
 function _clearPendingInvite() {
@@ -744,6 +551,12 @@ function getSseListenerInfo() {
 }
 
 window.updateWorkspaceMembers = updateWorkspaceMembers;
+window.copyInviteCode         = copyInviteCode;
+window.copyInviteLink         = copyInviteLink;
+window.showInviteModal        = showInviteModal;
+window.handleJoinSuite        = handleJoinSuite;
+window.resumePendingInvite    = resumePendingInvite;
+window.handleInviteUrlOnLoad  = handleInviteUrlOnLoad;
 
 /* ══════════════════════════════════════════════════════════════════
    HOST: INVALIDATE INVITES ON LEAVE / LOGOUT

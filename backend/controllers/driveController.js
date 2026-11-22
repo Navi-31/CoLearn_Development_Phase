@@ -382,13 +382,16 @@ async function uploadFile(req, res) {
 
   // Save metadata to Firestore
   const now = new Date().toISOString();
+  const uploaderDisplayName = (userDoc && (userDoc.name || userDoc.displayName || userDoc.username)) || (req.body && req.body.uploaderName) || 'Unknown uploader';
   const fileMetadata = {
     driveFileId:      driveFile.id,
     driveFolderId:    folderId,
     suiteId,
     ownerUid:         uid,
     ownerEmail:       userDoc.email  || '',
-    uploadedByName:   userDoc.name   || 'Unknown',
+    uploadedByName:   uploaderDisplayName,
+    uploaderUid:      uid,
+    uploaderName:     uploaderDisplayName,
     fileName:         finalFileName,
     mimeType:         multerFile.mimetype,
     fileSize:         multerFile.size,
@@ -465,6 +468,51 @@ async function listFiles(req, res) {
         .get()
     );
     const files = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+    // Safe resolution of uploader identity for older documents or missing metadata
+    const missingUploaderUids = new Set();
+    files.forEach(f => {
+      const name = f.uploadedByName || f.uploaderName;
+      if ((!name || name === 'Unknown' || name === 'Someone') && f.ownerUid) {
+        missingUploaderUids.add(f.ownerUid);
+      }
+    });
+
+    if (missingUploaderUids.size > 0) {
+      const userDocMap = new Map();
+      await Promise.all(
+        Array.from(missingUploaderUids).map(async (uId) => {
+          try {
+            const uSnap = await firestoreWithRetry(() => db.collection('users').doc(uId).get());
+            if (uSnap.exists) {
+              const uData = uSnap.data();
+              userDocMap.set(uId, uData.name || uData.displayName || uData.username || 'Unknown uploader');
+            }
+          } catch (_) {}
+        })
+      );
+
+      files.forEach(f => {
+        if (!f.uploadedByName || f.uploadedByName === 'Unknown' || f.uploadedByName === 'Someone') {
+          if (f.ownerUid && userDocMap.has(f.ownerUid)) {
+            f.uploadedByName = userDocMap.get(f.ownerUid);
+            f.uploaderName = f.uploadedByName;
+          } else {
+            f.uploadedByName = f.uploadedByName || 'Unknown uploader';
+            f.uploaderName = f.uploadedByName;
+          }
+        }
+      });
+    } else {
+      files.forEach(f => {
+        if (!f.uploadedByName && f.uploaderName) {
+          f.uploadedByName = f.uploaderName;
+        } else if (!f.uploadedByName) {
+          f.uploadedByName = 'Unknown uploader';
+        }
+      });
+    }
+
     return res.json({ success: true, files });
   } catch (e) {
     console.error('[driveController] listFiles error:', e.message);

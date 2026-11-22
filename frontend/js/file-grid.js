@@ -259,7 +259,7 @@ function _buildModalFileList(files, cat) {
 function _buildFileRow(f, cat) {
   const displayName = getLocalFileName(f.id, f.fileName);
   const uploadedAt  = f.uploadedAt ? new Date(f.uploadedAt).toLocaleDateString() : '';
-  const uploaderName = f.uploadedByName || 'Unknown';
+  const uploaderName = f.uploadedByName || f.uploaderName || f.ownerName || 'Unknown uploader';
   const fileSize    = f.fileSize ? _formatBytes(f.fileSize) : '';
   const isHostOrAdmin = _isHostOrAdmin();
 
@@ -269,7 +269,7 @@ function _buildFileRow(f, cat) {
       ${_renderFileIconFull(cat)}
       <div class="fl-file-row-info">
         <div class="fl-file-row-name" title="${_esc(f.fileName)}">${_esc(displayName)}</div>
-        <div class="fl-file-row-meta">${uploaderName} · ${uploadedAt}${fileSize ? ' · ' + fileSize : ''}</div>
+        <div class="fl-file-row-meta">Uploaded by <span style="font-weight:600;color:var(--fl-text-hi,#0f172a);">${_esc(uploaderName)}</span> · ${uploadedAt}${fileSize ? ' · ' + fileSize : ''}</div>
       </div>
       <div class="fl-file-row-actions">
         ${f.driveEmbedUrl || f.driveWebViewLink ? `

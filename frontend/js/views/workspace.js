@@ -76,30 +76,35 @@ function initWorkspace() {
   });
 
 
-  // Invite link — use real backend link if suite has an ID + user is host
+  // Suite invite code — fetch 5-digit code if permanent suite
+  const codeTextEl = document.getElementById('invite-code-text');
   const linkTextEl = document.getElementById('invite-link-text');
   if (suite && suite.id && AppState.currentUser) {
-    if (linkTextEl) linkTextEl.textContent = 'Generating invite link…';
+    if (codeTextEl) codeTextEl.textContent = 'Generating code…';
+    if (linkTextEl) linkTextEl.textContent = 'Generating code…';
     const user = AppState.currentUser;
-    if (!suite.ownerUid || suite.ownerUid === user.uid) {
+    const isHostOrAdmin = Boolean(suite.ownerUid === user.uid || suite.hostUid === user.uid || (Array.isArray(suite.adminUids) && suite.adminUids.includes(user.uid)));
+    if (isHostOrAdmin) {
       API.generateInvite({ suiteId: suite.id, uid: user.uid })
         .then(data => {
-          if (data && data.success) {
-            if (linkTextEl) linkTextEl.textContent = data.inviteUrl;
+          if (data && data.success && data.inviteCode) {
+            if (codeTextEl) codeTextEl.textContent = data.inviteCode;
+            if (linkTextEl) linkTextEl.textContent = data.inviteCode;
             if (typeof window !== 'undefined') {
-              window._currentInviteLink = data.inviteUrl;
+              window._currentInviteCode = String(data.inviteCode);
             }
           }
         })
         .catch(() => {
-          if (linkTextEl) linkTextEl.textContent = location.origin + '/invite/(code generated on demand)';
+          if (codeTextEl) codeTextEl.textContent = 'Code available via Host';
         });
     } else {
-      if (linkTextEl) linkTextEl.textContent = 'Ask the host for the invite link.';
+      if (codeTextEl) codeTextEl.textContent = 'Ask host for suite code';
+      if (linkTextEl) linkTextEl.textContent = 'Ask host for suite code';
     }
   } else {
-    const code = Math.random().toString(36).substr(2, 8).toUpperCase();
-    if (linkTextEl) linkTextEl.textContent = location.origin + '/quick/' + code;
+    if (codeTextEl) codeTextEl.textContent = 'Quick session (no code)';
+    if (linkTextEl) linkTextEl.textContent = 'Quick session (no code)';
   }
 
   // Set default state
@@ -1107,13 +1112,24 @@ function changeDocPage(delta) {
   if (ind) ind.textContent = `Page ${AppState.docPage} of ${AppState.DOC_PAGES}`;
 }
 
-/* ─ Invite link ──────────────────────────────────────────────── */
-// copyInviteLink() and showInviteModal() are implemented in invite.js
+/* ─ Invite code ──────────────────────────────────────────────── */
+// copyInviteCode() and showInviteModal() are implemented in invite.js
 // which overrides these stubs at runtime.
+function copyInviteCode() {
+  if (typeof window.copyInviteCode === 'function' && window.copyInviteCode !== copyInviteCode) {
+    window.copyInviteCode();
+    return;
+  }
+  const text = document.getElementById('invite-code-text')?.textContent || document.getElementById('invite-code-display')?.textContent || '';
+  const clean = text.replace(/[^0-9]/g, '');
+  if (clean) {
+    copyToClipboard(clean);
+    showToast('main-toast', `✓ Suite code ${clean} copied to clipboard!`, 'green');
+  }
+}
+
 function copyInviteLink() {
-  const text = document.getElementById('invite-link-text')?.textContent || location.href;
-  copyToClipboard(text);
-  showToast('copy-toast', '✓ Invite link copied!', 'green');
+  copyInviteCode();
 }
 
 function showInviteModal() { openModal('modal-ws-invite'); }
