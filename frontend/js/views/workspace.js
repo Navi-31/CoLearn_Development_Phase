@@ -266,6 +266,15 @@ function setWSState(state, silent) {
   if (state === 'room-hub' && !silent) {
     _renderRoomHub();
   }
+
+  // Push history state so browser Back can return to previous workspace sub-state
+  if (!silent && window.history && window.history.pushState) {
+    history.pushState({
+      view: 'view-workspace',
+      suiteId: AppState.currentSuite?.id,
+      wsState: state
+    }, '');
+  }
 }
 
 /* ─ Room Hub renderer ────────────────────────────────────────── */
@@ -275,9 +284,17 @@ function _renderRoomHub() {
   const isVoice = (typeof _voiceActive !== 'undefined' && _voiceActive) || (typeof window._voiceActive !== 'undefined' && window._voiceActive);
 
   hub.innerHTML = `
-    <div style="padding:0 0 0.5rem;">
-      <div style="font-size:1.1rem;font-weight:800;color:var(--fl-text-hi);margin-bottom:0.25rem;">&#128682; Room</div>
-      <div style="font-size:0.82rem;color:var(--fl-text-lo);">Choose what to do in the suite room.</div>
+    <div style="padding:0 0 1rem;">
+      <div style="display:flex;align-items:center;gap:0.5rem;font-size:0.75rem;color:var(--text-secondary,#587D90);margin-bottom:0.75rem;">
+        <button type="button" onclick="setWSState('invite')" style="display:inline-flex;align-items:center;gap:0.25rem;color:#0247AE;background:none;border:none;cursor:pointer;font-weight:600;padding:0;">
+          <span class="material-symbols-outlined" style="font-size:1rem;">arrow_back</span>
+          <span>Suite Overview</span>
+        </button>
+        <span style="color:#8E9099;">/</span>
+        <span style="color:#2C2C2C;font-weight:600;">Study Room</span>
+      </div>
+      <div style="font-size:1.1rem;font-weight:800;color:var(--text-primary,#2C2C2C);margin-bottom:0.25rem;">&#128682; Room Hub</div>
+      <div style="font-size:0.82rem;color:var(--text-secondary,#587D90);">Choose what to do in the suite room.</div>
     </div>
     <div class="fl-room-hub-grid">
       <button class="fl-room-hub-btn" onclick="joinVideoCall()">
@@ -343,6 +360,42 @@ function toggleSidebar() {
 }
 
 /* ─ Leave suite ──────────────────────────────────────────────── */
+async function confirmLeaveWorkspaceToDashboard() {
+  const isVideo = typeof _vcInCall !== 'undefined' && _vcInCall;
+  const isVoice = (typeof _voiceActive !== 'undefined' && _voiceActive) || (typeof window._voiceActive !== 'undefined' && window._voiceActive);
+  const isScreen = typeof _ssIsPresenting !== 'undefined' && _ssIsPresenting;
+
+  let msg = 'Return to Dashboard? Your active workspace session will close.';
+  if (isVideo || isVoice || isScreen) {
+    msg = 'You have an active call or screen share session. Leaving the workspace will end your session and disconnect you. Return to Dashboard?';
+  }
+
+  if (confirm(msg)) {
+    // Perform full cleanup without asking a second confirm
+    cleanupSuitePresence();
+
+    if (typeof cleanupVoice              === 'function') cleanupVoice();
+    if (typeof cleanupVideoCall          === 'function') await cleanupVideoCall();
+    if (typeof cleanupScreenShare        === 'function') await cleanupScreenShare();
+    if (typeof cleanupNotifications      === 'function') cleanupNotifications();
+    if (typeof cleanupPrivateChat        === 'function') cleanupPrivateChat();
+    if (typeof cleanupWhiteboardAutoHide === 'function') cleanupWhiteboardAutoHide();
+
+    cleanupSuiteChat();
+    if (typeof disconnectMemberSSE === 'function') disconnectMemberSSE();
+    if (typeof invalidateHostInvitesNow === 'function') {
+      await invalidateHostInvitesNow();
+    }
+    if (typeof clearSuiteDocState === 'function') {
+      clearSuiteDocState({ preserveQueue: false });
+    }
+
+    AppState.saveSuite(null);
+    navigate('view-dashboard');
+  }
+}
+window.confirmLeaveWorkspaceToDashboard = confirmLeaveWorkspaceToDashboard;
+
 async function leaveSuite() {
   if (!confirm('Leave this suite? Your session will end.')) return;
 

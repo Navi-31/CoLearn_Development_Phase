@@ -6,6 +6,9 @@ const VIEW_IDS = [
 ];
 
 function navigate(viewId, fromPopState = false) {
+  // Capture the view being navigated away from BEFORE clearing classes
+  const previousView = VIEW_IDS.find(id => document.getElementById(id)?.classList.contains('active'));
+
   VIEW_IDS.forEach(id => {
     const el = document.getElementById(id);
     if (el) el.classList.remove('active');
@@ -51,14 +54,14 @@ function navigate(viewId, fromPopState = false) {
   // Manage browser history state
   if (!fromPopState) {
     if (viewId === 'view-dashboard') {
-      const wasWorkspace = document.getElementById('view-workspace')?.classList.contains('active');
-      if (wasWorkspace) {
+      const wasWorkspaceOrAuth = previousView === 'view-workspace' || previousView === 'view-login' || previousView === 'view-signup';
+      if (wasWorkspaceOrAuth) {
         history.replaceState({ view: 'view-dashboard' }, '');
       } else {
         history.pushState({ view: 'view-dashboard' }, '');
       }
     } else if (viewId === 'view-workspace') {
-      history.pushState({ view: 'view-workspace', suiteId: AppState.currentSuite?.id }, '');
+      history.pushState({ view: 'view-workspace', suiteId: AppState.currentSuite?.id, wsState: AppState.wsCurrentState || 'invite' }, '');
     } else if (viewId === 'view-signup' || viewId === 'view-forgot') {
       history.pushState({ view: viewId }, '');
     } else if (viewId === 'view-login') {
@@ -79,6 +82,18 @@ window.addEventListener('popstate', event => {
       navigate('view-login', true);
       return;
     }
+    if (state.view === 'view-workspace') {
+      if (!AppState.currentSuite || !AppState.currentSuite.id) {
+        history.replaceState({ view: 'view-dashboard' }, '');
+        navigate('view-dashboard', true);
+        return;
+      }
+      navigate('view-workspace', true);
+      if (state.wsState && typeof setWSState === 'function') {
+        setWSState(state.wsState, true);
+      }
+      return;
+    }
     // Do NOT auto-redirect users from auth pages to view-dashboard even if AppState.currentUser exists.
     // Users must be able to view the login form, enter credentials, use browser autofill, or re-authenticate.
     navigate(state.view, true);
@@ -90,10 +105,40 @@ window.addEventListener('popstate', event => {
 /* ── Global keyboard shortcuts ───────────────────────────────── */
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
-    ['modal-create-suite','modal-quick-suite','modal-about','modal-profile','modal-ws-invite']
-      .forEach(closeModal);
+    // 1. Close all open modal overlays
+    document.querySelectorAll('.modal-overlay:not(.hidden)').forEach(el => el.classList.add('hidden'));
+
+    // 2. Close notification dropdown
+    const notifDropdown = document.getElementById('notification-dropdown');
+    if (notifDropdown && !notifDropdown.classList.contains('hidden')) {
+      notifDropdown.classList.add('hidden');
+    }
+
+    // 3. Close context menus
+    if (typeof closeDocContextMenu === 'function') closeDocContextMenu();
+    if (typeof closeMemberContextMenu === 'function') closeMemberContextMenu();
+
+    // 4. Close category modal and notepad
+    if (typeof closeCategoryModal === 'function') closeCategoryModal();
+    if (typeof closeNotepad === 'function') closeNotepad();
+
+    // 5. Close private chat panel
+    if (typeof closePrivateChatPanel === 'function') closePrivateChatPanel();
+
+    // 6. Minimize video call and screen share overlays
+    const vcOverlay = document.getElementById('video-call-overlay');
+    if (vcOverlay && !vcOverlay.classList.contains('hidden')) {
+      vcOverlay.classList.add('hidden');
+    }
+    const ssOverlay = document.getElementById('screen-share-overlay');
+    if (ssOverlay && !ssOverlay.classList.contains('hidden')) {
+      ssOverlay.classList.add('hidden');
+    }
+
+    // 7. Close AI study buddy if open
+    if (typeof closeAIBuddy === 'function') closeAIBuddy();
   }
-  if (e.key === 'Enter' && document.getElementById('view-login').classList.contains('active')) {
+  if (e.key === 'Enter' && document.getElementById('view-login')?.classList.contains('active')) {
     // Do not trigger login if focus is on the password toggle button
     const focused = document.activeElement;
     const isToggleBtn = focused && focused.id === 'login-pw-toggle';
@@ -101,11 +146,11 @@ document.addEventListener('keydown', e => {
   }
 });
 
-/* ── Close modals on backdrop click ──────────────────────────── */
-document.querySelectorAll('.modal-overlay').forEach(overlay => {
-  overlay.addEventListener('click', function(e) {
-    if (e.target === this) this.classList.add('hidden');
-  });
+/* ── Close modals on backdrop click (Delegated) ──────────────── */
+document.addEventListener('click', function(e) {
+  if (e.target && e.target.classList && e.target.classList.contains('modal-overlay')) {
+    e.target.classList.add('hidden');
+  }
 });
 
 /* ── App Initialisation ──────────────────────────────────────── */

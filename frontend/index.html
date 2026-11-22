@@ -146,6 +146,9 @@
 
         <!-- Trailing Action Cluster -->
         <div class="flex items-center gap-3">
+          <button type="button" id="landing-btn-dashboard" class="hidden text-sm font-semibold text-[#0247AE] hover:underline px-3 py-1.5 transition-colors cursor-pointer" onclick="navigate('view-dashboard')">
+            Dashboard →
+          </button>
           <button type="button" class="text-sm font-semibold text-[#2C2C2C] hover:text-[#0247AE] px-3 py-1.5 transition-colors cursor-pointer" onclick="navigate('view-login')">
             Sign In
           </button>
@@ -366,6 +369,15 @@
   <!-- VIEW 2: LOGIN (#view-login) -->
   <section id="view-login" class="view flex flex-col min-h-screen bg-[#FFFAFA] items-center justify-center p-4">
     <div class="w-full max-w-md my-auto">
+      <!-- Back Navigation Header -->
+      <div class="flex items-center justify-between mb-4">
+        <button type="button" onclick="navigate('view-landing')" class="inline-flex items-center gap-1.5 text-xs font-semibold text-[#587D90] hover:text-[#0247AE] transition-colors cursor-pointer py-1 px-1.5 -ml-1.5 rounded hover:bg-[#F6F3F2]">
+          <span class="material-symbols-outlined text-base">arrow_back</span>
+          <span>Back to Home</span>
+        </button>
+        <span class="text-xs font-bold text-[#0247AE] tracking-tight">CoLearn</span>
+      </div>
+
       <!-- Mode Tabs -->
       <div class="flex border-b border-[#E1DFE2] mb-6">
         <button type="button" class="flex-1 pb-2.5 text-sm font-semibold text-[#0247AE] border-b-2 border-[#0247AE] text-center cursor-pointer">
@@ -432,6 +444,15 @@
   <!-- VIEW 3: SIGNUP (#view-signup) -->
   <section id="view-signup" class="view flex flex-col min-h-screen bg-[#FFFAFA] items-center justify-start sm:justify-center p-4 py-8 overflow-y-auto">
     <div class="w-full max-w-lg my-auto">
+      <!-- Back Navigation Header -->
+      <div class="flex items-center justify-between mb-4">
+        <button type="button" onclick="navigate('view-landing')" class="inline-flex items-center gap-1.5 text-xs font-semibold text-[#587D90] hover:text-[#0247AE] transition-colors cursor-pointer py-1 px-1.5 -ml-1.5 rounded hover:bg-[#F6F3F2]">
+          <span class="material-symbols-outlined text-base">arrow_back</span>
+          <span>Back to Home</span>
+        </button>
+        <span class="text-xs font-bold text-[#0247AE] tracking-tight">CoLearn</span>
+      </div>
+
       <!-- Mode Tabs -->
       <div class="flex border-b border-[#E1DFE2] mb-6">
         <button type="button" class="flex-1 pb-2.5 text-sm font-medium text-[#587D90] hover:text-[#0247AE] text-center cursor-pointer transition-colors" onclick="navigate('view-login')">
@@ -573,6 +594,15 @@
   <!-- VIEW 4: FORGOT PASSWORD (#view-forgot) -->
   <section id="view-forgot" class="view flex flex-col min-h-screen bg-[#FFFAFA] items-center justify-center p-4">
     <div class="w-full max-w-md my-auto">
+      <!-- Back Navigation Header -->
+      <div class="flex items-center justify-between mb-4">
+        <button type="button" onclick="navigate('view-landing')" class="inline-flex items-center gap-1.5 text-xs font-semibold text-[#587D90] hover:text-[#0247AE] transition-colors cursor-pointer py-1 px-1.5 -ml-1.5 rounded hover:bg-[#F6F3F2]">
+          <span class="material-symbols-outlined text-base">arrow_back</span>
+          <span>Back to Home</span>
+        </button>
+        <span class="text-xs font-bold text-[#0247AE] tracking-tight">CoLearn</span>
+      </div>
+
       <!-- Mode Tabs -->
       <div class="flex border-b border-[#E1DFE2] mb-6">
         <button type="button" class="flex-1 pb-2.5 text-sm font-medium text-[#587D90] hover:text-[#0247AE] text-center cursor-pointer transition-colors" onclick="navigate('view-login')">
@@ -619,6 +649,10 @@
           <button type="button" id="btn-verify-otp" onclick="verifyResetStep()" class="btn-primary-stitch w-full py-2.5 rounded-md font-semibold text-sm cursor-pointer shadow-sm">
             Verify Code
           </button>
+          <button type="button" onclick="showForgotStep(1)" class="w-full py-2 text-xs font-semibold text-[#587D90] hover:text-[#0247AE] hover:bg-[#F8F9FA] rounded-md transition-colors cursor-pointer flex items-center justify-center gap-1">
+            <span class="material-symbols-outlined text-sm">arrow_back</span>
+            <span>Change Email / Back</span>
+          </button>
         </div>
 
         <!-- Step 3: New Password -->
@@ -633,6 +667,10 @@
           </div>
           <button type="button" id="btn-reset-password" onclick="handleResetPassword()" class="btn-primary-stitch w-full py-2.5 rounded-md font-semibold text-sm cursor-pointer shadow-sm">
             Update Password &amp; Sign In
+          </button>
+          <button type="button" onclick="showForgotStep(2)" class="w-full py-2 text-xs font-semibold text-[#587D90] hover:text-[#0247AE] hover:bg-[#F8F9FA] rounded-md transition-colors cursor-pointer flex items-center justify-center gap-1">
+            <span class="material-symbols-outlined text-sm">arrow_back</span>
+            <span>Back to Code Verification</span>
           </button>
         </div>
 
@@ -682,11 +720,29 @@
             <span>Study Network Connected</span>
           </div>
 
-          <!-- Notification Bell Trigger -->
-          <button type="button" id="btn-notification-bell" onclick="showToast('main-toast', '🔔 You are up to date on suite notifications.', 'dark')" class="w-8 h-8 rounded-full hover:bg-[#F6F3F2] border border-[#E1DFE2] flex items-center justify-center text-[#587D90] transition-colors relative cursor-pointer" title="Notifications">
-            <span class="material-symbols-outlined text-lg">notifications</span>
-            <span id="notification-count" class="hidden absolute -top-1 -right-1 w-4 h-4 bg-[#BA1A1A] text-white text-[10px] font-bold rounded-full flex items-center justify-center">0</span>
-          </button>
+          <!-- Notification Bell Trigger & Dropdown -->
+          <div id="notification-bell-wrap" class="relative">
+            <button type="button" id="btn-notification-bell" onclick="toggleNotificationPanel()" class="w-8 h-8 rounded-full hover:bg-[#F6F3F2] border border-[#E1DFE2] flex items-center justify-center text-[#587D90] transition-colors relative cursor-pointer" title="Notifications">
+              <span class="material-symbols-outlined text-lg">notifications</span>
+              <span id="notification-count" class="hidden absolute -top-1 -right-1 w-4 h-4 bg-[#BA1A1A] text-white text-[10px] font-bold rounded-full flex items-center justify-center">0</span>
+            </button>
+
+            <!-- Notification Dropdown -->
+            <div id="notification-dropdown" class="hidden absolute right-0 mt-2 w-80 sm:w-96 bg-white border border-[#E1DFE2] rounded-xl shadow-[0_8px_30px_rgba(45,67,88,0.12)] z-50 overflow-hidden">
+              <div class="px-4 py-3 border-b border-[#E1DFE2] bg-[#F6F3F2] flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <span class="material-symbols-outlined text-sm text-[#0247AE]">notifications</span>
+                  <span class="text-xs font-bold text-[#2C2C2C]">Notifications</span>
+                </div>
+                <button type="button" onclick="clearAllNotifications()" class="text-[11px] font-semibold text-[#0247AE] hover:underline cursor-pointer">
+                  Clear all
+                </button>
+              </div>
+              <div id="notification-list" class="max-h-80 overflow-y-auto divide-y divide-[#E1DFE2]/60 text-xs">
+                <div class="p-6 text-center text-[#587D90]">No notifications</div>
+              </div>
+            </div>
+          </div>
 
           <!-- User Profile Trigger -->
           <button type="button" onclick="showProfile()" class="flex items-center gap-2 pl-2 pr-3 py-1 rounded-full border border-[#E1DFE2] hover:bg-[#F6F3F2] transition-colors cursor-pointer">
@@ -799,13 +855,13 @@
   <section id="view-workspace" class="view flex flex-col h-screen overflow-hidden bg-[#FFFAFA] text-[#2C2C2C]">
     <!-- 1. WORKSPACE TOP BAR (#ws-topbar) - 52px Institutional Masthead -->
     <header id="ws-topbar" class="h-[52px] min-h-[52px] bg-white border-b border-[#E1DFE2] px-3 sm:px-4 flex items-center justify-between z-40 shrink-0 select-none shadow-[0_1px_3px_rgba(45,67,88,0.03)]">
-      <!-- Left: Brand Logo, Suite Name & Privacy Badge -->
+      <!-- Left: Exit to Dashboard, Suite Name & Privacy Badge -->
       <div class="flex items-center space-x-2 sm:space-x-3 overflow-hidden">
-        <a class="flex items-center gap-1.5 shrink-0 cursor-pointer" onclick="navigate('view-dashboard')" title="Return to Dashboard">
-          <span class="w-7 h-7 rounded bg-[#0247AE] text-white flex items-center justify-center font-bold text-xs shadow-sm">CL</span>
-          <span class="text-sm font-bold text-[#0247AE] tracking-tight hidden md:inline">CoLearn</span>
-        </a>
-        <span class="text-[#E1DFE2] text-sm">/</span>
+        <button type="button" onclick="confirmLeaveWorkspaceToDashboard()" class="flex items-center gap-1 text-xs font-semibold text-[#587D90] hover:text-[#0247AE] px-2 py-1 -ml-1 rounded hover:bg-[#F6F3F2] transition-colors cursor-pointer shrink-0" title="Exit Suite and Return to Dashboard">
+          <span class="material-symbols-outlined text-base">arrow_back</span>
+          <span class="hidden sm:inline">Dashboard</span>
+        </button>
+        <span class="text-[#E1DFE2] text-sm shrink-0">/</span>
 
         <!-- Suite Title & Badge -->
         <div class="flex items-center space-x-2 truncate">
@@ -843,7 +899,7 @@
         </button>
 
         <!-- Screen Share Pill -->
-        <div id="ws-screen-share-pill" style="display:none;" class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-[#F0EDED] text-[#2D4358] border border-[#E1DFE2]">
+        <div id="ws-screen-share-pill" style="display:none;" onclick="if(document.getElementById('screen-share-overlay') && !document.getElementById('screen-share-overlay').classList.contains('hidden')){ document.getElementById('screen-share-overlay').classList.add('hidden'); } else if(document.getElementById('screen-share-overlay')){ document.getElementById('screen-share-overlay').classList.remove('hidden'); }" class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-[#F0EDED] text-[#2D4358] border border-[#E1DFE2] cursor-pointer" title="Screen share active">
           <span class="material-symbols-outlined text-sm text-[#0247AE]">screen_share</span>
           <span id="ws-ss-indicator-text">Sharing</span>
         </div>
@@ -947,6 +1003,14 @@
         <div id="ws-state-whiteboard" style="display:none;" class="flex-1 flex flex-col relative w-full h-full overflow-hidden select-none">
           <!-- Canvas Viewport -->
           <div id="ws-canvas-viewport" class="relative w-full h-full bg-dot-grid overflow-hidden">
+            <!-- Floating Exit Canvas Pill -->
+            <div class="absolute top-4 left-4 z-30">
+              <button type="button" onclick="setWSState('invite')" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white border border-[#E1DFE2] text-xs font-semibold text-[#2C2C2C] shadow-[0_4px_12px_rgba(45,67,88,0.08)] hover:bg-[#F6F3F2] hover:text-[#0247AE] transition-colors cursor-pointer" title="Exit Whiteboard to Suite Overview">
+                <span class="material-symbols-outlined text-base">arrow_back</span>
+                <span>Exit Canvas</span>
+              </button>
+            </div>
+
             <!-- Canvas Wrapper -->
             <div id="whiteboard-canvas-wrapper" class="w-full h-full relative">
               <canvas id="whiteboard-canvas" class="absolute inset-0 w-full h-full z-10 cursor-crosshair"></canvas>
@@ -996,6 +1060,13 @@
               <button type="button" id="wb-btn-next" class="p-1.5 rounded hover:bg-[#F6F3F2] text-[#587D90] transition-colors cursor-pointer" title="Next Page">
                 <span class="material-symbols-outlined text-base">chevron_right</span>
               </button>
+
+              <div class="h-5 w-px bg-[#E1DFE2] mx-1"></div>
+
+              <!-- Exit Whiteboard Button -->
+              <button type="button" onclick="setWSState('invite')" class="p-1.5 rounded hover:bg-[#F6F3F2] text-[#587D90] hover:text-[#BA1A1A] transition-colors cursor-pointer" title="Exit Whiteboard">
+                <span class="material-symbols-outlined text-base">close</span>
+              </button>
             </div>
           </div>
         </div>
@@ -1005,6 +1076,16 @@
         <!-- Authoritative Reference: Stitch Screen 5                    -->
         <!-- ═════════════════════════════════════════════════════════════ -->
         <div id="ws-state-docs" style="display:none;" class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-6">
+          <!-- Documents Breadcrumb Navigation -->
+          <div class="flex items-center gap-2 text-xs text-[#587D90] pb-2 border-b border-[#E1DFE2]">
+            <button type="button" onclick="setWSState('invite')" class="inline-flex items-center gap-1 text-[#0247AE] hover:underline font-semibold cursor-pointer">
+              <span class="material-symbols-outlined text-sm">arrow_back</span>
+              <span>Suite Overview</span>
+            </button>
+            <span class="text-[#8E9099]">/</span>
+            <span class="text-[#2C2C2C] font-semibold">Documents &amp; Drive</span>
+          </div>
+
           <!-- Google Drive Connect Card -->
           <div class="bg-white border border-[#E1DFE2] rounded-xl p-6 shadow-[0_2px_8px_rgba(45,67,88,0.06)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div class="flex items-center gap-4">
@@ -1383,6 +1464,256 @@
           Close
         </button>
       </div>
+    </div>
+  </div>
+
+  <!-- Modal: Workspace Invite (#modal-ws-invite) -->
+  <div id="modal-ws-invite" class="modal-overlay hidden">
+    <div class="modal-dialog max-w-md">
+      <div class="modal-header">
+        <div class="modal-title">
+          <span class="material-symbols-outlined text-[#0247AE]">mail</span>
+          <span>Invite to Suite</span>
+        </div>
+        <button type="button" onclick="closeModal('modal-ws-invite')" class="text-[#587D90] hover:text-[#2C2C2C] cursor-pointer">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <div class="modal-body space-y-4">
+        <!-- Step 1: Generated code + link -->
+        <div id="invite-info-panel" style="display:none;" class="space-y-3">
+          <div class="bg-[#2D4358] rounded-xl p-4 text-center">
+            <div class="text-[11px] font-semibold text-[#DAE2FF] uppercase tracking-wider mb-1">5-Digit Invite Code</div>
+            <div id="invite-code-display" class="text-3xl font-mono font-bold tracking-widest text-white">─ ─ ─ ─ ─</div>
+          </div>
+          <div class="flex items-center gap-2 p-2 bg-[#F6F3F2] border border-[#E1DFE2] rounded-lg">
+            <span id="invite-link-display" class="text-xs text-[#0247AE] font-mono truncate flex-1 select-all">Generating…</span>
+            <button type="button" onclick="copyInviteLink()" class="btn-primary-stitch text-xs py-1 px-2.5 rounded shrink-0 cursor-pointer">
+              Copy Link
+            </button>
+          </div>
+          <div class="text-[11px] text-[#587D90] bg-[#FFF8F0] border border-[#F6E7D2] rounded-lg p-2.5 flex items-start gap-1.5">
+            <span class="material-symbols-outlined text-sm text-[#C8AA6E] shrink-0 mt-0.5">info</span>
+            <span>This code is active while you (the suite host) remain connected.</span>
+          </div>
+        </div>
+
+        <!-- Divider -->
+        <div id="invite-divider" style="display:none;" class="flex items-center gap-3">
+          <div class="flex-1 h-px bg-[#E1DFE2]"></div>
+          <span class="text-[11px] font-bold text-[#8E9099] uppercase tracking-wider">Send via Email</span>
+          <div class="flex-1 h-px bg-[#E1DFE2]"></div>
+        </div>
+
+        <!-- Step 2: Email form -->
+        <div id="invite-email-form" class="space-y-3">
+          <div>
+            <label class="block text-xs font-semibold text-[#2C2C2C] mb-1" for="invite-email-input">Recipient Institutional Email</label>
+            <input id="invite-email-input" type="email" class="input-stitch" placeholder="colleague@university.edu" onkeydown="if(event.key==='Enter') handleSendInviteEmail()"/>
+          </div>
+          <div id="invite-email-alert" class="hidden text-xs p-2.5 rounded-lg"></div>
+          <button type="button" id="btn-send-invite" onclick="handleSendInviteEmail()" class="btn-primary-stitch w-full py-2.5 rounded-lg text-xs font-semibold cursor-pointer">
+            Send Invitation
+          </button>
+        </div>
+
+        <!-- Loading state -->
+        <div id="invite-loading" style="display:none;" class="text-center py-4 text-xs text-[#587D90]">
+          <span class="material-symbols-outlined animate-spin text-xl text-[#0247AE] block mb-1">progress_activity</span>
+          Sending invitation…
+        </div>
+
+        <!-- Loading spinner for generating code -->
+        <div id="invite-generating" style="display:none;" class="text-center py-4 text-xs text-[#587D90]">
+          <span class="material-symbols-outlined animate-spin text-xl text-[#0247AE] block mb-1">progress_activity</span>
+          Generating invite code…
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" onclick="closeModal('modal-ws-invite')" class="btn-secondary-stitch text-xs py-2 px-3 rounded cursor-pointer">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Member Info (#modal-member-info) -->
+  <div id="modal-member-info" class="modal-overlay hidden">
+    <div class="modal-dialog max-w-sm">
+      <div class="modal-header">
+        <div class="modal-title">
+          <span class="material-symbols-outlined text-[#0247AE]">person</span>
+          <span>Member Profile</span>
+        </div>
+        <button type="button" onclick="closeModal('modal-member-info')" class="text-[#587D90] hover:text-[#2C2C2C] cursor-pointer">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <div class="modal-body space-y-4">
+        <div class="flex items-center gap-3.5 p-3.5 bg-[#F6F3F2] border border-[#E1DFE2] rounded-xl">
+          <div id="minfo-avatar" class="w-12 h-12 rounded-full bg-[#0247AE] text-white font-bold text-lg flex items-center justify-center shrink-0">
+            U
+          </div>
+          <div class="min-w-0 flex-1">
+            <div id="minfo-name" class="font-bold text-sm text-[#2C2C2C] truncate">Member Name</div>
+            <div id="minfo-status" class="text-xs text-[#587D90] mt-0.5">● Online</div>
+            <div id="minfo-role" class="text-[11px] font-semibold text-[#0247AE] mt-0.5">Member</div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer flex items-center justify-end gap-2">
+        <button type="button" id="minfo-msg-btn" class="btn-primary-stitch text-xs py-2 px-3 rounded cursor-pointer inline-flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-sm">chat</span>
+          <span>Message</span>
+        </button>
+        <button type="button" onclick="closeModal('modal-member-info')" class="btn-secondary-stitch text-xs py-2 px-3 rounded cursor-pointer">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Remove Member (#modal-remove-member) -->
+  <div id="modal-remove-member" class="modal-overlay hidden">
+    <div class="modal-dialog max-w-sm">
+      <div class="modal-header">
+        <div class="modal-title text-[#BA1A1A]">
+          <span class="material-symbols-outlined text-[#BA1A1A]">person_remove</span>
+          <span>Remove Member</span>
+        </div>
+        <button type="button" onclick="closeModal('modal-remove-member')" class="text-[#587D90] hover:text-[#2C2C2C] cursor-pointer">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <div class="modal-body text-xs text-[#587D90] leading-relaxed">
+        Are you sure you want to remove <strong id="remove-member-name" class="text-[#2C2C2C]">this member</strong> from the suite? They will lose access to the suite session and active materials immediately.
+      </div>
+      <div class="modal-footer flex items-center justify-end gap-2">
+        <button type="button" onclick="closeModal('modal-remove-member')" class="btn-secondary-stitch text-xs py-2 px-3 rounded cursor-pointer">
+          Cancel
+        </button>
+        <button type="button" id="btn-confirm-remove-member" onclick="confirmRemoveMember()" class="btn-primary-stitch text-xs py-2 px-3 rounded font-semibold bg-[#BA1A1A] hover:bg-rose-700 border-none cursor-pointer">
+          Remove Member
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Screen Share Busy (#modal-screen-share-busy) -->
+  <div id="modal-screen-share-busy" class="modal-overlay hidden">
+    <div class="modal-dialog max-w-sm text-center">
+      <div class="w-12 h-12 rounded-full bg-[#EBF8FF] text-[#0247AE] flex items-center justify-center mx-auto mb-3">
+        <span class="material-symbols-outlined text-2xl">screen_share</span>
+      </div>
+      <h3 class="text-base font-bold text-[#2C2C2C] mb-1">
+        <span id="ss-busy-presenter">Someone</span> is presenting
+      </h3>
+      <p class="text-xs text-[#587D90] mb-4">
+        Only one screen share stream can be active at a time. Please wait for the current presenter to stop sharing.
+      </p>
+      <div class="modal-footer justify-center">
+        <button type="button" onclick="closeModal('modal-screen-share-busy')" class="btn-primary-stitch text-xs py-2 px-6 rounded font-semibold cursor-pointer">
+          Got it
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide-out Private Chat Drawer (#private-chat-panel) -->
+  <div id="private-chat-panel" class="private-chat-panel hidden">
+    <div class="pc-header">
+      <div class="flex items-center gap-2">
+        <span class="material-symbols-outlined text-[#0247AE] text-lg">forum</span>
+        <span class="font-bold text-sm text-[#2C2C2C]">Private Messages</span>
+      </div>
+      <button type="button" onclick="closePrivateChatPanel()" class="text-[#587D90] hover:text-[#2C2C2C] cursor-pointer" title="Close Private Messages">
+        <span class="material-symbols-outlined text-lg">close</span>
+      </button>
+    </div>
+    <div class="pc-body">
+      <!-- Conversation List -->
+      <div id="pc-conversation-list" class="pc-conv-list">
+        <div class="p-4 text-center text-xs text-[#587D90]">
+          <span class="material-symbols-outlined text-2xl text-[#8E9099] block mb-1">chat_bubble_outline</span>
+          No conversations yet
+        </div>
+      </div>
+      <!-- Active Conversation -->
+      <div id="pc-active-conversation" class="pc-active-conv" style="display:none;">
+        <div class="pc-conv-header">
+          <button type="button" onclick="showConversationList()" class="inline-flex items-center gap-1 text-xs font-semibold text-[#0247AE] hover:underline cursor-pointer">
+            <span class="material-symbols-outlined text-sm">arrow_back</span>
+            <span>Back</span>
+          </button>
+          <span id="pc-peer-name" class="font-bold text-xs text-[#2C2C2C] truncate"></span>
+          <span id="pc-peer-status" class="text-[11px] text-emerald-600 font-medium"></span>
+        </div>
+        <div id="pc-messages" class="pc-messages"></div>
+        <div id="pc-typing-indicator" class="px-3 py-1 text-[11px] text-[#587D90] h-5"></div>
+        <!-- Reply preview -->
+        <div id="pc-reply-preview" style="display:none;" class="mx-2 mb-1 p-2 bg-[#EBF8FF] border-l-2 border-[#0247AE] rounded-r text-xs text-[#2D4358] flex items-center justify-between">
+          <span id="pc-reply-text" class="truncate flex-1"></span>
+          <button type="button" onclick="clearReply()" class="text-[#587D90] hover:text-[#2C2C2C] ml-2 cursor-pointer">
+            <span class="material-symbols-outlined text-sm">close</span>
+          </button>
+        </div>
+        <!-- Emoji Picker -->
+        <div id="pc-emoji-picker" class="pc-emoji-picker hidden"></div>
+        <div class="p-2 border-t border-[#E1DFE2] flex items-center gap-1.5 bg-white">
+          <button type="button" onclick="toggleEmojiPicker()" class="p-1 text-[#587D90] hover:text-[#0247AE] cursor-pointer" title="Insert Emoji">
+            <span class="material-symbols-outlined text-lg">sentiment_satisfied</span>
+          </button>
+          <input id="pc-message-input" type="text" class="input-stitch flex-1 text-xs py-1.5 px-2.5" placeholder="Type a message…" onkeydown="if(event.key==='Enter'&amp;&amp;!event.shiftKey){event.preventDefault();sendPrivateMessage();}" oninput="handlePrivateTyping()"/>
+          <button type="button" id="btn-pc-send" onclick="sendPrivateMessage()" class="btn-primary-stitch text-xs py-1.5 px-3 rounded cursor-pointer">
+            Send
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Video Call Overlay (#video-call-overlay) -->
+  <div id="video-call-overlay" class="media-overlay hidden" style="flex-direction:column;position:fixed;top:0;left:0;right:0;bottom:0;z-index:2000;background:rgba(15,23,42,0.96);display:flex;">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:0.9rem 1.5rem;background:rgba(0,0,0,0.3);border-bottom:1px solid rgba(255,255,255,0.1);flex-shrink:0;">
+      <div style="display:flex;align-items:center;gap:0.75rem;">
+        <span class="material-symbols-outlined text-white text-xl">videocam</span>
+        <span style="font-weight:700;color:#fff;font-size:0.95rem;">Video Call</span>
+        <span id="vc-status" style="color:#38bdf8;font-size:0.8rem;font-weight:600;">In call</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:0.6rem;">
+        <button type="button" class="btn-secondary-stitch text-xs py-1.5 px-3 rounded-full bg-white/10 hover:bg-white/20 text-white border-white/20 cursor-pointer inline-flex items-center gap-1" onclick="document.getElementById('video-call-overlay').classList.add('hidden')" title="Minimize overlay to workspace">
+          <span class="material-symbols-outlined text-sm">close_fullscreen</span>
+          <span>Minimize</span>
+        </button>
+      </div>
+    </div>
+    <div id="vc-grid" class="vc-grid" style="flex:1; padding:2rem 2rem 6rem; overflow-y:auto;"></div>
+  </div>
+
+  <!-- Screen Share Overlay (#screen-share-overlay) -->
+  <div id="screen-share-overlay" class="media-overlay hidden" style="flex-direction:column;position:fixed;top:0;left:0;right:0;bottom:0;z-index:2000;background:rgba(15,23,42,0.96);display:flex;">
+    <div id="screen-share-header" style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 1.25rem;background:rgba(0,0,0,0.4);border-bottom:1px solid rgba(255,255,255,0.12);flex-shrink:0;min-height:52px;gap:0.5rem;flex-wrap:wrap;">
+      <div style="display:flex;align-items:center;gap:0.75rem;min-width:0;">
+        <span class="material-symbols-outlined text-white text-xl">screen_share</span>
+        <span id="ss-presenter-name" style="font-weight:700;color:#fff;font-size:0.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Screen Share</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:0.6rem;flex-shrink:0;flex-wrap:nowrap;">
+        <button type="button" id="btn-stop-screen-share" class="btn-primary-stitch text-xs py-1.5 px-3 rounded-full bg-[#BA1A1A] hover:bg-rose-700 text-white border-none cursor-pointer inline-flex items-center gap-1" onclick="stopScreenShare()" style="display:none;">
+          <span class="material-symbols-outlined text-sm">stop_circle</span>
+          <span>Stop Sharing</span>
+        </button>
+        <button type="button" id="btn-fullscreen-screen-share" class="btn-secondary-stitch text-xs py-1.5 px-3 rounded-full bg-white/10 hover:bg-white/20 text-white border-white/20 cursor-pointer inline-flex items-center gap-1" onclick="toggleScreenShareFullscreen()" title="Toggle Fullscreen">
+          <span class="material-symbols-outlined text-sm">fullscreen</span>
+          <span>Fullscreen</span>
+        </button>
+        <button type="button" class="btn-secondary-stitch text-xs py-1.5 px-3 rounded-full bg-white/10 hover:bg-white/20 text-white border-white/20 cursor-pointer inline-flex items-center gap-1" onclick="document.getElementById('screen-share-overlay').classList.add('hidden')" title="Minimize overlay to workspace">
+          <span class="material-symbols-outlined text-sm">close_fullscreen</span>
+          <span>Minimize</span>
+        </button>
+      </div>
+    </div>
+    <div style="flex:1;display:flex;align-items:center;justify-content:center;background:#020617;position:relative;padding:1.5rem;">
+      <video id="screen-share-video" autoplay playsinline style="max-width:100%;max-height:100%;width:100%;height:100%;object-fit:contain;"></video>
     </div>
   </div>
 

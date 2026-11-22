@@ -238,6 +238,7 @@ var DocumentRenderer = (function () {
             '</div>' +
             '<div style="display:flex;align-items:center;gap:10px;">' +
               '<a href="' + escapeHtml(downloadUrl) + '" target="_blank" class="cl-btn">⬇️ Download</a>' +
+              '<button type="button" onclick="window.close()" class="cl-btn" style="background:#f1f5f9;color:#334155;border-color:#cbd5e1;">✕ Close</button>' +
             '</div>' +
           '</div>' +
           '<div class="cl-viewer-body">' + contentHtml + '</div>' +

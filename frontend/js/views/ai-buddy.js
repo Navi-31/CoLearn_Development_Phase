@@ -676,3 +676,8 @@ async function appendAIBubbleStreaming(msg) {
   // Stream typewriter text
   await streamTypewriter(textContainer, msg.content, 20);
 }
+
+// Global aliases for toolbar and button event handlers
+window.toggleAI = toggleAIBuddy;
+window.closeAI  = closeAIBuddy;
+window.openAI   = openAIBuddy;

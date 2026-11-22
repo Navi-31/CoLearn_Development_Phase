@@ -1,6 +1,16 @@
 /* ── Landing Page View Handler ─────────────────────────────────── */
 
 function initLandingPage() {
+  // If user is already authenticated, show the Return to Dashboard action in header
+  const dashBtn = document.getElementById('landing-btn-dashboard');
+  if (dashBtn) {
+    if (window.AppState && window.AppState.currentUser) {
+      dashBtn.style.display = 'inline-flex';
+    } else {
+      dashBtn.style.display = 'none';
+    }
+  }
+
   const revealObserverOptions = { threshold: 0.15, rootMargin: '0px 0px -50px 0px' };
   const revealObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
