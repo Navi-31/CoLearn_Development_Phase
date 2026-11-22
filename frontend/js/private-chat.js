@@ -49,10 +49,22 @@ function initPrivateChat(userId, userName) {
 
 function openPrivateConversation(peerId, peerName) {
   if (!_pcUserId && window.AppState && window.AppState.currentUser) {
-    initPrivateChat(window.AppState.currentUser.uid, window.AppState.currentUser.name);
+    var curName = window.AppState.currentUser.name || window.AppState.currentUser.username || 'User';
+    initPrivateChat(window.AppState.currentUser.uid, curName);
   }
   if (!_pcUserId && window.fsAuth && window.fsAuth.currentUser) {
     initPrivateChat(window.fsAuth.currentUser.uid, window.fsAuth.currentUser.displayName || 'User');
+  }
+  if (!_pcUserId && typeof localStorage !== 'undefined') {
+    try {
+      var rawUser = localStorage.getItem('fs_user');
+      if (rawUser) {
+        var u = JSON.parse(rawUser);
+        if (u && (u.uid || u.id)) {
+          initPrivateChat(u.uid || u.id, u.name || u.username || 'User');
+        }
+      }
+    } catch (_) {}
   }
   if (!_pcUserId) return;
 

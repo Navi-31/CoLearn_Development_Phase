@@ -20,7 +20,7 @@ function initMemberContextMenu() {
 
   /* Close on Escape */
   document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') hideMemberContextMenu();
+    if (e.key === 'Escape' || e.key === 'Esc') hideMemberContextMenu();
   });
 
   /* Close on click outside */
@@ -28,6 +28,31 @@ function initMemberContextMenu() {
     if (_cmMenuEl && !_cmMenuEl.classList.contains('hidden') && !_cmMenuEl.contains(e.target)) {
       hideMemberContextMenu();
     }
+  });
+
+  /* Close on window resize, navigation, or scrolling outside the menu */
+  window.addEventListener('resize', hideMemberContextMenu);
+  window.addEventListener('hashchange', hideMemberContextMenu);
+  window.addEventListener('popstate', hideMemberContextMenu);
+
+  /* Delegation: Right-click directly on member cards in sidebar */
+  document.addEventListener('contextmenu', function(e) {
+    var card = e.target.closest('.member-card[data-uid], .member-card[data-member-uid]');
+    if (!card) {
+      // Right-clicking outside a member entry: close menu if open, do NOT open menu
+      if (_cmMenuEl && !_cmMenuEl.classList.contains('hidden') && !_cmMenuEl.contains(e.target)) {
+        hideMemberContextMenu();
+      }
+      return;
+    }
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    var uid  = card.dataset.uid || card.dataset.memberUid;
+    if (!uid) return;
+    var name = card.dataset.name || card.querySelector('.member-name')?.textContent?.trim() || 'Member';
+    showMemberContextMenu(e, uid, name);
   });
 
   /* MutationObserver: auto-attach handlers when member cards are added to sidebar */
@@ -38,6 +63,8 @@ function initMemberContextMenu() {
     });
     observer.observe(sidebar, { childList: true, subtree: true });
   }
+
+  _patchMemberCards();
 
   console.info('[MemberContextMenu] Initialised.');
 }
@@ -103,109 +130,117 @@ function showMemberContextMenu(e, memberId, memberName, isCallerHost) {
 
   var items = [];
 
-  // Always: VIEW DETAILS
-  items.push({
-    label: '👁️ VIEW DETAILS',
-    action: function() { _cmShowMemberProfile(memberId, memberName); }
-  });
-
-  if (callerRole === 'HOST') {
-    if (targetRole === 'MEMBER' && !isSelf) {
-      // Check admin limit
+  if (isSelf) {
+    // Host, Admin, or Member right-clicking their own entry:
+    // Do not show promotion, demotion, removal, or ownership-transfer options.
+    items.push({
+      label: '👁️ View Profile',
+      action: function() { _cmShowMemberProfile(memberId, memberName); }
+    });
+  } else if (callerRole === 'HOST') {
+    if (targetRole === 'MEMBER') {
+      // 1. Promote to Admin
       var adminLimit = typeof suite.adminLimit === 'number' ? suite.adminLimit : 3;
       var adminCount = (suite && Array.isArray(suite.adminUids)) ? suite.adminUids.length : 0;
       var atLimit = adminCount >= adminLimit;
 
       if (atLimit) {
         items.push({
-          label: '🛡️ PROMOTE',
+          label: '🛡️ Promote to Admin',
           disabled: true,
           explanation: `Admin limit reached (${adminCount}/${adminLimit}). Increase limit in Settings to promote.`
         });
       } else {
         items.push({
-          label: '🛡️ PROMOTE',
+          label: '🛡️ Promote to Admin',
           action: function() { _cmPromoteAdmin(memberId, memberName); }
         });
       }
 
+      // 2. Private Chat
       items.push({
-        label: '💬 CHAT',
+        label: '💬 Private Chat',
         action: function() { _cmOpenPrivateChat(memberId, memberName); }
       });
 
+      // 3. Remove Member
       items.push({
-        label: '🚫 REMOVE',
+        label: '🚫 Remove Member',
         danger: true,
-        action: function() { _cmConfirmRemove(memberId, memberName); }
+        action: function() { _cmConfirmRemove(memberId, memberName, 'MEMBER'); }
       });
-    } else if (targetRole === 'ADMIN' && !isSelf) {
+
+    } else if (targetRole === 'ADMIN') {
+      // 1. Demote to Member
       items.push({
-        label: '⏬ DEMOTE',
+        label: '⏬ Demote to Member',
         action: function() { _cmDemoteAdmin(memberId, memberName); }
       });
 
+      // 2. Private Chat
       items.push({
-        label: '💬 CHAT',
+        label: '💬 Private Chat',
         action: function() { _cmOpenPrivateChat(memberId, memberName); }
       });
 
+      // 3. Remove Admin
       items.push({
-        label: '🚫 REMOVE',
+        label: '🚫 Remove Admin',
         danger: true,
-        action: function() { _cmConfirmRemove(memberId, memberName); }
+        action: function() { _cmConfirmRemove(memberId, memberName, 'ADMIN'); }
       });
     }
-    // Host targeting self: only VIEW DETAILS
+
   } else if (callerRole === 'ADMIN') {
-    if (targetRole === 'HOST') {
+    if (targetRole === 'MEMBER') {
+      // 1. Private Chat
       items.push({
-        label: '💬 CHAT',
+        label: '💬 Private Chat',
         action: function() { _cmOpenPrivateChat(memberId, memberName); }
       });
-    } else if (targetRole === 'MEMBER' && !isSelf) {
+
+      // 2. Remove Member
       items.push({
-        label: '💬 CHAT',
-        action: function() { _cmOpenPrivateChat(memberId, memberName); }
-      });
-      items.push({
-        label: '🚫 REMOVE',
+        label: '🚫 Remove Member',
         danger: true,
-        action: function() { _cmConfirmRemove(memberId, memberName); }
+        action: function() { _cmConfirmRemove(memberId, memberName, 'MEMBER'); }
       });
-    } else if (targetRole === 'ADMIN' && !isSelf) {
+
+    } else if (targetRole === 'ADMIN' || targetRole === 'HOST') {
+      // Admin right-clicking another Admin or the Host: Private Chat only
       items.push({
-        label: '💬 CHAT',
+        label: '💬 Private Chat',
         action: function() { _cmOpenPrivateChat(memberId, memberName); }
       });
     }
+
   } else {
-    // MEMBER
-    if (!isSelf) {
-      items.push({
-        label: '💬 CHAT',
-        action: function() { _cmOpenPrivateChat(memberId, memberName); }
-      });
-    }
+    // Regular Member right-clicking any other person: Private Chat only
+    items.push({
+      label: '💬 Private Chat',
+      action: function() { _cmOpenPrivateChat(memberId, memberName); }
+    });
   }
 
   // Render items
   window._cmActiveActions = items;
   var html = items.map(function(item, idx) {
     if (item.disabled) {
-      return `<div class="ctx-item" style="opacity:0.5;cursor:not-allowed;" title="${_esc(item.explanation || '')}">${item.label} <small style="display:block;font-size:0.65rem;color:var(--fl-text-muted);">${_esc(item.explanation || '')}</small></div>`;
+      return `<div class="cm-btn ctx-item" style="opacity:0.5;cursor:not-allowed;display:flex;flex-direction:column;align-items:flex-start;" title="${_esc(item.explanation || '')}"><span>${item.label}</span><small style="font-size:0.65rem;color:var(--fl-text-muted);">${_esc(item.explanation || '')}</small></div>`;
     }
-    var cls = 'ctx-item' + (item.danger ? ' danger' : '');
+    var cls = 'cm-btn ctx-item' + (item.danger ? ' danger' : '');
     return `<button class="${cls}" onclick="hideMemberContextMenu();window._cmExecuteAction(${idx})">${item.label}</button>`;
   }).join('');
 
   if (isSelf) {
-    html += '<div class="ctx-separator"></div>';
-    html += '<div class="ctx-item" style="pointer-events:none;opacity:0.6;font-size:0.75rem;font-style:italic;">(That\'s you)</div>';
+    html += '<div class="ctx-separator" style="height:1px;background:var(--border,#e2e8f0);margin:4px 0;"></div>';
+    html += '<div class="cm-btn ctx-item" style="pointer-events:none;opacity:0.6;font-size:0.75rem;font-style:italic;">(That\'s you)</div>';
   }
 
   _cmMenuEl.innerHTML = html;
   _cmMenuEl.classList.remove('hidden');
+  _cmMenuEl.classList.add('active');
+  _cmMenuEl.style.display = 'flex';
 
   /* Position at cursor or touch position (keep within viewport) */
   var rect = _cmMenuEl.getBoundingClientRect();
@@ -216,8 +251,10 @@ function showMemberContextMenu(e, memberId, memberName, isCallerHost) {
 
   var x = clientX;
   var y = clientY;
-  if (x + menuW > window.innerWidth)  x = Math.max(8, window.innerWidth  - menuW - 8);
-  if (y + menuH > window.innerHeight) y = Math.max(8, window.innerHeight - menuH - 8);
+  if (x + menuW > window.innerWidth - 8)  x = Math.max(8, window.innerWidth  - menuW - 8);
+  if (y + menuH > window.innerHeight - 8) y = Math.max(8, window.innerHeight - menuH - 8);
+  x = Math.max(8, x);
+  y = Math.max(8, y);
 
   _cmMenuEl.style.left = x + 'px';
   _cmMenuEl.style.top  = y + 'px';
@@ -231,7 +268,12 @@ window._cmExecuteAction = function(index) {
 
 /* ══ Public: hideMemberContextMenu ══════════════════════════ */
 function hideMemberContextMenu() {
-  if (_cmMenuEl) _cmMenuEl.classList.add('hidden');
+  if (!_cmMenuEl) _cmMenuEl = document.getElementById('member-context-menu');
+  if (_cmMenuEl) {
+    _cmMenuEl.classList.add('hidden');
+    _cmMenuEl.classList.remove('active');
+    _cmMenuEl.style.display = 'none';
+  }
 }
 
 /* ══ Public: confirmRemoveMember (called from modal) ════════ */
@@ -426,10 +468,17 @@ function _cmShowMemberProfile(memberId, memberName) {
   }
 }
 
-function _cmConfirmRemove(memberId, memberName) {
-  _cmPendingRemove = { memberId: memberId, memberName: memberName };
+function _cmConfirmRemove(memberId, memberName, targetRole) {
+  _cmPendingRemove = { memberId: memberId, memberName: memberName, role: targetRole };
   var nameEl = document.getElementById('remove-member-name');
   if (nameEl) nameEl.textContent = memberName;
+
+  var isTargetAdmin = (targetRole === 'ADMIN');
+  var titleEl = document.getElementById('remove-member-title') || document.querySelector('#modal-remove-member .modal-title span:last-child');
+  var btnEl = document.getElementById('btn-confirm-remove-member');
+  if (titleEl) titleEl.textContent = isTargetAdmin ? 'Remove Admin' : 'Remove Member';
+  if (btnEl) btnEl.textContent = isTargetAdmin ? 'Remove Admin' : 'Remove Member';
+
   if (typeof openModal === 'function') openModal('modal-remove-member');
 }
 
@@ -447,29 +496,48 @@ function _patchMemberCards() {
     
     // Desktop right-click
     card.addEventListener('contextmenu', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
       var uid  = card.dataset.uid || card.dataset.memberUid;
-      var name = card.dataset.name || card.querySelector('.member-name')?.textContent || 'Member';
+      var name = card.dataset.name || card.querySelector('.member-name')?.textContent?.trim() || 'Member';
       showMemberContextMenu(e, uid, name);
     });
 
     // Mobile long-press
     var pressTimer = null;
+    var touchStartX = 0;
+    var touchStartY = 0;
     var touchMoved = false;
 
     card.addEventListener('touchstart', function(e) {
       touchMoved = false;
+      if (e.touches && e.touches[0]) {
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+      }
       pressTimer = setTimeout(function() {
         if (!touchMoved) {
           var uid  = card.dataset.uid || card.dataset.memberUid;
-          var name = card.dataset.name || card.querySelector('.member-name')?.textContent || 'Member';
-          showMemberContextMenu(e, uid, name);
+          var name = card.dataset.name || card.querySelector('.member-name')?.textContent?.trim() || 'Member';
+          showMemberContextMenu({
+            clientX: touchStartX,
+            clientY: touchStartY,
+            preventDefault: function() {},
+            stopPropagation: function() {}
+          }, uid, name);
         }
       }, 500);
     }, { passive: true });
 
-    card.addEventListener('touchmove', function() {
-      touchMoved = true;
-      if (pressTimer) clearTimeout(pressTimer);
+    card.addEventListener('touchmove', function(e) {
+      if (e.touches && e.touches[0]) {
+        var dx = Math.abs(e.touches[0].clientX - touchStartX);
+        var dy = Math.abs(e.touches[0].clientY - touchStartY);
+        if (dx > 10 || dy > 10) touchMoved = true;
+      } else {
+        touchMoved = true;
+      }
+      if (touchMoved && pressTimer) clearTimeout(pressTimer);
     }, { passive: true });
 
     card.addEventListener('touchend', function() {
