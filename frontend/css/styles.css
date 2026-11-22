@@ -1100,6 +1100,84 @@ body {
   z-index: 15;
 }
 
+/* ── Direct Flowchart Nodes Layer ─────────────────────────────── */
+.wb-fc-node {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  cursor: grab;
+  box-sizing: border-box;
+  z-index: 16;
+  transition: box-shadow 0.15s, border-color 0.15s;
+}
+
+.wb-fc-node:active {
+  cursor: grabbing;
+}
+
+.wb-fc-node-start_end {
+  background: #f0fdf4;
+  border: 2px solid #16a34a;
+  border-radius: 9999px;
+  color: #14532d;
+}
+
+.wb-fc-node-process {
+  background: #eff6ff;
+  border: 2px solid #2563eb;
+  border-radius: 8px;
+  color: #1e3a8a;
+}
+
+.wb-fc-node-decision {
+  background: #fffbeb;
+  border: 2px solid #d97706;
+  border-radius: 4px;
+  transform: rotate(0deg);
+  color: #78350f;
+}
+
+.wb-fc-node.selected {
+  outline: 2px solid #dc2626 !important;
+  outline-offset: 3px;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25);
+}
+
+.wb-fc-node-text {
+  width: 100%;
+  padding: 0 8px;
+  text-align: center;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.wb-fc-connector-point {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: #ffffff;
+  border: 2px solid #2563eb;
+  border-radius: 50%;
+  cursor: crosshair;
+  z-index: 20;
+  transition: transform 0.15s, background 0.15s;
+}
+
+.wb-fc-connector-point:hover {
+  transform: scale(1.4);
+  background: #2563eb;
+}
+
+.wb-fc-point-top    { top: -6px; left: calc(50% - 5px); }
+.wb-fc-point-right  { top: calc(50% - 5px); right: -6px; }
+.wb-fc-point-bottom { bottom: -6px; left: calc(50% - 5px); }
+.wb-fc-point-left   { top: calc(50% - 5px); left: -6px; }
+
 /* ── Whiteboard Active Tool Highlighting & Inputs ─────────────── */
 .wb-btn.active,
 button#wb-btn-pen.active,

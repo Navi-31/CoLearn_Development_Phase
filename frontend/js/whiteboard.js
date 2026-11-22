@@ -932,6 +932,169 @@ function _renderFlowchartNodes() {
   });
 }
 
+function _updateNodeDOM(node) {
+  const el = document.getElementById('wb-fc-node-' + node.id);
+  if (!el) return;
+  el.style.left = (node.x / 1600 * 100) + '%';
+  el.style.top  = (node.y / 1200 * 100) + '%';
+  if (node.width)  el.style.width  = (node.width / 1600 * 100) + '%';
+  if (node.height) el.style.height = (node.height / 1200 * 100) + '%';
+  const textEl = el.querySelector('.wb-fc-node-text');
+  if (textEl && node.label !== undefined) {
+    textEl.textContent = node.label;
+  }
+}
+
+function _openNodeTextEditor(node) {
+  const el = document.getElementById('wb-fc-node-' + node.id);
+  if (!el) return;
+  const textEl = el.querySelector('.wb-fc-node-text');
+  if (!textEl) return;
+
+  const currentLabel = node.label || '';
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.value = currentLabel;
+  input.className = 'wb-fc-node-input';
+  input.style.width = '85%';
+  input.style.textAlign = 'center';
+  input.style.fontSize = 'inherit';
+  input.style.fontFamily = 'inherit';
+  input.style.background = 'transparent';
+  input.style.border = '1px dashed #2563eb';
+  input.style.borderRadius = '4px';
+  input.style.outline = 'none';
+  input.style.color = 'inherit';
+  input.style.zIndex = '10';
+
+  textEl.innerHTML = '';
+  textEl.appendChild(input);
+  input.focus();
+  input.select();
+
+  let committed = false;
+  function commitNodeText() {
+    if (committed) return;
+    committed = true;
+    const newText = input.value.trim() || currentLabel;
+    node.label = newText;
+    textEl.innerHTML = '';
+    textEl.textContent = newText;
+    _pushWBUndo();
+    _syncWBToRemote();
+  }
+
+  input.addEventListener('blur', commitNodeText);
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.stopPropagation();
+      input.blur();
+    } else if (e.key === 'Escape') {
+      e.stopPropagation();
+      committed = true;
+      textEl.innerHTML = '';
+      textEl.textContent = currentLabel;
+    }
+  });
+}
+
+function _handleNodeConnection(nodeId) {
+  if (!_connectorSourceNodeId) {
+    _connectorSourceNodeId = nodeId;
+    _renderObjectLayer();
+  } else if (_connectorSourceNodeId === nodeId) {
+    _connectorSourceNodeId = null;
+    _renderObjectLayer();
+  } else {
+    const page = wbPages[wbPageIndex];
+    if (page) {
+      if (!page.flowchartConnectors) page.flowchartConnectors = [];
+      const exists = page.flowchartConnectors.some(c =>
+        (c.fromId === _connectorSourceNodeId && c.toId === nodeId) ||
+        (c.fromId === nodeId && c.toId === _connectorSourceNodeId)
+      );
+      if (!exists) {
+        page.flowchartConnectors.push({
+          id: 'conn_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+          fromId: _connectorSourceNodeId,
+          toId: nodeId,
+          color: wbColor || '#2563eb'
+        });
+        _pushWBUndo();
+        _syncWBToRemote();
+      }
+    }
+    _connectorSourceNodeId = null;
+    _renderObjectLayer();
+  }
+}
+
+function _handleFlowchartPlacement(pos, tool) {
+  const page = wbPages[wbPageIndex];
+  if (!page) return;
+  _ensurePageObjects(page);
+  _commitActiveTextEditor();
+
+  let nodeType = 'process';
+  let label = 'Process';
+  let width = 140;
+  let height = 60;
+
+  if (tool === 'fc-start') {
+    nodeType = 'start_end';
+    label = 'Start / End';
+    height = 50;
+  } else if (tool === 'fc-decision') {
+    nodeType = 'decision';
+    label = 'Decision';
+    width = 130;
+    height = 70;
+  }
+
+  const newNode = {
+    id: 'fc_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+    type: nodeType,
+    label: label,
+    x: Math.max(10, Math.min(1600 - width, Math.round(pos.x - width / 2))),
+    y: Math.max(10, Math.min(1200 - height, Math.round(pos.y - height / 2))),
+    width: width,
+    height: height,
+    color: wbColor || '#2563eb'
+  };
+
+  page.flowchartNodes.push(newNode);
+  selectedNodeId = newNode.id;
+  selectedTextId = null;
+  selectedConnectorId = null;
+
+  _pushWBUndo();
+  _renderObjectLayer();
+  _syncWBToRemote();
+}
+
+function deleteFlowchartNode(id) {
+  const page = wbPages[wbPageIndex];
+  if (!page || !page.flowchartNodes) return;
+  page.flowchartNodes = page.flowchartNodes.filter(n => n.id !== id);
+  if (page.flowchartConnectors) {
+    page.flowchartConnectors = page.flowchartConnectors.filter(c => c.fromId !== id && c.toId !== id);
+  }
+  if (selectedNodeId === id) selectedNodeId = null;
+  _renderObjectLayer();
+  _pushWBUndo();
+  _syncWBToRemote();
+}
+
+function deleteFlowchartConnector(id) {
+  const page = wbPages[wbPageIndex];
+  if (!page || !page.flowchartConnectors) return;
+  page.flowchartConnectors = page.flowchartConnectors.filter(c => c.id !== id);
+  if (selectedConnectorId === id) selectedConnectorId = null;
+  _renderFlowchartConnectors();
+  _pushWBUndo();
+  _syncWBToRemote();
+}
+
 function _renderFlowchartConnectors() {
   const svg = document.getElementById('wb-fc-svg-layer');
   if (!svg) return;
@@ -1241,12 +1404,53 @@ function _renderCombinedPageCanvas(pageIndex) {
     try { expCtx.drawImage(wbCanvas, 0, 0, 1600, 1200); } catch (_) {}
   }
 
-  // 1. Draw Flowchart connectors
-  if (page && page.flowchartConnectors && page.flowchartNodes) {
-    const nodeMap = {};
-    page.flowchartNodes.forEach(n => { nodeMap[n.id] = n; });
+  // Prepare flowchart nodes and connectors (supports both SVG flowchart layers and Drawflow models)
+  let exportNodes = (page && page.flowchartNodes && page.flowchartNodes.length > 0) ? page.flowchartNodes : [];
+  let exportConnectors = (page && page.flowchartConnectors && page.flowchartConnectors.length > 0) ? page.flowchartConnectors : [];
 
-    page.flowchartConnectors.forEach(conn => {
+  if (exportNodes.length === 0 && page && page.drawflowData && page.drawflowData.drawflow && page.drawflowData.drawflow.Home) {
+    const dfData = page.drawflowData.drawflow.Home.data;
+    if (dfData) {
+      exportNodes = [];
+      exportConnectors = [];
+      Object.keys(dfData).forEach(k => {
+        const item = dfData[k];
+        const nType = (item.name === 'start_end' || item.name === 'decision') ? item.name : 'process';
+        const label = (item.data && item.data.label) || (item.name ? item.name.toUpperCase() : 'Node');
+        exportNodes.push({
+          id: String(item.id),
+          type: nType,
+          label: label,
+          x: item.pos_x || 100,
+          y: item.pos_y || 100,
+          width: nType === 'start_end' ? 140 : (nType === 'decision' ? 130 : 140),
+          height: nType === 'start_end' ? 50 : (nType === 'decision' ? 70 : 60),
+          color: '#2563eb'
+        });
+
+        if (item.outputs) {
+          Object.keys(item.outputs).forEach(outKey => {
+            const conns = item.outputs[outKey].connections || [];
+            conns.forEach(c => {
+              exportConnectors.push({
+                id: 'conn_' + item.id + '_' + c.node,
+                fromId: String(item.id),
+                toId: String(c.node),
+                color: '#2563eb'
+              });
+            });
+          });
+        }
+      });
+    }
+  }
+
+  // 1. Draw Flowchart connectors
+  if (exportConnectors.length > 0 && exportNodes.length > 0) {
+    const nodeMap = {};
+    exportNodes.forEach(n => { nodeMap[n.id] = n; });
+
+    exportConnectors.forEach(conn => {
       const fromNode = nodeMap[conn.fromId];
       const toNode   = nodeMap[conn.toId];
       if (!fromNode || !toNode) return;
@@ -1276,8 +1480,8 @@ function _renderCombinedPageCanvas(pageIndex) {
   }
 
   // 2. Draw Flowchart nodes
-  if (page && page.flowchartNodes && page.flowchartNodes.length > 0) {
-    page.flowchartNodes.forEach(node => {
+  if (exportNodes.length > 0) {
+    exportNodes.forEach(node => {
       expCtx.save();
       if (node.type === 'start_end') {
         expCtx.fillStyle = '#f0fdf4';
@@ -1598,6 +1802,7 @@ function _syncWBToRemote() {
    KEYBOARD SHORTCUTS
    ═══════════════════════════════════════════════════════════════ */
 
+let _wbClipboard = null;
 let _wbShortcutsSetup = false;
 function _setupWBShortcuts() {
   if (_wbShortcutsSetup) return;
@@ -1653,12 +1858,132 @@ function _setupWBShortcuts() {
       return;
     }
 
-    // Delete or Backspace for selected text object or selected Drawflow node/connection
+    // Ctrl+C / Cmd+C -> Copy selected text or node
+    if (isCtrlOrMeta && (key === 'c' || code === 'keyc')) {
+      const page = wbPages[wbPageIndex];
+      if (selectedTextId && page && page.textObjects) {
+        const item = page.textObjects.find(t => t.id === selectedTextId);
+        if (item) {
+          _wbClipboard = { type: 'text', data: JSON.parse(JSON.stringify(item)) };
+          e.preventDefault();
+          e.stopPropagation();
+          return;
+        }
+      }
+      if (selectedNodeId && page && page.flowchartNodes) {
+        const node = page.flowchartNodes.find(n => n.id === selectedNodeId);
+        if (node) {
+          _wbClipboard = { type: 'node', data: JSON.parse(JSON.stringify(node)) };
+          e.preventDefault();
+          e.stopPropagation();
+          return;
+        }
+      }
+    }
+
+    // Ctrl+V / Cmd+V -> Paste selected text or node
+    if (isCtrlOrMeta && (key === 'v' || code === 'keyv')) {
+      if (_wbClipboard) {
+        const page = wbPages[wbPageIndex];
+        if (!page) return;
+        _ensurePageObjects(page);
+
+        if (_wbClipboard.type === 'text') {
+          e.preventDefault();
+          e.stopPropagation();
+          const clone = JSON.parse(JSON.stringify(_wbClipboard.data));
+          clone.id = 'txt_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+          clone.x = Math.min(1500, (clone.x || 100) + 24);
+          clone.y = Math.min(1150, (clone.y || 100) + 24);
+          page.textObjects.push(clone);
+          selectedTextId = clone.id;
+          selectedNodeId = null;
+          selectedConnectorId = null;
+          _pushWBUndo();
+          _renderObjectLayer();
+          _syncWBToRemote();
+          return;
+        }
+
+        if (_wbClipboard.type === 'node') {
+          e.preventDefault();
+          e.stopPropagation();
+          const clone = JSON.parse(JSON.stringify(_wbClipboard.data));
+          clone.id = 'fc_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+          clone.x = Math.min(1500, (clone.x || 100) + 24);
+          clone.y = Math.min(1150, (clone.y || 100) + 24);
+          page.flowchartNodes.push(clone);
+          selectedNodeId = clone.id;
+          selectedTextId = null;
+          selectedConnectorId = null;
+          _pushWBUndo();
+          _renderObjectLayer();
+          _syncWBToRemote();
+          return;
+        }
+      }
+    }
+
+    // Ctrl+D / Cmd+D -> Duplicate selected text or node
+    if (isCtrlOrMeta && (key === 'd' || code === 'keyd')) {
+      const page = wbPages[wbPageIndex];
+      if (page) {
+        _ensurePageObjects(page);
+        if (selectedTextId && page.textObjects) {
+          const item = page.textObjects.find(t => t.id === selectedTextId);
+          if (item) {
+            e.preventDefault();
+            e.stopPropagation();
+            const clone = JSON.parse(JSON.stringify(item));
+            clone.id = 'txt_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+            clone.x = Math.min(1500, (clone.x || 100) + 24);
+            clone.y = Math.min(1150, (clone.y || 100) + 24);
+            page.textObjects.push(clone);
+            selectedTextId = clone.id;
+            selectedNodeId = null;
+            selectedConnectorId = null;
+            _pushWBUndo();
+            _renderObjectLayer();
+            _syncWBToRemote();
+            return;
+          }
+        }
+        if (selectedNodeId && page.flowchartNodes) {
+          const node = page.flowchartNodes.find(n => n.id === selectedNodeId);
+          if (node) {
+            e.preventDefault();
+            e.stopPropagation();
+            const clone = JSON.parse(JSON.stringify(node));
+            clone.id = 'fc_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+            clone.x = Math.min(1500, (clone.x || 100) + 24);
+            clone.y = Math.min(1150, (clone.y || 100) + 24);
+            page.flowchartNodes.push(clone);
+            selectedNodeId = clone.id;
+            selectedTextId = null;
+            selectedConnectorId = null;
+            _pushWBUndo();
+            _renderObjectLayer();
+            _syncWBToRemote();
+            return;
+          }
+        }
+      }
+    }
+
+    // Delete or Backspace for selected text object, flowchart node/connector or selected Drawflow node/connection
     if (key === 'delete' || key === 'backspace' || code === 'delete' || code === 'backspace') {
       if (selectedTextId) {
         e.preventDefault();
         e.stopPropagation();
         deleteTextObject(selectedTextId);
+      } else if (selectedNodeId) {
+        e.preventDefault();
+        e.stopPropagation();
+        deleteFlowchartNode(selectedNodeId);
+      } else if (selectedConnectorId) {
+        e.preventDefault();
+        e.stopPropagation();
+        deleteFlowchartConnector(selectedConnectorId);
       } else if (_drawflowEditor && (_drawflowEditor.node_selected || _drawflowEditor.connection_selected)) {
         e.preventDefault();
         e.stopPropagation();
@@ -1670,6 +1995,11 @@ function _setupWBShortcuts() {
     // Escape -> dismiss Drawflow more menu, cancel connection/edit, deselect
     if (key === 'escape' || code === 'escape') {
       hideDrawflowMoreMenu();
+      selectedTextId = null;
+      selectedNodeId = null;
+      selectedConnectorId = null;
+      _connectorSourceNodeId = null;
+      _renderObjectLayer();
       if (_drawflowEditor) {
         if (_drawflowEditor.node_selected) {
           try { _drawflowEditor.node_selected.classList.remove('selected'); } catch (_) {}
@@ -2128,6 +2458,8 @@ window.exportAllPagesAsZip       = exportAllPagesAsZip;
 window.initWhiteboardAutoHide    = initWhiteboardAutoHide;
 window.cleanupWhiteboardAutoHide = cleanupWhiteboardAutoHide;
 window.deleteTextObject          = deleteTextObject;
+window.deleteFlowchartNode       = deleteFlowchartNode;
+window.deleteFlowchartConnector  = deleteFlowchartConnector;
 window.initWBSync                = initWBSync;
 window.addDrawflowNode           = addDrawflowNode;
 window.deleteSelectedDrawflowNode = deleteSelectedDrawflowNode;
