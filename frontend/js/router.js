@@ -137,6 +137,10 @@ document.addEventListener('keydown', e => {
 
     // 7. Close AI study buddy if open
     if (typeof closeAIBuddy === 'function') closeAIBuddy();
+
+    // 8. Dismiss flowchart more menu and smart recognition card if open
+    if (typeof hideDrawflowMoreMenu === 'function') hideDrawflowMoreMenu();
+    if (typeof _dismissSmartPredictionCard === 'function') _dismissSmartPredictionCard();
   }
   if (e.key === 'Enter' && document.getElementById('view-login')?.classList.contains('active')) {
     // Do not trigger login if focus is on the password toggle button

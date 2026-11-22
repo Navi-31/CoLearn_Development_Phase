@@ -731,13 +731,14 @@ function addDrawflowNode(type) {
 let _drawflowMode = 'select'; // 'select' | 'arrow'
 function setDrawflowMode(mode) {
   _drawflowMode = mode;
-  const selectBtn = document.getElementById('df-btn-mode-select');
-  const arrowBtn  = document.getElementById('df-btn-mode-arrow');
+  document.querySelectorAll('#df-btn-mode-select, #df-btn-mode-select-sub').forEach(btn => {
+    btn.classList.toggle('active', mode === 'select');
+  });
+  document.querySelectorAll('#df-btn-mode-arrow, #df-btn-mode-arrow-sub').forEach(btn => {
+    btn.classList.toggle('active', mode === 'arrow');
+  });
+
   const dfContainer = document.getElementById('drawflow');
-
-  if (selectBtn) selectBtn.classList.toggle('active', mode === 'select');
-  if (arrowBtn)  arrowBtn.classList.toggle('active', mode === 'arrow');
-
   if (dfContainer) {
     dfContainer.classList.toggle('df-mode-arrow', mode === 'arrow');
   }

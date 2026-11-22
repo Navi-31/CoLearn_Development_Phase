@@ -226,6 +226,7 @@ function setWSState(state, silent) {
   if (state === 'whiteboard') document.getElementById('btn-whiteboard')?.classList.add('active-tool');
 
   if (state === 'whiteboard') {
+    if (typeof initWhiteboard === 'function') initWhiteboard();
     if (!silent) setTimeout(resizeWhiteboard, 80);
     // Auto screen share on whiteboard start (Issue 9)
     if (typeof _ssIsPresenting !== 'undefined' && !_ssIsPresenting && typeof startScreenShare === 'function') {

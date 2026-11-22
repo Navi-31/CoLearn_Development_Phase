@@ -1003,70 +1003,177 @@
         <div id="ws-state-whiteboard" style="display:none;" class="flex-1 flex flex-col relative w-full h-full overflow-hidden select-none">
           <!-- Canvas Viewport -->
           <div id="ws-canvas-viewport" class="relative w-full h-full bg-dot-grid overflow-hidden">
-            <!-- Floating Exit Canvas Pill -->
-            <div class="absolute top-4 left-4 z-30">
+            <!-- Floating Exit Canvas Pill & Live Indicator -->
+            <div class="absolute top-4 left-4 z-30 flex items-center gap-2">
               <button type="button" onclick="setWSState('invite')" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white border border-[#E1DFE2] text-xs font-semibold text-[#2C2C2C] shadow-[0_4px_12px_rgba(45,67,88,0.08)] hover:bg-[#F6F3F2] hover:text-[#0247AE] transition-colors cursor-pointer" title="Exit Whiteboard to Suite Overview">
                 <span class="material-symbols-outlined text-base">arrow_back</span>
                 <span>Exit Canvas</span>
               </button>
+              <div id="wb-live-status" style="display:none;" class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-white border border-[#E1DFE2] text-xs font-semibold text-[#059669] shadow-[0_4px_12px_rgba(45,67,88,0.08)]">
+                <span class="w-2 h-2 rounded-full bg-[#059669] animate-pulse"></span>
+                <span>Live</span>
+              </div>
             </div>
 
             <!-- Canvas Wrapper -->
             <div id="whiteboard-canvas-wrapper" class="w-full h-full relative">
               <canvas id="whiteboard-canvas" class="absolute inset-0 w-full h-full z-10 cursor-crosshair"></canvas>
               <div id="wb-text-layer" class="absolute inset-0 pointer-events-none z-20"></div>
-              <div id="drawflow" class="absolute inset-0 pointer-events-none z-20"></div>
+              <div id="drawflow" class="absolute inset-0 z-20" style="display:none;"></div>
               <svg id="wb-fc-svg-layer" class="absolute inset-0 pointer-events-none w-full h-full z-15"></svg>
             </div>
 
-            <!-- Floating Stitch Academic Toolbar (Screen 2 Authority) -->
-            <div class="absolute top-4 left-1/2 -translate-x-1/2 z-30 bg-white border border-[#E1DFE2] rounded-xl shadow-[0_4px_16px_rgba(45,67,88,0.12)] p-1.5 flex items-center gap-1">
+            <!-- Floating Stitch Academic Main Toolbar (Screen 2 Authority) -->
+            <div class="absolute top-4 left-1/2 -translate-x-1/2 z-30 bg-white border border-[#E1DFE2] rounded-xl shadow-[0_4px_16px_rgba(45,67,88,0.12)] p-1.5 flex items-center gap-1 max-w-[95vw] overflow-x-auto select-none">
               <!-- Select Mode -->
-              <button type="button" id="df-btn-mode-select" class="p-2 rounded hover:bg-[#F6F3F2] text-[#2C2C2C] transition-colors cursor-pointer active-tool" title="Select / Move">
+              <button type="button" id="df-btn-mode-select" onclick="setDrawflowMode('select')" class="p-2 rounded hover:bg-[#F6F3F2] text-[#2C2C2C] transition-colors cursor-pointer active shrink-0" title="Select / Move">
                 <span class="material-symbols-outlined text-lg">pan_tool</span>
               </button>
               <!-- Pen Tool -->
-              <button type="button" id="wb-btn-pen" class="p-2 rounded hover:bg-[#F6F3F2] text-[#0247AE] transition-colors cursor-pointer" title="Freehand Pen">
+              <button type="button" id="wb-btn-pen" onclick="setWBTool('pen')" class="p-2 rounded hover:bg-[#F6F3F2] text-[#0247AE] transition-colors cursor-pointer active shrink-0" title="Freehand Pen">
                 <span class="material-symbols-outlined text-lg">edit</span>
               </button>
               <!-- Eraser Tool -->
-              <button type="button" id="wb-btn-eraser" class="p-2 rounded hover:bg-[#F6F3F2] text-[#2C2C2C] transition-colors cursor-pointer" title="Eraser">
+              <button type="button" id="wb-btn-eraser" onclick="setWBTool('eraser')" class="p-2 rounded hover:bg-[#F6F3F2] text-[#2C2C2C] transition-colors cursor-pointer shrink-0" title="Eraser">
                 <span class="material-symbols-outlined text-lg">ink_eraser</span>
               </button>
               <!-- Text Tool -->
-              <button type="button" id="wb-btn-text" class="p-2 rounded hover:bg-[#F6F3F2] text-[#2C2C2C] transition-colors cursor-pointer" title="Text Annotation">
+              <button type="button" id="wb-btn-text" onclick="setWBTool('text')" class="p-2 rounded hover:bg-[#F6F3F2] text-[#2C2C2C] transition-colors cursor-pointer shrink-0" title="Direct Text Annotation (Click canvas to type)">
                 <span class="material-symbols-outlined text-lg">title</span>
               </button>
               <!-- Flowchart Tool -->
-              <button type="button" id="wb-btn-flowchart" class="p-2 rounded hover:bg-[#F6F3F2] text-[#2C2C2C] transition-colors cursor-pointer" title="Flowchart Nodes">
+              <button type="button" id="wb-btn-flowchart" onclick="setWBTool('flowchart')" class="p-2 rounded hover:bg-[#F6F3F2] text-[#2C2C2C] transition-colors cursor-pointer shrink-0" title="Flowchart diagram mode (Drawflow)">
                 <span class="material-symbols-outlined text-lg">account_tree</span>
               </button>
-              <!-- Connector Tool -->
-              <button type="button" id="df-btn-mode-arrow" class="p-2 rounded hover:bg-[#F6F3F2] text-[#2C2C2C] transition-colors cursor-pointer" title="Connector Arrow">
-                <span class="material-symbols-outlined text-lg">arrow_forward</span>
-              </button>
-              <!-- Smart Snap Toggle -->
-              <button type="button" id="wb-btn-smart" class="p-2 rounded hover:bg-[#F6F3F2] text-[#2C2C2C] transition-colors cursor-pointer" title="Smart Grid Snap">
-                <span class="material-symbols-outlined text-lg">grid_goldenratio</span>
+              <!-- Smart Write / AI Recognition Tool -->
+              <button type="button" id="wb-btn-smart" onclick="toggleWBSmartRecognition()" class="p-2 rounded hover:bg-[#F6F3F2] text-[#2C2C2C] transition-colors cursor-pointer shrink-0" title="Toggle Smart Handwriting & Math Recognition">
+                <span class="material-symbols-outlined text-lg">auto_fix_high</span>
               </button>
 
-              <div class="h-5 w-px bg-[#E1DFE2] mx-1"></div>
+              <div class="h-5 w-px bg-[#E1DFE2] mx-1 shrink-0"></div>
 
-              <!-- Page Navigation Controls -->
-              <button type="button" id="wb-btn-prev" class="p-1.5 rounded hover:bg-[#F6F3F2] text-[#587D90] transition-colors cursor-pointer" title="Previous Page">
+              <!-- Color Picker -->
+              <div class="relative flex items-center justify-center p-1 rounded hover:bg-[#F6F3F2] cursor-pointer shrink-0" title="Stroke / Text Color">
+                <input type="color" class="wb-color-picker w-6 h-6 rounded-full cursor-pointer border border-[#E1DFE2] p-0 overflow-hidden bg-transparent" id="wb-color" value="#0247AE" onchange="updateWBColor(this.value)">
+              </div>
+              <!-- Size Stepper -->
+              <div class="flex items-center gap-1 px-1.5 py-1 rounded bg-[#F6F3F2] text-xs text-[#2C2C2C] shrink-0" title="Brush / Stroke Size (1-40)">
+                <span class="material-symbols-outlined text-sm text-[#587D90]">line_weight</span>
+                <input type="number" class="wb-size-input w-8 bg-transparent text-center font-mono font-bold text-xs outline-none" id="wb-size" value="4" min="1" max="40" onchange="updateWBSize(this.value)">
+              </div>
+
+              <div class="h-5 w-px bg-[#E1DFE2] mx-1 shrink-0"></div>
+
+              <!-- Undo (Ctrl+Z) -->
+              <button type="button" onclick="wbAction('undo')" class="p-2 rounded hover:bg-[#F6F3F2] text-[#2C2C2C] transition-colors cursor-pointer shrink-0" title="Undo (Ctrl+Z)">
+                <span class="material-symbols-outlined text-lg">undo</span>
+              </button>
+              <!-- Redo (Ctrl+Y) -->
+              <button type="button" onclick="wbAction('redo')" class="p-2 rounded hover:bg-[#F6F3F2] text-[#2C2C2C] transition-colors cursor-pointer shrink-0" title="Redo (Ctrl+Y)">
+                <span class="material-symbols-outlined text-lg">redo</span>
+              </button>
+              <!-- Clear Current Page -->
+              <button type="button" onclick="wbAction('clear')" class="p-2 rounded hover:bg-[#F6F3F2] text-[#2C2C2C] hover:text-[#BA1A1A] transition-colors cursor-pointer shrink-0" title="Clear Current Page">
+                <span class="material-symbols-outlined text-lg">delete_sweep</span>
+              </button>
+
+              <div class="h-5 w-px bg-[#E1DFE2] mx-1 shrink-0"></div>
+
+              <!-- Add New Page -->
+              <button type="button" onclick="wbAction('new')" class="p-1.5 rounded hover:bg-[#F6F3F2] text-[#0247AE] transition-colors cursor-pointer shrink-0" title="Add New Page">
+                <span class="material-symbols-outlined text-base">note_add</span>
+              </button>
+              <!-- Previous Page -->
+              <button type="button" id="wb-btn-prev" onclick="wbAction('prev')" class="p-1.5 rounded hover:bg-[#F6F3F2] text-[#587D90] transition-colors cursor-pointer shrink-0" title="Previous Page">
                 <span class="material-symbols-outlined text-base">chevron_left</span>
               </button>
-              <span id="wb-page-label" class="text-xs font-mono font-semibold px-1 text-[#2C2C2C]">1 / 1</span>
-              <button type="button" id="wb-btn-next" class="p-1.5 rounded hover:bg-[#F6F3F2] text-[#587D90] transition-colors cursor-pointer" title="Next Page">
+              <!-- Page Label -->
+              <span id="wb-page-label" class="text-xs font-mono font-semibold px-1 text-[#2C2C2C] whitespace-nowrap min-w-[50px] text-center shrink-0">Page 1</span>
+              <!-- Next Page -->
+              <button type="button" id="wb-btn-next" onclick="wbAction('next')" class="p-1.5 rounded hover:bg-[#F6F3F2] text-[#587D90] transition-colors cursor-pointer shrink-0" title="Next Page">
                 <span class="material-symbols-outlined text-base">chevron_right</span>
               </button>
+              <!-- Delete Page -->
+              <button type="button" onclick="wbAction('delete_page')" class="p-1.5 rounded hover:bg-[#F6F3F2] text-[#587D90] hover:text-[#BA1A1A] transition-colors cursor-pointer shrink-0" title="Delete Current Page">
+                <span class="material-symbols-outlined text-base">delete</span>
+              </button>
 
-              <div class="h-5 w-px bg-[#E1DFE2] mx-1"></div>
+              <div class="h-5 w-px bg-[#E1DFE2] mx-1 shrink-0"></div>
+
+              <!-- Save PNG -->
+              <button type="button" onclick="wbAction('save')" class="p-2 rounded hover:bg-[#F6F3F2] text-[#2C2C2C] transition-colors cursor-pointer shrink-0" title="Save current page as PNG">
+                <span class="material-symbols-outlined text-lg">image</span>
+              </button>
+              <!-- Download ZIP -->
+              <button type="button" onclick="wbAction('zip')" class="p-2 rounded hover:bg-[#F6F3F2] text-[#0247AE] transition-colors cursor-pointer shrink-0" title="Download all pages as ZIP">
+                <span class="material-symbols-outlined text-lg">folder_zip</span>
+              </button>
+
+              <div class="h-5 w-px bg-[#E1DFE2] mx-1 shrink-0"></div>
 
               <!-- Exit Whiteboard Button -->
-              <button type="button" onclick="setWSState('invite')" class="p-1.5 rounded hover:bg-[#F6F3F2] text-[#587D90] hover:text-[#BA1A1A] transition-colors cursor-pointer" title="Exit Whiteboard">
+              <button type="button" onclick="setWSState('invite')" class="p-1.5 rounded hover:bg-[#F6F3F2] text-[#587D90] hover:text-[#BA1A1A] transition-colors cursor-pointer shrink-0" title="Exit Whiteboard">
                 <span class="material-symbols-outlined text-base">close</span>
               </button>
+            </div>
+
+            <!-- Floating Stitch Flowchart Sub-Toolbar (#wb-flowchart-toolbar) -->
+            <div id="wb-flowchart-toolbar" style="display:none;" class="absolute top-[68px] left-1/2 -translate-x-1/2 z-30 bg-white border border-[#E1DFE2] rounded-xl shadow-[0_4px_16px_rgba(45,67,88,0.12)] p-1.5 flex items-center gap-1.5 select-none max-w-[95vw] overflow-x-auto">
+              <button type="button" onclick="addDrawflowNode('start_end')" class="px-2.5 py-1 rounded-lg bg-[#F0FDF4] border border-[#16A34A]/30 text-[#15803D] text-xs font-semibold hover:bg-emerald-100 transition-colors cursor-pointer flex items-center gap-1.5 shrink-0" title="Add Start / End node (Capsule)">
+                <span class="w-2.5 h-2.5 rounded-full bg-[#16A34A]"></span>
+                <span>Start/End</span>
+              </button>
+              <button type="button" onclick="addDrawflowNode('process')" class="px-2.5 py-1 rounded-lg bg-[#EFF6FF] border border-[#2563EB]/30 text-[#1D4ED8] text-xs font-semibold hover:bg-blue-100 transition-colors cursor-pointer flex items-center gap-1.5 shrink-0" title="Add Process node (Rectangle)">
+                <span class="w-2.5 h-2.5 rounded-sm bg-[#0247AE]"></span>
+                <span>Process</span>
+              </button>
+              <button type="button" onclick="addDrawflowNode('decision')" class="px-2.5 py-1 rounded-lg bg-[#FFFBEB] border border-[#D97706]/30 text-[#B45309] text-xs font-semibold hover:bg-amber-100 transition-colors cursor-pointer flex items-center gap-1.5 shrink-0" title="Add Decision node (Diamond)">
+                <span class="w-2.5 h-2.5 rotate-45 bg-[#D97706]"></span>
+                <span>Decision</span>
+              </button>
+
+              <div class="h-4 w-px bg-[#E1DFE2] shrink-0"></div>
+
+              <button type="button" id="df-btn-mode-arrow" onclick="setDrawflowMode('arrow')" class="px-2.5 py-1 rounded-lg border border-[#E1DFE2] text-xs font-semibold text-[#2C2C2C] hover:bg-[#F6F3F2] transition-colors cursor-pointer flex items-center gap-1 shrink-0" title="Arrow mode: drag between node handles to connect">
+                <span class="material-symbols-outlined text-base">arrow_forward</span>
+                <span>Arrow</span>
+              </button>
+              <button type="button" id="df-btn-mode-select-sub" onclick="setDrawflowMode('select')" class="px-2.5 py-1 rounded-lg border border-[#E1DFE2] text-xs font-semibold text-[#2C2C2C] hover:bg-[#F6F3F2] transition-colors cursor-pointer flex items-center gap-1 active shrink-0" title="Select and move nodes / edit connections">
+                <span class="material-symbols-outlined text-base">pan_tool</span>
+                <span>Select</span>
+              </button>
+
+              <div class="h-4 w-px bg-[#E1DFE2] shrink-0"></div>
+
+              <!-- More options dropdown -->
+              <div class="relative inline-block shrink-0">
+                <button type="button" id="df-btn-more" onclick="toggleDrawflowMoreMenu(event)" class="p-1 rounded-lg hover:bg-[#F6F3F2] text-[#2C2C2C] transition-colors cursor-pointer" title="More Flowchart Options">
+                  <span class="material-symbols-outlined text-base">more_vert</span>
+                </button>
+                <div id="df-more-menu" class="hidden absolute top-full right-0 mt-1 min-w-[170px] bg-white border border-[#E1DFE2] rounded-xl shadow-[0_8px_24px_rgba(45,67,88,0.14)] p-1.5 z-50 flex flex-col gap-0.5">
+                  <button type="button" onclick="zoomDrawflow(1.1);hideDrawflowMoreMenu();" class="w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-medium text-[#2C2C2C] hover:bg-[#F6F3F2] flex items-center gap-2 cursor-pointer">
+                    <span class="material-symbols-outlined text-sm text-[#0247AE]">zoom_in</span>
+                    <span>Zoom In</span>
+                  </button>
+                  <button type="button" onclick="zoomDrawflow(0.9);hideDrawflowMoreMenu();" class="w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-medium text-[#2C2C2C] hover:bg-[#F6F3F2] flex items-center gap-2 cursor-pointer">
+                    <span class="material-symbols-outlined text-sm text-[#0247AE]">zoom_out</span>
+                    <span>Zoom Out</span>
+                  </button>
+                  <button type="button" onclick="resetDrawflowZoom();hideDrawflowMoreMenu();" class="w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-medium text-[#2C2C2C] hover:bg-[#F6F3F2] flex items-center gap-2 cursor-pointer">
+                    <span class="material-symbols-outlined text-sm text-[#587D90]">restart_alt</span>
+                    <span>Reset Zoom</span>
+                  </button>
+                  <div class="h-px bg-[#E1DFE2] my-1"></div>
+                  <button type="button" onclick="deleteSelectedDrawflowNode();hideDrawflowMoreMenu();" class="w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-medium text-[#BA1A1A] hover:bg-rose-50 flex items-center gap-2 cursor-pointer">
+                    <span class="material-symbols-outlined text-sm text-[#BA1A1A]">delete</span>
+                    <span>Delete Selected (Del)</span>
+                  </button>
+                  <button type="button" onclick="clearDrawflowCanvas();hideDrawflowMoreMenu();" class="w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-medium text-[#BA1A1A] hover:bg-rose-50 flex items-center gap-2 cursor-pointer">
+                    <span class="material-symbols-outlined text-sm text-[#BA1A1A]">clear_all</span>
+                    <span>Clear Flowchart</span>
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
