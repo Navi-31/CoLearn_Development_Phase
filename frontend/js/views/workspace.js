@@ -952,14 +952,21 @@ function openSuiteSettingsModal() {
   if (limitVal) limitVal.textContent = adminLimit;
   if (limitHidden) limitHidden.value = adminLimit;
 
-  // Permissions: Host vs Admin/Member
-  const isHost = (user && (suite.hostUid === user.uid || suite.ownerUid === user.uid));
-  if (nameInput) nameInput.disabled = !isHost;
-  if (nameHint) nameHint.style.display = isHost ? 'none' : 'block';
+  // Permissions: Host vs Admin vs Member
+  const isHost = Boolean(user && (suite.hostUid === user.uid || suite.ownerUid === user.uid));
+  const adminUids = Array.isArray(suite.adminUids) ? suite.adminUids : [];
+  const isAdmin = !isHost && Boolean(user && adminUids.includes(user.uid));
+  const canEdit = isHost || isAdmin;
+
+  const adminContainer = document.getElementById('sett-admin-container');
+  if (adminContainer) adminContainer.style.display = isHost ? 'block' : 'none';
+
+  if (nameInput) nameInput.disabled = !canEdit;
+  if (nameHint) nameHint.style.display = canEdit ? 'none' : 'block';
   if (adminHint) adminHint.style.display = isHost ? 'none' : 'block';
   if (decBtn) decBtn.disabled = !isHost;
   if (incBtn) incBtn.disabled = !isHost;
-  if (saveBtn) saveBtn.style.display = isHost ? 'block' : 'none';
+  if (saveBtn) saveBtn.style.display = canEdit ? 'block' : 'none';
 
   if (typeof openModal === 'function') {
     openModal('modal-suite-settings');
@@ -1006,9 +1013,12 @@ function stepSettingsAdminLimit(delta) {
 async function saveSuiteSettings() {
   const suite = AppState.currentSuite;
   const user  = AppState.currentUser;
-  const isHost = (user && suite && (suite.hostUid === user.uid || suite.ownerUid === user.uid));
-  if (!isHost) {
-    showToast('main-toast', 'Only the suite host can modify settings', 'dark');
+  const isHost = Boolean(user && suite && (suite.hostUid === user.uid || suite.ownerUid === user.uid));
+  const adminUids = (suite && Array.isArray(suite.adminUids)) ? suite.adminUids : [];
+  const isAdmin = !isHost && Boolean(user && adminUids.includes(user.uid));
+
+  if (!isHost && !isAdmin) {
+    showToast('main-toast', 'Only the suite host or admins can modify settings', 'dark');
     return;
   }
 
@@ -1018,7 +1028,6 @@ async function saveSuiteSettings() {
   const saveBtn = document.getElementById('btn-save-suite-settings');
 
   const newName = (nameInput?.value || '').trim();
-  const newLimit = parseInt(limitHidden?.value || '3', 10);
 
   if (!newName) {
     if (errAlert) {
@@ -1028,19 +1037,24 @@ async function saveSuiteSettings() {
     return;
   }
 
+  const payload = { name: newName };
+  if (isHost) {
+    const newLimit = parseInt(limitHidden?.value || '3', 10);
+    payload.adminLimit = newLimit;
+  }
+
   if (errAlert) errAlert.classList.add('hidden');
   if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'Saving…'; }
 
   try {
-    const res = await API.updateSuiteSettings(suite.id, {
-      name: newName,
-      adminLimit: newLimit
-    });
+    const res = await API.updateSuiteSettings(suite.id, payload);
 
     if (res && res.success) {
       showToast('main-toast', '✓ Suite settings updated!', 'green');
       suite.name = res.suite?.name || newName;
-      suite.adminLimit = res.suite?.adminLimit !== undefined ? res.suite.adminLimit : newLimit;
+      if (res.suite?.adminLimit !== undefined) {
+        suite.adminLimit = res.suite.adminLimit;
+      }
       AppState.saveSuite(suite);
 
       // Update workspace header title

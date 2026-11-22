@@ -85,9 +85,20 @@ router.patch('/suite/:suiteId/settings', requireAuth, async (req, res) => {
       }
       const data = suiteDoc.data();
 
-      // Only host can update suite settings
-      if (data.ownerUid !== callerUid) {
-        throw new Error('FORBIDDEN_HOST_ONLY');
+      // Authorization: Host or Admin can update settings.
+      // Host can update name and adminLimit.
+      // Admin can update name, but CANNOT update adminLimit.
+      // Members cannot update settings.
+      const isHost = data.ownerUid === callerUid || data.hostUid === callerUid;
+      const adminUids = Array.isArray(data.adminUids) ? data.adminUids : [];
+      const isAdmin = !isHost && adminUids.includes(callerUid);
+
+      if (!isHost && !isAdmin) {
+        throw new Error('FORBIDDEN_SETTINGS');
+      }
+
+      if (adminLimit !== undefined && !isHost) {
+        throw new Error('FORBIDDEN_ADMIN_LIMIT_HOST_ONLY');
       }
 
       const updates = { updatedAt: new Date().toISOString() };
@@ -128,6 +139,12 @@ router.patch('/suite/:suiteId/settings', requireAuth, async (req, res) => {
   } catch (err) {
     if (err.message === 'NOT_FOUND') {
       return res.status(404).json({ success: false, error: 'Suite not found.' });
+    }
+    if (err.message === 'FORBIDDEN_SETTINGS') {
+      return res.status(403).json({ success: false, error: 'Only the suite host or admins can modify suite settings.' });
+    }
+    if (err.message === 'FORBIDDEN_ADMIN_LIMIT_HOST_ONLY') {
+      return res.status(403).json({ success: false, error: 'Only the suite host can modify the admin limit.' });
     }
     if (err.message === 'FORBIDDEN_HOST_ONLY') {
       return res.status(403).json({ success: false, error: 'Only the suite host can modify suite settings.' });
@@ -171,7 +188,7 @@ router.get('/suite/:suiteId/members', requireAuth, async (req, res) => {
 
     // Authorization: only actual suite members (or host) may fetch the member list.
     // This prevents non-members from enumerating who is in a suite.
-    const isCallerMember = suite.ownerUid === callerUid || memberUids.includes(callerUid);
+    const isCallerMember = suite.ownerUid === callerUid || suite.hostUid === callerUid || memberUids.includes(callerUid);
     if (!isCallerMember) {
       return res.status(403).json({ success: false, error: 'Access denied: you are not a member of this suite.' });
     }
@@ -184,7 +201,7 @@ router.get('/suite/:suiteId/members', requireAuth, async (req, res) => {
         try {
           const userSnap = await db.collection('users').doc(uid).get();
           const u = userSnap.exists ? userSnap.data() : {};
-          const isHost = uid === suite.ownerUid;
+          const isHost = uid === suite.ownerUid || uid === suite.hostUid;
           const isAdmin = !isHost && adminUids.includes(uid);
           return { 
             uid, 
@@ -195,7 +212,7 @@ router.get('/suite/:suiteId/members', requireAuth, async (req, res) => {
             isAdmin,
           };
         } catch {
-          const isHost = uid === suite.ownerUid;
+          const isHost = uid === suite.ownerUid || uid === suite.hostUid;
           const isAdmin = !isHost && adminUids.includes(uid);
           return { 
             uid, 
@@ -234,7 +251,7 @@ router.delete('/suite/:suiteId/members/:memberId', requireAuth, async (req, res)
   if (!callerUid)  return res.status(401).json({ success: false, error: 'Authentication required.' });
   if (!suiteId)    return res.status(400).json({ success: false, error: 'Suite ID required.' });
   if (!memberId)   return res.status(400).json({ success: false, error: 'Member ID required.' });
-  if (callerUid === memberId) return res.status(400).json({ success: false, error: 'Host cannot remove themselves from the suite.' });
+  if (callerUid === memberId) return res.status(400).json({ success: false, error: 'Cannot remove yourself from the suite.' });
 
   try {
     const suiteRef  = db.collection('suites').doc(suiteId);
@@ -247,11 +264,11 @@ router.delete('/suite/:suiteId/members/:memberId', requireAuth, async (req, res)
 
       const suite = suiteSnap.data();
       suiteName = suite.name || 'Suite';
-      const isHost = suite.ownerUid === callerUid;
+      const isHost = suite.ownerUid === callerUid || suite.hostUid === callerUid;
       const adminUids = Array.isArray(suite.adminUids) ? suite.adminUids : [];
       const isAdmin = !isHost && adminUids.includes(callerUid);
 
-      const isTargetHost = suite.ownerUid === memberId;
+      const isTargetHost = suite.ownerUid === memberId || suite.hostUid === memberId;
       const isTargetAdmin = !isTargetHost && adminUids.includes(memberId);
 
       // Enforce removal authorization
@@ -366,10 +383,11 @@ router.post('/suite/:suiteId/promote/:memberId', requireAuth, async (req, res) =
       if (!suiteSnap.exists) throw new Error('NOT_FOUND');
 
       const suite = suiteSnap.data();
-      if (suite.ownerUid !== callerUid) {
+      const isHost = suite.ownerUid === callerUid || suite.hostUid === callerUid;
+      if (!isHost) {
         throw new Error('FORBIDDEN_HOST_ONLY');
       }
-      if (suite.ownerUid === memberId) {
+      if (suite.ownerUid === memberId || suite.hostUid === memberId) {
         throw new Error('CANNOT_PROMOTE_HOST');
       }
 
@@ -456,7 +474,8 @@ router.post('/suite/:suiteId/demote/:memberId', requireAuth, async (req, res) =>
       if (!suiteSnap.exists) throw new Error('NOT_FOUND');
 
       const suite = suiteSnap.data();
-      if (suite.ownerUid !== callerUid) {
+      const isHost = suite.ownerUid === callerUid || suite.hostUid === callerUid;
+      if (!isHost) {
         throw new Error('FORBIDDEN_HOST_ONLY');
       }
 
@@ -595,7 +614,7 @@ router.get('/suite/:suiteId/join-requests', requireAuth, async (req, res) => {
     if (!suiteSnap.exists) return res.status(404).json({ success: false, error: 'Suite not found.' });
 
     const suite = suiteSnap.data();
-    const isHost = suite.ownerUid === callerUid;
+    const isHost = suite.ownerUid === callerUid || suite.hostUid === callerUid;
     const isAdmin = Array.isArray(suite.adminUids) && suite.adminUids.includes(callerUid);
 
     if (!isHost && !isAdmin) {
@@ -636,7 +655,7 @@ router.post('/suite/:suiteId/join-requests/:requestId/approve', requireAuth, asy
       if (!reqSnap.exists) throw new Error('REQUEST_NOT_FOUND');
 
       const suite = suiteSnap.data();
-      const isHost = suite.ownerUid === callerUid;
+      const isHost = suite.ownerUid === callerUid || suite.hostUid === callerUid;
       const isAdmin = Array.isArray(suite.adminUids) && suite.adminUids.includes(callerUid);
 
       if (!isHost && !isAdmin) {
@@ -717,7 +736,7 @@ router.post('/suite/:suiteId/join-requests/:requestId/reject', requireAuth, asyn
       if (!reqSnap.exists) throw new Error('REQUEST_NOT_FOUND');
 
       const suite = suiteSnap.data();
-      const isHost = suite.ownerUid === callerUid;
+      const isHost = suite.ownerUid === callerUid || suite.hostUid === callerUid;
       const isAdmin = Array.isArray(suite.adminUids) && suite.adminUids.includes(callerUid);
 
       if (!isHost && !isAdmin) {

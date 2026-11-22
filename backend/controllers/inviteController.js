@@ -67,11 +67,12 @@ async function sendInvite(req, res) {
 
   const callerUid = req.verifiedUid || uid;
 
-  // Authorisation: Host, Admin, or Member of the suite can send invites / add people
-  const memberUids = Array.isArray(suite.memberUids) ? suite.memberUids : [];
-  const isMember = suite.ownerUid === callerUid || memberUids.includes(callerUid);
-  if (!isMember) {
-    return res.status(403).json({ success: false, error: 'Only suite members can send invitations.' });
+  // Authorisation: Only Host or Admin can send invites / add people
+  const isHost = suite.ownerUid === callerUid || suite.hostUid === callerUid;
+  const adminUids = Array.isArray(suite.adminUids) ? suite.adminUids : [];
+  const isAdmin = !isHost && adminUids.includes(callerUid);
+  if (!isHost && !isAdmin) {
+    return res.status(403).json({ success: false, error: 'Only the suite host or admins can send invitations.' });
   }
 
   // Generate invite (or re-use existing active one for this suite+host)
@@ -123,10 +124,12 @@ async function generateInvite(req, res) {
     return res.status(500).json({ success: false, error: 'Server error.' });
   }
 
-  const memberUids = Array.isArray(suite.memberUids) ? suite.memberUids : [];
-  const isMember = suite.ownerUid === callerUid || memberUids.includes(callerUid);
-  if (!isMember) {
-    return res.status(403).json({ success: false, error: 'Only suite members can generate invites.' });
+  // Authorisation: Only Host or Admin can generate invites
+  const isHost = suite.ownerUid === callerUid || suite.hostUid === callerUid;
+  const adminUids = Array.isArray(suite.adminUids) ? suite.adminUids : [];
+  const isAdmin = !isHost && adminUids.includes(callerUid);
+  if (!isHost && !isAdmin) {
+    return res.status(403).json({ success: false, error: 'Only the suite host or admins can generate invitations.' });
   }
 
   const { inviteCode, inviteToken } = inviteStore.createInvite(suiteId, suite.name, suite.ownerUid);

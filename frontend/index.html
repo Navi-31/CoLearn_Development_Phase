@@ -1436,13 +1436,14 @@
         </div>
 
         <div>
-          <label class="block text-xs font-semibold text-[#2C2C2C] mb-1.5">Max Member Limit</label>
+          <label class="block text-xs font-semibold text-[#2C2C2C] mb-1.5">Maximum Number of Admins</label>
           <div class="flex items-center gap-3">
             <button type="button" id="cs-admin-limit-dec" onclick="stepAdminLimit(-1)" class="w-8 h-8 rounded border border-[#E1DFE2] flex items-center justify-center font-bold text-sm cursor-pointer hover:bg-[#F6F3F2]">-</button>
             <span id="cs-admin-limit-val" class="font-mono font-bold text-sm w-8 text-center">3</span>
             <input type="hidden" id="cs-admin-limit" value="3"/>
             <button type="button" id="cs-admin-limit-inc" onclick="stepAdminLimit(1)" class="w-8 h-8 rounded border border-[#E1DFE2] flex items-center justify-center font-bold text-sm cursor-pointer hover:bg-[#F6F3F2]">+</button>
           </div>
+          <p class="text-[11px] text-[#587D90] mt-1">Maximum admins the Host can appoint (min 1, max 20). Can be changed later in Suite Settings.</p>
         </div>
       </div>
       <div class="modal-footer">
@@ -1530,13 +1531,34 @@
         </button>
       </div>
       <div class="modal-body space-y-4">
+        <!-- Error Alert -->
+        <div id="sett-error-alert" class="hidden p-3 bg-red-50 border border-red-200 rounded-lg text-xs text-red-700"></div>
+
         <div>
           <label class="block text-xs font-semibold text-[#2C2C2C] mb-1.5" for="sett-suite-name">Suite Title</label>
           <input id="sett-suite-name" type="text" class="input-stitch"/>
+          <p id="sett-suite-name-hint" class="text-[11px] text-[#587D90] mt-1 hidden">Only the Host and Admins can rename the suite.</p>
         </div>
+
         <div class="text-xs text-[#587D90] space-y-1">
           <div>Host: <span id="sett-suite-host" class="font-semibold text-[#2C2C2C]"></span></div>
           <div>Created: <span id="sett-suite-created" class="font-mono"></span></div>
+        </div>
+
+        <!-- Admin Limit Settings (Host Only) -->
+        <div id="sett-admin-container" class="pt-3 border-t border-[#E1DFE2]">
+          <div class="flex items-center justify-between mb-1.5">
+            <label class="block text-xs font-semibold text-[#2C2C2C]">Maximum Number of Admins</label>
+            <span class="text-xs text-[#587D90]">Appointed: <span id="sett-admin-current" class="font-bold text-[#2C2C2C]">0</span> / <span id="sett-admin-allowed" class="font-bold text-[#2C2C2C]">3</span></span>
+          </div>
+          <div class="flex items-center gap-3">
+            <button type="button" id="sett-admin-dec" onclick="stepSettingsAdminLimit(-1)" class="w-8 h-8 rounded border border-[#E1DFE2] flex items-center justify-center font-bold text-sm cursor-pointer hover:bg-[#F6F3F2]">-</button>
+            <span id="sett-admin-limit-val" class="font-mono font-bold text-sm w-8 text-center">3</span>
+            <input type="hidden" id="sett-admin-limit" value="3"/>
+            <button type="button" id="sett-admin-inc" onclick="stepSettingsAdminLimit(1)" class="w-8 h-8 rounded border border-[#E1DFE2] flex items-center justify-center font-bold text-sm cursor-pointer hover:bg-[#F6F3F2]">+</button>
+          </div>
+          <p class="text-[11px] text-[#587D90] mt-1.5">Configure maximum admins the Host can appoint (min 1, max 20). Cannot be reduced below the current number of appointed admins.</p>
+          <p id="sett-admin-hint" class="text-[11px] text-amber-700 mt-1 hidden">Only the Suite Host can modify the Admin limit.</p>
         </div>
       </div>
       <div class="modal-footer">

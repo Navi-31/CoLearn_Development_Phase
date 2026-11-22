@@ -276,6 +276,7 @@ async function confirmRemoveMember() {
 
 /* ══ API Action Wrappers ═════════════════════════════════════ */
 async function _cmPromoteAdmin(memberId, memberName) {
+  if (!confirm('Promote ' + memberName + ' to Suite Admin?')) return;
   var suite = window.AppState && window.AppState.currentSuite;
   if (!suite || !suite.id) return;
   try {
@@ -310,6 +311,7 @@ async function _cmPromoteAdmin(memberId, memberName) {
 }
 
 async function _cmDemoteAdmin(memberId, memberName) {
+  if (!confirm('Demote ' + memberName + ' from Admin to Member?')) return;
   var suite = window.AppState && window.AppState.currentSuite;
   if (!suite || !suite.id) return;
   try {

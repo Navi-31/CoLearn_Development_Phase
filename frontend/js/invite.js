@@ -38,8 +38,11 @@ async function showInviteModal() {
     return;
   }
 
-  // Only the host can generate invites
-  if (suite.ownerUid && suite.ownerUid !== user.uid) {
+  // Only the host or admins can generate invites
+  const isHost = Boolean(suite.ownerUid === user.uid || suite.hostUid === user.uid);
+  const adminUids = Array.isArray(suite.adminUids) ? suite.adminUids : [];
+  const isAdmin = !isHost && adminUids.includes(user.uid);
+  if (!isHost && !isAdmin) {
     _setInviteModalState('not-host');
     return;
   }
@@ -111,7 +114,7 @@ function _setInviteModalState(state, code, link, errorMsg) {
       if (emailForm)  emailForm.style.display   = 'block';
       if (alertEl) {
         alertEl.className   = 'alert-error';
-        alertEl.textContent = 'Only the Suite Host can send invitations.';
+        alertEl.textContent = 'Only the Suite Host or Admins can send invitations.';
         alertEl.style.display = 'block';
       }
       if (sendBtn) sendBtn.disabled = true;
@@ -682,8 +685,13 @@ function getSseListenerInfo() {
           ? `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--fl-green, #16a34a);margin-right:4px;"></span> <span style="color:var(--fl-green, #16a34a);font-weight:600;">Online</span>`
           : `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--fl-text-muted, #94a3b8);margin-right:4px;"></span> <span style="color:var(--fl-text-muted, #64748b);">Offline</span>`;
 
-        if (m.isHost) badges += ` <span style="background:var(--fl-accent-bg);color:var(--fl-accent-dark);padding:2px 6px;border-radius:4px;font-size:0.65rem;margin-left:4px;font-weight:700;">HOST</span>`;
-        if (m.isAdmin) badges += ` <span style="background:var(--fl-yellow-bg);color:var(--fl-yellow);padding:2px 6px;border-radius:4px;font-size:0.65rem;margin-left:4px;font-weight:700;">ADMIN</span>`;
+        if (m.isHost) {
+          badges += ` <span style="background:var(--fl-accent-bg);color:var(--fl-accent-dark);padding:2px 6px;border-radius:4px;font-size:0.65rem;margin-left:4px;font-weight:700;">HOST</span>`;
+        } else if (m.isAdmin) {
+          badges += ` <span style="background:var(--fl-yellow-bg);color:var(--fl-yellow);padding:2px 6px;border-radius:4px;font-size:0.65rem;margin-left:4px;font-weight:700;">ADMIN</span>`;
+        } else {
+          badges += ` <span style="background:#f1f5f9;color:#475569;padding:2px 6px;border-radius:4px;font-size:0.65rem;margin-left:4px;font-weight:600;">MEMBER</span>`;
+        }
 
         return `
           <div class="member-card" data-uid="${escapeHtml(m.uid || '')}" data-name="${escapeHtml(m.name || '')}" data-online="${isOnline ? '1' : '0'}" data-host="${m.isHost ? '1' : '0'}" style="animation:fadeIn 0.3s ease;display:flex;align-items:center;gap:0.75rem;padding:0.75rem 1rem;border-bottom:1px solid var(--fl-border);cursor:context-menu;">
@@ -706,14 +714,28 @@ function getSseListenerInfo() {
       memberGrid.innerHTML = displayMembers.map((m, i) => {
         const bgStyle = avatarColorsGrid[i % avatarColorsGrid.length] || '';
         const isOnline = !!(presenceMap[m.uid] && presenceMap[m.uid].online) || (isSelfInActiveSuite && m.uid === currentUid);
-        return `<div class="member-card" data-uid="${escapeHtml(m.uid || '')}" data-name="${escapeHtml(m.name || '')}" data-online="${isOnline ? '1' : '0'}" data-host="${m.isHost ? '1' : '0'}" style="background:var(--c-lightgray);border-radius:9px;padding:0.6rem 0.8rem;font-size:0.85rem;color:var(--c-charcoal);animation:fadeIn 0.3s ease;cursor:context-menu;">
+          const roleLabel = m.isHost ? 'Host' : (m.isAdmin ? 'Admin' : 'Member');
+          return `<div class="member-card" data-uid="${escapeHtml(m.uid || '')}" data-name="${escapeHtml(m.name || '')}" data-online="${isOnline ? '1' : '0'}" data-host="${m.isHost ? '1' : '0'}" style="background:var(--c-lightgray);border-radius:9px;padding:0.6rem 0.8rem;font-size:0.85rem;color:var(--c-charcoal);animation:fadeIn 0.3s ease;cursor:context-menu;">
           <div style="display:flex;align-items:center;justify-content:space-between;">
             <span style="font-weight:600;">${escapeHtml(m.name || 'Unknown')}</span>
             <span style="font-size:0.72rem;font-weight:600;color:${isOnline ? 'var(--fl-green, #16a34a)' : 'var(--fl-text-muted, #64748b)'};">${isOnline ? '● Online' : '○ Offline'}</span>
           </div>
-          <span style="color:var(--c-slate);font-size:0.78rem;">${m.username ? '@' + escapeHtml(m.username) : ''}${m.isHost ? ' · Host' : ' · Member'}</span>
+          <span style="color:var(--c-slate);font-size:0.78rem;">${m.username ? '@' + escapeHtml(m.username) : ''} · ${roleLabel}</span>
         </div>`;
       }).join('');
+    }
+
+    // Toggle "+ Invite Peers" button visibility (Host and Admins only)
+    const activeSuite = AppState.currentSuite;
+    const activeUser  = AppState.currentUser;
+    const isHostOrAdmin = Boolean(activeUser && activeSuite && (
+      activeSuite.hostUid === activeUser.uid ||
+      activeSuite.ownerUid === activeUser.uid ||
+      (Array.isArray(activeSuite.adminUids) && activeSuite.adminUids.includes(activeUser.uid))
+    ));
+    const sidebarInviteBtn = document.getElementById('btn-sidebar-invite');
+    if (sidebarInviteBtn) {
+      sidebarInviteBtn.style.display = isHostOrAdmin ? '' : 'none';
     }
 
     if (typeof window._patchMemberCards === 'function') {
