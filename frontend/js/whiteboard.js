@@ -285,6 +285,11 @@ function setWBTool(tool) {
     if (btn) btn.classList.toggle('active', tool === t);
   });
 
+  const dfSelectBtn = document.getElementById('df-btn-mode-select');
+  if (dfSelectBtn) {
+    dfSelectBtn.classList.toggle('active', tool === 'flowchart' && _drawflowMode === 'select');
+  }
+
   const dfEl = document.getElementById('drawflow');
   const dfToolbar = document.getElementById('wb-flowchart-toolbar');
 
@@ -679,8 +684,18 @@ function loadDrawflowForPage(pageIndex) {
 /**
  * Add a node to Drawflow (Start/End, Process, Decision)
  */
-function addDrawflowNode(type) {
-  if (!_drawflowEditor) return;
+async function addDrawflowNode(type) {
+  if (!_drawflowEditor) {
+    try { await initDrawflowEditor(); } catch (_) {}
+  }
+
+  if (!_drawflowEditor) {
+    // Graceful fallback to SVG flowchart node if Drawflow CDN is unavailable
+    const typeMap = { start_end: 'fc-start', process: 'fc-process', decision: 'fc-decision' };
+    const rect = wbCanvas ? wbCanvas.getBoundingClientRect() : { width: 800, height: 600 };
+    _handleFlowchartPlacement({ x: 800, y: 600 }, typeMap[type] || 'fc-process');
+    return;
+  }
 
   const rect = wbCanvas ? wbCanvas.getBoundingClientRect() : { width: 800, height: 600 };
   const centerX = Math.round(rect.width / 2) - 70;
@@ -925,6 +940,8 @@ function _renderFlowchartNodes() {
       selectedNodeId = node.id;
       selectedTextId = null;
       selectedConnectorId = null;
+      document.querySelectorAll('.wb-fc-node.selected').forEach(n => n.classList.remove('selected'));
+      el.classList.add('selected');
       _initObjectDrag(node, true, e);
     });
 
@@ -1166,6 +1183,7 @@ function _pushWBUndo() {
       textObjects: JSON.parse(JSON.stringify(page.textObjects || [])),
       flowchartNodes: JSON.parse(JSON.stringify(page.flowchartNodes || [])),
       flowchartConnectors: JSON.parse(JSON.stringify(page.flowchartConnectors || [])),
+      drawflowData: page.drawflowData ? JSON.parse(JSON.stringify(page.drawflowData)) : null,
     };
     page.undoStack.push(JSON.stringify(stateObj));
     if (page.undoStack.length > 30) page.undoStack.shift();
@@ -1186,6 +1204,7 @@ function wbUndo() {
       textObjects: JSON.parse(JSON.stringify(page.textObjects || [])),
       flowchartNodes: JSON.parse(JSON.stringify(page.flowchartNodes || [])),
       flowchartConnectors: JSON.parse(JSON.stringify(page.flowchartConnectors || [])),
+      drawflowData: page.drawflowData ? JSON.parse(JSON.stringify(page.drawflowData)) : null,
     };
     page.redoStack.push(JSON.stringify(currentState));
 
@@ -1193,6 +1212,14 @@ function wbUndo() {
     page.textObjects         = prevState.textObjects || [];
     page.flowchartNodes      = prevState.flowchartNodes || [];
     page.flowchartConnectors = prevState.flowchartConnectors || [];
+    page.drawflowData        = prevState.drawflowData || null;
+
+    if (_drawflowEditor) {
+      _drawflowEditor.clearModuleSelected();
+      if (page.drawflowData && page.drawflowData.drawflow) {
+        try { _drawflowEditor.import(page.drawflowData); } catch (_) {}
+      }
+    }
 
     const img = new Image();
     img.onload = function() {
@@ -1221,6 +1248,7 @@ function wbRedo() {
       textObjects: JSON.parse(JSON.stringify(page.textObjects || [])),
       flowchartNodes: JSON.parse(JSON.stringify(page.flowchartNodes || [])),
       flowchartConnectors: JSON.parse(JSON.stringify(page.flowchartConnectors || [])),
+      drawflowData: page.drawflowData ? JSON.parse(JSON.stringify(page.drawflowData)) : null,
     };
     page.undoStack.push(JSON.stringify(currentState));
 
@@ -1228,6 +1256,14 @@ function wbRedo() {
     page.textObjects         = nextState.textObjects || [];
     page.flowchartNodes      = nextState.flowchartNodes || [];
     page.flowchartConnectors = nextState.flowchartConnectors || [];
+    page.drawflowData        = nextState.drawflowData || null;
+
+    if (_drawflowEditor) {
+      _drawflowEditor.clearModuleSelected();
+      if (page.drawflowData && page.drawflowData.drawflow) {
+        try { _drawflowEditor.import(page.drawflowData); } catch (_) {}
+      }
+    }
 
     const img = new Image();
     img.onload = function() {
@@ -1248,9 +1284,10 @@ function wbRedo() {
    ═══════════════════════════════════════════════════════════════ */
 
 function _saveCurrentPage() {
-  if (!wbCanvas || !wbPages[wbPageIndex]) return;
+  if (!wbPages[wbPageIndex]) return;
   try {
-    wbPages[wbPageIndex].dataUrl = wbCanvas.toDataURL('image/png');
+    if (wbCanvas) wbPages[wbPageIndex].dataUrl = wbCanvas.toDataURL('image/png');
+    if (_drawflowEditor) wbPages[wbPageIndex].drawflowData = _drawflowEditor.export();
   } catch (_) {}
 }
 
@@ -1312,6 +1349,10 @@ function wbAction(action) {
         wbPages[wbPageIndex].textObjects = [];
         wbPages[wbPageIndex].flowchartNodes = [];
         wbPages[wbPageIndex].flowchartConnectors = [];
+        wbPages[wbPageIndex].drawflowData = null;
+      }
+      if (_drawflowEditor) {
+        try { _drawflowEditor.clearModuleSelected(); } catch (_) {}
       }
       _saveCurrentPage();
       _renderObjectLayer();
@@ -1396,12 +1437,15 @@ function _renderCombinedPageCanvas(pageIndex) {
   expCtx.fillRect(0, 0, 1600, 1200);
 
   const page = wbPages[pageIndex];
-  if (page && page.dataUrl) {
+  if (pageIndex === wbPageIndex && wbCanvas) {
+    try { expCtx.drawImage(wbCanvas, 0, 0, 1600, 1200); } catch (_) {}
+    if (_drawflowEditor && page) {
+      try { page.drawflowData = _drawflowEditor.export(); } catch (_) {}
+    }
+  } else if (page && page.dataUrl) {
     const img = new Image();
     img.src = page.dataUrl;
     try { expCtx.drawImage(img, 0, 0, 1600, 1200); } catch (_) {}
-  } else if (pageIndex === wbPageIndex && wbCanvas) {
-    try { expCtx.drawImage(wbCanvas, 0, 0, 1600, 1200); } catch (_) {}
   }
 
   // Prepare flowchart nodes and connectors (supports both SVG flowchart layers and Drawflow models)
@@ -1879,6 +1923,28 @@ function _setupWBShortcuts() {
           return;
         }
       }
+      if (_drawflowEditor && _drawflowEditor.node_selected) {
+        const idStr = _drawflowEditor.node_selected.id.replace('node-', '');
+        const dfNode = _drawflowEditor.drawflow.drawflow.Home.data[idStr];
+        if (dfNode) {
+          _wbClipboard = {
+            type: 'drawflow',
+            data: {
+              name: dfNode.name,
+              inputs: Object.keys(dfNode.inputs || {}).length,
+              outputs: Object.keys(dfNode.outputs || {}).length,
+              class: dfNode.class,
+              data: JSON.parse(JSON.stringify(dfNode.data || {})),
+              html: dfNode.html,
+              pos_x: (dfNode.pos_x || 100) + 30,
+              pos_y: (dfNode.pos_y || 100) + 30,
+            }
+          };
+          e.preventDefault();
+          e.stopPropagation();
+          return;
+        }
+      }
     }
 
     // Ctrl+V / Cmd+V -> Paste selected text or node
@@ -1919,6 +1985,17 @@ function _setupWBShortcuts() {
           _pushWBUndo();
           _renderObjectLayer();
           _syncWBToRemote();
+          return;
+        }
+
+        if (_wbClipboard.type === 'drawflow' && _drawflowEditor) {
+          e.preventDefault();
+          e.stopPropagation();
+          const d = _wbClipboard.data;
+          _drawflowEditor.addNode(d.name, d.inputs, d.outputs, d.pos_x, d.pos_y, d.class, JSON.parse(JSON.stringify(d.data)), d.html);
+          _wbClipboard.data.pos_x += 20;
+          _wbClipboard.data.pos_y += 20;
+          _saveAndSyncDrawflow();
           return;
         }
       }
@@ -1964,6 +2041,26 @@ function _setupWBShortcuts() {
             _pushWBUndo();
             _renderObjectLayer();
             _syncWBToRemote();
+            return;
+          }
+        }
+        if (_drawflowEditor && _drawflowEditor.node_selected) {
+          const idStr = _drawflowEditor.node_selected.id.replace('node-', '');
+          const dfNode = _drawflowEditor.drawflow.drawflow.Home.data[idStr];
+          if (dfNode) {
+            e.preventDefault();
+            e.stopPropagation();
+            _drawflowEditor.addNode(
+              dfNode.name,
+              Object.keys(dfNode.inputs || {}).length,
+              Object.keys(dfNode.outputs || {}).length,
+              (dfNode.pos_x || 100) + 30,
+              (dfNode.pos_y || 100) + 30,
+              dfNode.class,
+              JSON.parse(JSON.stringify(dfNode.data || {})),
+              dfNode.html
+            );
+            _saveAndSyncDrawflow();
             return;
           }
         }
@@ -2097,6 +2194,7 @@ function initWhiteboardAutoHide() {
 }
 
 function cleanupWhiteboardAutoHide() {
+  _saveCurrentPage();
   _wbAutoHideActive = false;
   if (_wbAutoHideTimer) {
     clearTimeout(_wbAutoHideTimer);
