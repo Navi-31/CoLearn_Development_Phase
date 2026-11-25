@@ -33,6 +33,9 @@
   },
   "homepage": "https://github.com/Navi-31/CoLearn_Development_Phase#readme",
   "license": "MIT",
+  "engines": {
+    "node": ">=20.19.0"
+  },
   "dependencies": {
     "jsdom": "^29.1.1"
   }

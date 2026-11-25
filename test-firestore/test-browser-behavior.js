@@ -143,37 +143,37 @@ function runBrowserBehaviorTest() {
   window.showMemberContextMenu({ clientX: 100, clientY: 100 }, 'uid_member_charlie', 'Charlie Member');
   let buttons = getMenuButtons();
   console.log('HOST -> MEMBER buttons:', buttons);
-  assert.deepStrictEqual(buttons, ['👁️ VIEW DETAILS', '🛡️ PROMOTE', '💬 CHAT', '🚫 REMOVE']);
-  console.log('[PASS] HOST -> MEMBER: View Details, Promote, Chat, Remove');
+  assert.deepStrictEqual(buttons, ['🛡️ Promote to Admin', '💬 Private Chat', '🚫 Remove Member']);
+  console.log('[PASS] HOST -> MEMBER: Promote to Admin, Private Chat, Remove Member');
 
   // 2. HOST -> ADMIN (Bob)
   window.showMemberContextMenu({ clientX: 100, clientY: 100 }, 'uid_admin_bob', 'Bob Admin');
   buttons = getMenuButtons();
   console.log('HOST -> ADMIN buttons:', buttons);
-  assert.deepStrictEqual(buttons, ['👁️ VIEW DETAILS', '⏬ DEMOTE', '💬 CHAT', '🚫 REMOVE']);
-  console.log('[PASS] HOST -> ADMIN: View Details, Demote, Chat, Remove');
+  assert.deepStrictEqual(buttons, ['⏬ Demote to Member', '💬 Private Chat', '🚫 Remove Admin']);
+  console.log('[PASS] HOST -> ADMIN: Demote to Member, Private Chat, Remove Admin');
 
   // 3. HOST -> self (Host)
   window.showMemberContextMenu({ clientX: 100, clientY: 100 }, 'uid_host', 'Host');
   buttons = getMenuButtons();
   console.log('HOST -> self buttons:', buttons);
-  assert.deepStrictEqual(buttons, ['👁️ VIEW DETAILS', '(That\'s you)']);
-  console.log('[PASS] HOST -> self: View Details');
+  assert.deepStrictEqual(buttons, ['👁️ View Profile', '(That\'s you)']);
+  console.log('[PASS] HOST -> self: View Profile');
 
   // 4. ADMIN (Bob) -> MEMBER (Charlie)
   window.AppState.currentUser = { uid: 'uid_admin_bob', name: 'Bob Admin' };
   window.showMemberContextMenu({ clientX: 100, clientY: 100 }, 'uid_member_charlie', 'Charlie Member');
   buttons = getMenuButtons();
   console.log('ADMIN -> MEMBER buttons:', buttons);
-  assert.deepStrictEqual(buttons, ['👁️ VIEW DETAILS', '💬 CHAT', '🚫 REMOVE']);
-  console.log('[PASS] ADMIN -> MEMBER: View Details, Chat, Remove');
+  assert.deepStrictEqual(buttons, ['💬 Private Chat', '🚫 Remove Member']);
+  console.log('[PASS] ADMIN -> MEMBER: Private Chat, Remove Member');
 
   // 5. ADMIN (Bob) -> HOST (Host)
   window.showMemberContextMenu({ clientX: 100, clientY: 100 }, 'uid_host', 'Host');
   buttons = getMenuButtons();
   console.log('ADMIN -> HOST buttons:', buttons);
-  assert.deepStrictEqual(buttons, ['👁️ VIEW DETAILS', '💬 CHAT']);
-  console.log('[PASS] ADMIN -> HOST: View Details, Chat');
+  assert.deepStrictEqual(buttons, ['💬 Private Chat']);
+  console.log('[PASS] ADMIN -> HOST: Private Chat');
 
   // Add a second admin Dan to test ADMIN -> ADMIN
   window.AppState.currentSuite.adminUids.push('uid_admin_dan');
@@ -185,30 +185,30 @@ function runBrowserBehaviorTest() {
   window.showMemberContextMenu({ clientX: 100, clientY: 100 }, 'uid_admin_dan', 'Dan Admin');
   buttons = getMenuButtons();
   console.log('ADMIN -> ADMIN buttons:', buttons);
-  assert.deepStrictEqual(buttons, ['👁️ VIEW DETAILS', '💬 CHAT']);
-  console.log('[PASS] ADMIN -> ADMIN: View Details, Chat');
+  assert.deepStrictEqual(buttons, ['💬 Private Chat']);
+  console.log('[PASS] ADMIN -> ADMIN: Private Chat');
 
   // 7. ADMIN (Bob) -> self (Bob)
   window.showMemberContextMenu({ clientX: 100, clientY: 100 }, 'uid_admin_bob', 'Bob Admin');
   buttons = getMenuButtons();
   console.log('ADMIN -> self buttons:', buttons);
-  assert.deepStrictEqual(buttons, ['👁️ VIEW DETAILS', '(That\'s you)']);
-  console.log('[PASS] ADMIN -> self: View Details');
+  assert.deepStrictEqual(buttons, ['👁️ View Profile', '(That\'s you)']);
+  console.log('[PASS] ADMIN -> self: View Profile');
 
   // 8. MEMBER (Charlie) -> others (Bob Admin)
   window.AppState.currentUser = { uid: 'uid_member_charlie', name: 'Charlie Member' };
   window.showMemberContextMenu({ clientX: 100, clientY: 100 }, 'uid_admin_bob', 'Bob Admin');
   buttons = getMenuButtons();
   console.log('MEMBER -> others buttons:', buttons);
-  assert.deepStrictEqual(buttons, ['👁️ VIEW DETAILS', '💬 CHAT']);
-  console.log('[PASS] MEMBER -> others: View Details, Chat');
+  assert.deepStrictEqual(buttons, ['💬 Private Chat']);
+  console.log('[PASS] MEMBER -> others: Private Chat');
 
   // 9. MEMBER (Charlie) -> self (Charlie)
   window.showMemberContextMenu({ clientX: 100, clientY: 100 }, 'uid_member_charlie', 'Charlie Member');
   buttons = getMenuButtons();
   console.log('MEMBER -> self buttons:', buttons);
-  assert.deepStrictEqual(buttons, ['👁️ VIEW DETAILS', '(That\'s you)']);
-  console.log('[PASS] MEMBER -> self: View Details');
+  assert.deepStrictEqual(buttons, ['👁️ View Profile', '(That\'s you)']);
+  console.log('[PASS] MEMBER -> self: View Profile');
 
   // 10. Admin Limit check: HOST -> MEMBER when admin limit is reached
   window.AppState.currentUser = { uid: 'uid_host', name: 'Host' };
